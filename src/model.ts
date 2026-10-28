@@ -14,7 +14,11 @@ export type Plan = {budget:number; limits:Record<Category,number>};
 export type Transaction = {id:string;date:string;kind:'expense'|'topup'|'wash';category:Category;amount:number;currency:'EUR'|'CZK';rate:number;eur:number;credit:number;note:string};
 export type Data = {version:1;settings:{start:string;end:string;rate:number|null;openingCard:number;openingTravel:number;openingEmergency:number};plans:Record<string,Plan>;transactions:Transaction[]};
 export const defaultPlan = ():Plan => ({budget:55000,limits:Object.fromEntries(categories.map(c=>[c.id,c.limit])) as Plan['limits']});
-export const freshData = ():Data => ({version:1,settings:{start:'2026-11',end:'2027-01',rate:null,openingCard:0,openingTravel:0,openingEmergency:0},plans:{'2026-11':defaultPlan()},transactions:[]});
+export const octoberPlan = ():Plan => {const limits=Object.fromEntries(categories.map(c=>[c.id,Math.round(c.limit*7/31)])) as Plan['limits'];return {budget:Object.values(limits).reduce((a,b)=>a+b,0),limits};};
+export function includeOctober(d:Data):Data {return d.settings.start==='2026-11'?{...d,settings:{...d.settings,start:'2026-10'},plans:{'2026-10':octoberPlan(),...d.plans}}:d;}
+export const periodStart=(d:Data,m:string)=>m==='2026-10'&&d.settings.start===m?m+'-25':m+'-01';
+export const periodDays=(d:Data,m:string)=>lastDay(m)-Number(periodStart(d,m).slice(8))+1;
+export const freshData = ():Data => ({version:1,settings:{start:'2026-10',end:'2027-01',rate:null,openingCard:0,openingTravel:0,openingEmergency:0},plans:{'2026-10':octoberPlan(),'2026-11':defaultPlan()},transactions:[]});
 export const money = (cents:number,currency='EUR') => new Intl.NumberFormat('en-IE',{style:'currency',currency,maximumFractionDigits:2}).format(cents/100);
 export const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export function monthLabel(m:string){return new Date(m+'-15T12:00:00').toLocaleDateString('en-GB',{month:'long',year:'numeric'});}
@@ -22,15 +26,15 @@ export function months(start:string,end:string){const result:string[]=[];let [y,
 export const lastDay = (m:string) => new Date(Number(m.slice(0,4)),Number(m.slice(5)),0).getDate();
 export const monthEnd = (m:string) => `${m}-${lastDay(m)}`;
 export function planFor(d:Data,m:string):Plan {const key=Object.keys(d.plans).filter(k=>k<=m).sort().at(-1);return key?d.plans[key]:defaultPlan();}
-export function weeks(m:string){const n=lastDay(m);const out:{start:string;end:string;days:number}[]=[];let day=1;while(day<=n){const dow=new Date(`${m}-${String(day).padStart(2,'0')}T12:00:00`).getDay();const end=Math.min(n,day+(7-(dow||7)));out.push({start:`${m}-${String(day).padStart(2,'0')}`,end:`${m}-${String(end).padStart(2,'0')}`,days:end-day+1});day=end+1;}return out;}
+export function weeks(m:string,d?:Data){const n=lastDay(m);const out:{start:string;end:string;days:number}[]=[];let day=d?Number(periodStart(d,m).slice(8)):1;while(day<=n){const dow=new Date(`${m}-${String(day).padStart(2,'0')}T12:00:00`).getDay();const end=Math.min(n,day+(7-(dow||7)));out.push({start:`${m}-${String(day).padStart(2,'0')}`,end:`${m}-${String(end).padStart(2,'0')}`,days:end-day+1});day=end+1;}return out;}
 export function summary(d:Data,m:string,range?:{start:string;end:string;days:number}){
- const start=range?.start??m+'-01',end=range?.end??monthEnd(m),p=planFor(d,m);
+ const start=range?.start??periodStart(d,m),end=range?.end??monthEnd(m),p=planFor(d,m);
  const rows=d.transactions.filter(t=>t.date>=start&&t.date<=end);
  const spent=Object.fromEntries(categories.map(c=>[c.id,rows.filter(t=>t.category===c.id&&t.kind!=='wash').reduce((s,t)=>s+t.eur,0)])) as Record<Category,number>;
  const fund=(category:'travel'|'emergency')=>(category==='travel'?d.settings.openingTravel:d.settings.openingEmergency)+months(d.settings.start,m<d.settings.end?m:d.settings.end).reduce((s,month)=>s+planFor(d,month).limits[category],0)-d.transactions.filter(t=>t.date<=end&&t.category===category&&t.kind==='expense').reduce((s,t)=>s+t.eur,0);
  const card=d.settings.openingCard+d.transactions.filter(t=>t.date<=end).reduce((s,t)=>s+(t.kind==='topup'?t.credit:t.kind==='wash'?-t.credit:0),0);
  const cash=Object.values(spent).reduce((a,b)=>a+b,0);
- const fraction=range?range.days/lastDay(m):1;
+ const fraction=range?range.days/periodDays(d,m):1;
  const everyday=categories.filter(c=>!['travel','emergency'].includes(c.id)).reduce((s,c)=>s+spent[c.id],0);
  return {rows,spent,cash,card,travel:fund('travel'),emergency:fund('emergency'),wash:rows.filter(t=>t.kind==='wash').reduce((s,t)=>s+t.credit,0),everydayRemaining:Math.round((p.budget-p.limits.travel-p.limits.emergency)*fraction)-everyday,budget:Math.round(p.budget*fraction)};
 }

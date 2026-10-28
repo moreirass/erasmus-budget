@@ -1,7 +1,8 @@
 import {describe,it} from 'node:test';
 import assert from 'node:assert/strict';
-import {freshData,makeTransaction,summary,validateData,planFor,weeks,type Transaction} from './model.ts';
+import {freshData as actualFreshData,makeTransaction,summary,validateData,planFor,weeks,type Transaction} from './model.ts';
 import {importCSV,toCSV} from './transfer.ts';
+const freshData=()=>{const d=actualFreshData();d.settings.start='2026-11';delete d.plans['2026-10'];return d;};
 const tx=(overrides:Partial<Transaction>={})=>makeTransaction({id:crypto.randomUUID(),date:'2026-11-03',kind:'expense',category:'groceries',amount:25000,currency:'CZK',rate:25,note:'',...overrides});
 describe('accounting and backups',()=>{
  it('starts empty with the correct budget',()=>{const d=freshData(),s=summary(d,'2026-11');assert.deepEqual(d.transactions,[]);assert.equal(s.cash,0);assert.equal(s.card,0);assert.equal(s.travel,15000);assert.equal(s.emergency,3000);assert.equal(s.everydayRemaining,37000);});
@@ -17,3 +18,5 @@ describe('accounting and backups',()=>{
  it('deduplicates identical CSV and rejects changed duplicate IDs',()=>{const d=freshData();d.transactions=[tx()];assert.equal(importCSV(toCSV(d),d).transactions.length,1);const other=structuredClone(d);other.transactions[0].note='different';assert.throws(()=>importCSV(toCSV(other),d),/existing ID/);});
  it('rejects unsupported backups, CSV and rates',()=>{assert.throws(()=>validateData({version:2}));assert.throws(()=>importCSV('bad,headers',freshData()));const d=freshData();d.transactions=[tx({rate:0})];assert.throws(()=>validateData(d));});
 });
+
+it('includes seven October days and preserves November',()=>{const d=actualFreshData();assert.equal(weeks('2026-10',d).reduce((n,w)=>n+w.days,0),7);assert.equal(planFor(d,'2026-11').budget,55000);assert.equal(summary(d,'2026-10').travel,Math.round(15000*7/31));});
