@@ -26,3 +26,5 @@
 [data-theme=dark] .form-error,[data-theme=dark] .notice.error{background:#452c26;color:#ffbca4;border-color:#805343}
 @media(max-width:820px){.hero-grid{grid-template-columns:1fr 1fr}.category-label{align-items:flex-start}}
 @media(max-width:560px){.header-actions{gap:5px}.breadcrumb{font-size:11px;letter-spacing:0}.breadcrumb span{margin:0 5px}.location{display:none}.mini-card .tiny{font-size:11px}.category-label{flex-wrap:wrap}.transaction{flex-wrap:wrap}.transaction-description{min-width:110px}.transaction-tools{flex-wrap:wrap}.under-hero{font-size:12px}.sidebar nav button{font-size:11px}.form-grid{grid-template-columns:1fr}.mini-footer{flex-wrap:wrap}.bar-chart{gap:6px}.bar-column>span{font-size:10px}.category-list{gap:24px}.brand small{font-size:10px}}
+
+.transaction-kinds{flex-wrap:wrap}.transaction-kinds>button{flex:1 1 40%!important}

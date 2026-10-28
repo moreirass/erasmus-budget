@@ -30,3 +30,10 @@ it('applies global limits to all months and prorates October once',()=>{
  assert.deepEqual(globalPlan(next),p);assert.deepEqual(applyGlobalPlan(next,p),next);
  assert.deepEqual(next.transactions,d.transactions);
 });
+
+it('support increases available category money without becoming spending or card credit',()=>{
+ const d=freshData();d.transactions=[tx({kind:'income',amount:5000,currency:'EUR',category:'groceries'}),tx({kind:'income',amount:2000,currency:'EUR',category:'travel'}),tx({kind:'income',amount:1000,currency:'EUR',category:'laundry'})];
+ validateData(d);const s=summary(d,'2026-11');assert.equal(s.cash,0);assert.equal(s.card,0);assert.equal(s.income,8000);assert.equal(s.everydayRemaining,43000);assert.equal(s.travel,17000);assert.equal(summary(d,'2026-12').travel,32000);assert.equal(s.received.groceries,5000);
+ assert.deepEqual(importCSV(toCSV(d),freshData()).transactions,d.transactions);
+ d.transactions=[];assert.equal(summary(d,'2026-11').income,0);
+});

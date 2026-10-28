@@ -11,7 +11,7 @@ export const categories = [
 ] as const;
 export type Category = typeof categories[number]['id'];
 export type Plan = {budget:number; limits:Record<Category,number>};
-export type Transaction = {id:string;date:string;kind:'expense'|'topup'|'wash';category:Category;amount:number;currency:'EUR'|'CZK';rate:number;eur:number;credit:number;note:string};
+export type Transaction = {id:string;date:string;kind:'expense'|'topup'|'wash'|'income';category:Category;amount:number;currency:'EUR'|'CZK';rate:number;eur:number;credit:number;note:string};
 export type Data = {version:1;settings:{start:string;end:string;rate:number|null;openingCard:number;openingTravel:number;openingEmergency:number};plans:Record<string,Plan>;transactions:Transaction[]};
 export const defaultPlan = ():Plan => ({budget:55000,limits:Object.fromEntries(categories.map(c=>[c.id,c.limit])) as Plan['limits']});
 export const octoberPlan = ():Plan => {const limits=Object.fromEntries(categories.map(c=>[c.id,Math.round(c.limit*7/31)])) as Plan['limits'];return {budget:Object.values(limits).reduce((a,b)=>a+b,0),limits};};
@@ -30,17 +30,19 @@ export function weeks(m:string,d?:Data){const n=lastDay(m);const out:{start:stri
 export function summary(d:Data,m:string,range?:{start:string;end:string;days:number}){
  const start=range?.start??periodStart(d,m),end=range?.end??monthEnd(m),p=planFor(d,m);
  const rows=d.transactions.filter(t=>t.date>=start&&t.date<=end);
- const spent=Object.fromEntries(categories.map(c=>[c.id,rows.filter(t=>t.category===c.id&&t.kind!=='wash').reduce((s,t)=>s+t.eur,0)])) as Record<Category,number>;
- const fund=(category:'travel'|'emergency')=>(category==='travel'?d.settings.openingTravel:d.settings.openingEmergency)+months(d.settings.start,m<d.settings.end?m:d.settings.end).reduce((s,month)=>s+planFor(d,month).limits[category],0)-d.transactions.filter(t=>t.date<=end&&t.category===category&&t.kind==='expense').reduce((s,t)=>s+t.eur,0);
+ const spent=Object.fromEntries(categories.map(c=>[c.id,rows.filter(t=>t.category===c.id&&(t.kind==='expense'||t.kind==='topup')).reduce((s,t)=>s+t.eur,0)])) as Record<Category,number>;
+ const received=Object.fromEntries(categories.map(c=>[c.id,rows.filter(t=>t.category===c.id&&t.kind==='income').reduce((s,t)=>s+t.eur,0)])) as Record<Category,number>;
+ const income=Object.values(received).reduce((a,b)=>a+b,0);
+ const fund=(category:'travel'|'emergency')=>(category==='travel'?d.settings.openingTravel:d.settings.openingEmergency)+d.transactions.filter(t=>t.date<=end&&t.category===category&&t.kind==='income').reduce((s,t)=>s+t.eur,0)+months(d.settings.start,m<d.settings.end?m:d.settings.end).reduce((s,month)=>s+planFor(d,month).limits[category],0)-d.transactions.filter(t=>t.date<=end&&t.category===category&&t.kind==='expense').reduce((s,t)=>s+t.eur,0);
  const card=d.settings.openingCard+d.transactions.filter(t=>t.date<=end).reduce((s,t)=>s+(t.kind==='topup'?t.credit:t.kind==='wash'?-t.credit:0),0);
  const cash=Object.values(spent).reduce((a,b)=>a+b,0);
  const fraction=range?range.days/periodDays(d,m):1;
  const everyday=categories.filter(c=>!['travel','emergency'].includes(c.id)).reduce((s,c)=>s+spent[c.id],0);
- return {rows,spent,cash,card,travel:fund('travel'),emergency:fund('emergency'),wash:rows.filter(t=>t.kind==='wash').reduce((s,t)=>s+t.credit,0),everydayRemaining:Math.round((p.budget-p.limits.travel-p.limits.emergency)*fraction)-everyday,budget:Math.round(p.budget*fraction)};
+ return {rows,spent,received,income,cash,card,travel:fund('travel'),emergency:fund('emergency'),wash:rows.filter(t=>t.kind==='wash').reduce((s,t)=>s+t.credit,0),everydayRemaining:Math.round((p.budget-p.limits.travel-p.limits.emergency)*fraction)-everyday+income-received.travel-received.emergency,budget:Math.round(p.budget*fraction)};
 }
 export function makeTransaction(input:Omit<Transaction,'eur'|'credit'>):Transaction {
  const eur=input.currency==='EUR'?input.amount:Math.round(input.amount/input.rate);
- const credit=input.kind==='expense'?0:input.currency==='CZK'?input.amount:Math.round(input.amount*input.rate);
+ const credit=(input.kind==='expense'||input.kind==='income')?0:input.currency==='CZK'?input.amount:Math.round(input.amount*input.rate);
  return {...input,eur,credit};
 }
 const monthValid=(s:unknown):s is string=>typeof s==='string'&&/^20\d{2}-(0[1-9]|1[0-2])$/.test(s);
@@ -63,8 +65,8 @@ export function validateData(value:unknown):Data {
  for(const t of d.transactions){
   if(!t||typeof t.id!=='string'||!t.id||t.id.length>100||ids.has(t.id))fail('Transactions need unique IDs.');ids.add(t.id);
   if(typeof t.date!=='string'||!/^20\d{2}-\d{2}-\d{2}$/.test(t.date)||!monthValid(t.date.slice(0,7))||Number(t.date.slice(8))<1||Number(t.date.slice(8))>lastDay(t.date.slice(0,7))||t.date<s.start+'-01'||t.date>monthEnd(s.end))fail('A transaction date falls outside the tracking period or is invalid.');
-  if(!['expense','topup','wash'].includes(t.kind)||!categories.some(c=>c.id===t.category)||!['EUR','CZK'].includes(t.currency)||!nonnegative(t.amount)||!t.amount||!Number.isFinite(t.rate)||t.rate<=0||t.rate>1000||typeof t.note!=='string'||t.note.length>500)fail('Invalid transaction fields.');
-  if((t.kind!=='expense'&&t.category!=='laundry')||(t.kind==='expense'&&t.category==='laundry'))fail('Laundry must be a top-up or wash.');
+  if(!['expense','topup','wash','income'].includes(t.kind)||!categories.some(c=>c.id===t.category)||!['EUR','CZK'].includes(t.currency)||!nonnegative(t.amount)||!t.amount||!Number.isFinite(t.rate)||t.rate<=0||t.rate>1000||typeof t.note!=='string'||t.note.length>500)fail('Invalid transaction fields.');
+  if(((t.kind==='topup'||t.kind==='wash')&&t.category!=='laundry')||(t.kind==='expense'&&t.category==='laundry'))fail('Laundry must be a top-up or wash.');
   const rebuilt=makeTransaction(t);
   if(!nonnegative(t.eur)||!nonnegative(t.credit)||t.eur!==rebuilt.eur||t.credit!==rebuilt.credit)fail('Transaction conversion does not match its saved rate.');
  }
