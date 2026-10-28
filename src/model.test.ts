@@ -1,6 +1,6 @@
 import {describe,it} from 'node:test';
 import assert from 'node:assert/strict';
-import {freshData as actualFreshData,makeTransaction,summary,validateData,planFor,weeks,type Transaction} from './model.ts';
+import {freshData as actualFreshData,makeTransaction,summary,validateData,applyGlobalPlan,globalPlan,planFor,weeks,type Transaction} from './model.ts';
 import {importCSV,toCSV} from './transfer.ts';
 const freshData=()=>{const d=actualFreshData();d.settings.start='2026-11';delete d.plans['2026-10'];return d;};
 const tx=(overrides:Partial<Transaction>={})=>makeTransaction({id:crypto.randomUUID(),date:'2026-11-03',kind:'expense',category:'groceries',amount:25000,currency:'CZK',rate:25,note:'',...overrides});
@@ -20,3 +20,13 @@ describe('accounting and backups',()=>{
 });
 
 it('includes seven October days and preserves November',()=>{const d=actualFreshData();assert.equal(weeks('2026-10',d).reduce((n,w)=>n+w.days,0),7);assert.equal(planFor(d,'2026-11').budget,55000);assert.equal(summary(d,'2026-10').travel,Math.round(15000*7/31));});
+
+it('applies global limits to all months and prorates October once',()=>{
+ const d=actualFreshData(),p=structuredClone(globalPlan(d));p.limits.groceries+=1000;p.limits.nightlife-=1000;
+ d.plans['2026-12']={...p,budget:1};
+ const next=applyGlobalPlan(d,p);
+ for(const m of ['2026-11','2026-12','2027-01'])assert.deepEqual(planFor(next,m),p);
+ assert.equal(planFor(next,'2026-10').limits.groceries,Math.round(p.limits.groceries*7/31));
+ assert.deepEqual(globalPlan(next),p);assert.deepEqual(applyGlobalPlan(next,p),next);
+ assert.deepEqual(next.transactions,d.transactions);
+});

@@ -73,3 +73,14 @@ export function validateData(value:unknown):Data {
  for(const t of [...d.transactions].sort((a,b)=>a.date.localeCompare(b.date)||(a.kind==='topup'?-1:1))){card+=t.kind==='topup'?t.credit:t.kind==='wash'?-t.credit:0;if(card<0)fail(`Laundry credit would be negative on ${t.date}. Add the missing top-up or opening credit first.`);}
  return structuredClone(d);
 }
+
+export const globalPlan = (d:Data):Plan => planFor(d,d.settings.start==='2026-10'?'2026-11':d.settings.start);
+export function applyGlobalPlan(d:Data,p:Plan):Data {
+ const plans:Record<string,Plan>={'2000-01':structuredClone(p)};
+ if(d.settings.start==='2026-10'){
+  const limits=Object.fromEntries(categories.map(c=>[c.id,Math.round(p.limits[c.id]*7/31)])) as Plan['limits'];
+  plans['2026-10']={budget:Object.values(limits).reduce((a,b)=>a+b,0),limits};
+  plans['2026-11']=structuredClone(p);
+ }
+ return validateData({...d,plans});
+}
