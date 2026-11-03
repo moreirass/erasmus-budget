@@ -1,3 +1,4 @@
+import {currencyFactor,validCurrency,validRate} from './fx.ts';
 export const categories = [
  {id:'groceries',name:'Groceries & hygiene',icon:'🥑',color:'#60886a',limit:10000},
  {id:'snacks',name:'Snacks & coffee',icon:'☕',color:'#c49b69',limit:4500},
@@ -11,7 +12,7 @@ export const travelTypes=[{id:'transport',name:'Transport',guide:6500},{id:'acco
 export type TravelType=typeof travelTypes[number]['id'];
 export type Category = typeof categories[number]['id'];
 export type Plan = {budget:number; limits:Record<Category,number>};
-export type Transaction = {id:string;date:string;kind:'expense'|'topup'|'wash'|'income';category:Category;amount:number;currency:'EUR'|'CZK';rate:number;eur:number;credit:number;note:string;travelType?:TravelType;legacyCategory?:string;addedOrder?:number};
+export type Transaction = {id:string;date:string;kind:'expense'|'topup'|'wash'|'income';category:Category;amount:number;currency:string;rate:number;eur:number;credit:number;note:string;travelType?:TravelType;legacyCategory?:string;addedOrder?:number;rateDate?:string;rateSource?:'Frankfurter'|'manual'};
 export type Data = {version:1;layoutVersion?:2;legacy?:{plans:unknown;openingTravel:number;openingEmergency:number};settings:{start:string;end:string;rate:number|null;openingCard:number;openingTravel:number;openingEmergency:number};plans:Record<string,Plan>;transactions:Transaction[]};
 export const defaultPlan = ():Plan => ({budget:55000,limits:Object.fromEntries(categories.map(c=>[c.id,c.limit])) as Plan['limits']});
 export const octoberPlan = ():Plan => {const limits=Object.fromEntries(categories.map(c=>[c.id,Math.round(c.limit*7/31)])) as Plan['limits'];return {budget:Object.values(limits).reduce((a,b)=>a+b,0),limits};};
@@ -19,7 +20,7 @@ export function includeOctober(d:Data):Data {return d.settings.start==='2026-11'
 export const periodStart=(d:Data,m:string)=>m==='2026-10'&&d.settings.start===m?m+'-25':m+'-01';
 export const periodDays=(d:Data,m:string)=>lastDay(m)-Number(periodStart(d,m).slice(8))+1;
 export const freshData = ():Data => ({version:1,layoutVersion:2,settings:{start:'2026-10',end:'2027-01',rate:null,openingCard:0,openingTravel:0,openingEmergency:0},plans:{'2026-10':octoberPlan(),'2026-11':defaultPlan()},transactions:[]});
-export const money = (cents:number,currency='EUR') => new Intl.NumberFormat('en-IE',{style:'currency',currency,maximumFractionDigits:2}).format(cents/100);
+export const money = (cents:number,currency='EUR') => new Intl.NumberFormat('en-IE',{style:'currency',currency,maximumFractionDigits:2}).format(cents/currencyFactor(currency));
 export const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export function monthLabel(m:string){return new Date(m+'-15T12:00:00').toLocaleDateString('en-GB',{month:'long',year:'numeric'});}
 export function months(start:string,end:string){const result:string[]=[];let [y,m]=start.split('-').map(Number);while(`${y}-${String(m).padStart(2,'0')}`<=end && result.length<120){result.push(`${y}-${String(m).padStart(2,'0')}`);if(++m>12){y++;m=1;}}return result;}
@@ -40,7 +41,7 @@ export function summary(d:Data,m:string,range?:{start:string;end:string;days:num
  return {rows,spent,received,income,cash,card,travel:Math.round(p.limits.travel*fraction)+received.travel-spent.travel,wash:rows.filter(t=>t.kind==='wash').reduce((s,t)=>s+t.credit,0),everydayRemaining:Math.round((p.budget-p.limits.travel)*fraction)-everyday+income-received.travel,budget:Math.round(p.budget*fraction)};
 }
 export function makeTransaction(input:Omit<Transaction,'eur'|'credit'>):Transaction {
- const eur=input.currency==='EUR'?input.amount:Math.round(input.amount/input.rate);
+ const eur=input.currency==='EUR'?input.amount:Math.round(input.amount/currencyFactor(input.currency)*100/input.rate);
  const credit=(input.kind==='expense'||input.kind==='income')?0:input.currency==='CZK'?input.amount:Math.round(input.amount*input.rate);
  return {...input,eur,credit};
 }
@@ -66,8 +67,11 @@ export function validateData(value:unknown):Data {
  for(const t of d.transactions){
   if(!t||typeof t.id!=='string'||!t.id||t.id.length>100||ids.has(t.id))fail('Transactions need unique IDs.');ids.add(t.id);
   if(typeof t.date!=='string'||!/^20\d{2}-\d{2}-\d{2}$/.test(t.date)||!monthValid(t.date.slice(0,7))||Number(t.date.slice(8))<1||Number(t.date.slice(8))>lastDay(t.date.slice(0,7))||t.date<s.start+'-01'||t.date>monthEnd(s.end))fail('A transaction date falls outside the tracking period or is invalid.');
-  if(!['expense','topup','wash','income'].includes(t.kind)||!categories.some(c=>c.id===t.category)||!['EUR','CZK'].includes(t.currency)||!nonnegative(t.amount)||!t.amount||!Number.isFinite(t.rate)||t.rate<=0||t.rate>1000||typeof t.note!=='string'||t.note.length>500)fail('Invalid transaction fields.');
+  if(!['expense','topup','wash','income'].includes(t.kind)||!categories.some(c=>c.id===t.category)||!validCurrency(t.currency)||!nonnegative(t.amount)||!t.amount||!validRate(t.rate)||typeof t.note!=='string'||t.note.length>500)fail('Invalid transaction fields.');
   if(((t.kind==='topup'||t.kind==='wash')&&t.category!=='laundry')||(t.kind==='expense'&&t.category==='laundry'))fail('Laundry must be a top-up or wash.');
+  if((t.kind==='topup'||t.kind==='wash')&&!['EUR','CZK'].includes(t.currency))fail('Laundry card entries use EUR or CZK.');
+  if(t.rateDate!==undefined&&!/^20\d{2}-\d{2}-\d{2}$/.test(t.rateDate))fail('Invalid rate date.');
+  if(t.rateSource!==undefined&&!['Frankfurter','manual'].includes(t.rateSource))fail('Invalid rate source.');
   if(t.travelType!==undefined&&(t.category!=='travel'||!travelTypes.some(x=>x.id===t.travelType)))fail('Invalid travel subcategory.');
   const rebuilt=makeTransaction(t);
   if(!nonnegative(t.eur)||!nonnegative(t.credit)||t.eur!==rebuilt.eur||t.credit!==rebuilt.credit)fail('Transaction conversion does not match its saved rate.');

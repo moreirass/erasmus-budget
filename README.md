@@ -40,11 +40,15 @@ Top-ups count once as bank outflows and increase CZK card credit. Washes consume
 
 ## Currencies, history and backups
 
-Enter EUR or CZK amounts and your effective CZK-per-EUR rate. Conversion is saved on each entry and never changes when the default rate changes. There is no automatic market-rate feed. Bank fees are not inferred.
+Choose a currency from the searchable list when adding an expense or income. The full available Frankfurter monetary-currency catalog is loaded online (cryptocurrencies are excluded). Search by ISO code, English name or Portuguese name. Without a cached catalog, the browser’s ISO currency list is available offline.
+
+Latest EUR reference rates come from Frankfurter v2, refreshed at app opening, reconnection or resumption when the cache is older than six hours. You can also press Refresh rates. The publication date and fetch time are shown; weekends or holidays may return an earlier published rate. This is a reference rate, not guaranteed to match your bank. Choose My bank / manual rate to override it. Backdated entries use the latest reference unless manually overridden; automatic historical-date lookup is not included.
+
+Rates and catalog are cached separately from the financial document, so refreshes do not create Supabase conflicts. Offline entries can use cached rates; without a rate you must enter one manually. Each entry saves its currency, EUR conversion, rate and optional publication/source metadata. Editing starts with the entry’s saved rate, preserving historical valuations. Foreign amounts use currency-specific integer minor units (JPY has no fractional digits, KWD has three). Budgets stay in EUR; the laundry card stays in CZK with EUR/CZK-only top-ups and washes. Bank fees are not inferred.
 
 Transactions are grouped by day, newest day first, then first-added first within a day. Editing an entry preserves its insertion order. Older entries receive an insertion sequence based on their existing stored order; previously lost creation chronology cannot be reconstructed. Sequence numbers travel with JSON, CSV and cloud sync.
 
-JSON saves all settings, plans, history and legacy metadata. Import replaces the workspace after confirmation. CSV exports transactions, including travel categories and insertion order. CSV import merges IDs, skips identical records and rejects changed duplicates. Original 10-column and previous 12-column Pocket CSVs are also accepted. Use JSON when moving the complete budget. Export backups before clearing browser storage. Refund/negative entries are not supported; use income for support and edit/delete mistakes.
+JSON saves all settings, plans, history and legacy metadata. Import replaces the workspace after confirmation. CSV exports transactions, including travel categories and insertion order. CSV import merges IDs, skips identical records and rejects changed duplicates. Original 10-column, previous 12-column and 13-column Pocket CSVs are also accepted. New CSVs include rateDate and rateSource. Amount is always in the original currency’s minor units; eur and card credit remain in EUR/CZK cents. Use JSON when moving the complete budget. Export backups before clearing browser storage. Refund/negative entries are not supported; use income for support and edit/delete mistakes.
 
 ## Existing budgets migrate automatically
 

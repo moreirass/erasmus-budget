@@ -1,3 +1,4 @@
+import {currencyDigits,currencyFactor,parseRates,parseRateCache,parseCurrencies,searchCurrencies} from './fx.ts';
 import {describe,it} from 'node:test';
 import assert from 'node:assert/strict';
 import {freshData as actualFreshData,makeTransaction,summary,validateData,applyGlobalPlan,globalPlan,currentPeriod,transactionOrder,planFor,weeks,type Transaction} from './model.ts';
@@ -68,4 +69,27 @@ it('sorts by date then insertion order and preserves that order on edits and CSV
  assert.deepEqual(importCSV(toCSV(d),freshData()).transactions.sort(transactionOrder).map(t=>t.id),['new-day','first','second']);
  const legacy=structuredClone(d);legacy.transactions.forEach(t=>delete t.addedOrder);
  assert.deepEqual(validateData(legacy).transactions.map(t=>t.addedOrder),[1,2,3]);
+});
+
+it('converts currencies with zero, two and three fractional digits and large rates',()=>{
+ const d=freshData();d.transactions=[tx({currency:'JPY',amount:1500,rate:150}),tx({currency:'USD',amount:1100,rate:1.1}),tx({currency:'KWD',amount:3300,rate:0.33}),tx({currency:'VND',amount:280000,rate:28000})];
+ const validated=validateData(d);assert.equal(currencyDigits('JPY'),0);assert.equal(currencyFactor('KWD'),1000);assert.equal(validated.transactions[0].eur,1000);assert.equal(validated.transactions[1].eur,1000);assert.equal(validated.transactions[2].eur,1000);assert.equal(validated.transactions[3].eur,1000);
+ assert.deepEqual(importCSV(toCSV(d),freshData()).transactions,validated.transactions);
+ d.transactions=[tx({kind:'wash',category:'laundry',currency:'USD'})];assert.throws(()=>validateData(d),/EUR or CZK/);
+});
+it('validates rates and keeps cached publication dates',()=>{
+ const rates=parseRates([{base:'EUR',quote:'CZK',rate:24.5,date:'2026-11-02'},{base:'EUR',quote:'CZK',rate:24.6,date:'2026-11-03'},{base:'USD',quote:'JPY',rate:100,date:'2026-11-03'},{base:'EUR',quote:'GBP',rate:-1,date:'2026-11-03'}]);
+ assert.deepEqual(rates,{CZK:{rate:24.6,date:'2026-11-03'}});assert.throws(()=>parseRates({}));assert.throws(()=>parseRates([]));
+ assert.deepEqual(parseRateCache({fetchedAt:100,rates}),{fetchedAt:100,rates});assert.equal(parseRateCache(null),null);
+ assert.deepEqual(parseRateCache({fetchedAt:1,rates:{CZK:{rate:NaN,date:'2026-11-03'}}}),null);
+});
+it('searches full currency names, ISO codes and Portuguese names',()=>{
+ const list=parseCurrencies([{iso_code:'USD',name:'United States Dollar'},{iso_code:'JPY',name:'Japanese Yen'},{iso_code:'BAD!',name:'Invalid'}]);
+ assert.equal(searchCurrencies(list,'usd')[0].code,'USD');assert.equal(searchCurrencies(list,'japanese')[0].code,'JPY');assert.equal(searchCurrencies(list,'dolar')[0].code,'USD');assert.ok(list.some(c=>c.code==='EUR'));
+});
+it('preserves rate provenance and existing conversion snapshots across JSON and CSV',()=>{
+ const d=freshData();d.transactions=[tx({currency:'GBP',amount:860,rate:0.86,rateSource:'Frankfurter',rateDate:'2026-11-02'})];
+ assert.equal(d.transactions[0].eur,1000);d.settings.rate=99;
+ assert.deepEqual(importCSV(toCSV(d),freshData()).transactions,validateData(d).transactions);
+ assert.deepEqual(validateData(JSON.parse(JSON.stringify(d))),validateData(d));
 });

@@ -1,0 +1,6 @@
+import {useState} from 'react';
+import {currencyName,searchCurrencies,type CurrencyInfo} from './fx';
+export function CurrencyPicker({value,onChange,currencies,disabled=false}:{value:string;onChange:(code:string)=>void;currencies:CurrencyInfo[];disabled?:boolean}){
+ const [open,setOpen]=useState(false),[query,setQuery]=useState('');const results=searchCurrencies(currencies,query);
+ return <div className="currency-picker"><span className="field-label">Currency</span><button type="button" disabled={disabled} aria-expanded={open} aria-label={`Currency: ${value}`} onClick={()=>{setOpen(!open);setQuery('');}}>{value} · {currencyName(value)} ▾</button>{open&&<div className="currency-options"><input autoFocus aria-label="Search currencies" placeholder="Search name or code · EUR, dólar…" value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Escape'){e.preventDefault();setOpen(false);}}}/><div className="currency-results" role="listbox" aria-label="Currencies">{results.map(c=><button type="button" role="option" aria-selected={c.code===value} key={c.code} onClick={()=>{onChange(c.code);setOpen(false);}}><b>{c.code}</b><span>{c.name}</span></button>)}{!results.length&&<p>No currencies found.</p>}</div></div>}</div>;
+}
