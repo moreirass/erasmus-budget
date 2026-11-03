@@ -1,24 +1,24 @@
 export const categories = [
-  {id:'groceries',name:'Groceries',icon:'🥑',color:'#60886a',limit:17000},
-  {id:'restaurants',name:'Restaurants',icon:'🍜',color:'#d9a65d',limit:4000},
-  {id:'laundry',name:'Laundry',icon:'🫧',color:'#7daab1',limit:5500},
-  {id:'nightlife',name:'Nightlife',icon:'✨',color:'#9a89b8',limit:8000},
-  {id:'travel',name:'Travel',icon:'🚆',color:'#517f9e',limit:15000},
-  {id:'other',name:'Hygiene & other',icon:'🧴',color:'#bd8d7c',limit:2500},
-  {id:'emergency',name:'Emergency',icon:'🛟',color:'#b5a056',limit:3000},
-  {id:'lodging',name:'Lodging',icon:'🏠',color:'#9baba5',limit:0},
-  {id:'transport',name:'Local transport',icon:'🚋',color:'#a4b6bd',limit:0},
+ {id:'groceries',name:'Groceries & hygiene',icon:'🥑',color:'#60886a',limit:10000},
+ {id:'snacks',name:'Snacks & coffee',icon:'☕',color:'#c49b69',limit:4500},
+ {id:'restaurants',name:'Restaurants & canteen',icon:'🍜',color:'#d9a65d',limit:7500},
+ {id:'laundry',name:'Laundry',icon:'🫧',color:'#7daab1',limit:5500},
+ {id:'nightlife',name:'Nightlife',icon:'✨',color:'#9a89b8',limit:9000},
+ {id:'other',name:'Other',icon:'🧴',color:'#bd8d7c',limit:2500},
+ {id:'travel',name:'Travel & tourism',icon:'🚆',color:'#517f9e',limit:16000},
 ] as const;
+export const travelTypes=[{id:'transport',name:'Transport',guide:6500},{id:'accommodation',name:'Accommodation',guide:4500},{id:'food',name:'Food on trips',guide:3000},{id:'activities',name:'Tourism & activities',guide:2000},{id:'unclassified',name:'Unclassified travel',guide:0}] as const;
+export type TravelType=typeof travelTypes[number]['id'];
 export type Category = typeof categories[number]['id'];
 export type Plan = {budget:number; limits:Record<Category,number>};
-export type Transaction = {id:string;date:string;kind:'expense'|'topup'|'wash'|'income';category:Category;amount:number;currency:'EUR'|'CZK';rate:number;eur:number;credit:number;note:string};
-export type Data = {version:1;settings:{start:string;end:string;rate:number|null;openingCard:number;openingTravel:number;openingEmergency:number};plans:Record<string,Plan>;transactions:Transaction[]};
+export type Transaction = {id:string;date:string;kind:'expense'|'topup'|'wash'|'income';category:Category;amount:number;currency:'EUR'|'CZK';rate:number;eur:number;credit:number;note:string;travelType?:TravelType;legacyCategory?:string;addedOrder?:number};
+export type Data = {version:1;layoutVersion?:2;legacy?:{plans:unknown;openingTravel:number;openingEmergency:number};settings:{start:string;end:string;rate:number|null;openingCard:number;openingTravel:number;openingEmergency:number};plans:Record<string,Plan>;transactions:Transaction[]};
 export const defaultPlan = ():Plan => ({budget:55000,limits:Object.fromEntries(categories.map(c=>[c.id,c.limit])) as Plan['limits']});
 export const octoberPlan = ():Plan => {const limits=Object.fromEntries(categories.map(c=>[c.id,Math.round(c.limit*7/31)])) as Plan['limits'];return {budget:Object.values(limits).reduce((a,b)=>a+b,0),limits};};
 export function includeOctober(d:Data):Data {return d.settings.start==='2026-11'?{...d,settings:{...d.settings,start:'2026-10'},plans:{'2026-10':octoberPlan(),...d.plans}}:d;}
 export const periodStart=(d:Data,m:string)=>m==='2026-10'&&d.settings.start===m?m+'-25':m+'-01';
 export const periodDays=(d:Data,m:string)=>lastDay(m)-Number(periodStart(d,m).slice(8))+1;
-export const freshData = ():Data => ({version:1,settings:{start:'2026-10',end:'2027-01',rate:null,openingCard:0,openingTravel:0,openingEmergency:0},plans:{'2026-10':octoberPlan(),'2026-11':defaultPlan()},transactions:[]});
+export const freshData = ():Data => ({version:1,layoutVersion:2,settings:{start:'2026-10',end:'2027-01',rate:null,openingCard:0,openingTravel:0,openingEmergency:0},plans:{'2026-10':octoberPlan(),'2026-11':defaultPlan()},transactions:[]});
 export const money = (cents:number,currency='EUR') => new Intl.NumberFormat('en-IE',{style:'currency',currency,maximumFractionDigits:2}).format(cents/100);
 export const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export function monthLabel(m:string){return new Date(m+'-15T12:00:00').toLocaleDateString('en-GB',{month:'long',year:'numeric'});}
@@ -33,12 +33,11 @@ export function summary(d:Data,m:string,range?:{start:string;end:string;days:num
  const spent=Object.fromEntries(categories.map(c=>[c.id,rows.filter(t=>t.category===c.id&&(t.kind==='expense'||t.kind==='topup')).reduce((s,t)=>s+t.eur,0)])) as Record<Category,number>;
  const received=Object.fromEntries(categories.map(c=>[c.id,rows.filter(t=>t.category===c.id&&t.kind==='income').reduce((s,t)=>s+t.eur,0)])) as Record<Category,number>;
  const income=Object.values(received).reduce((a,b)=>a+b,0);
- const fund=(category:'travel'|'emergency')=>(category==='travel'?d.settings.openingTravel:d.settings.openingEmergency)+d.transactions.filter(t=>t.date<=end&&t.category===category&&t.kind==='income').reduce((s,t)=>s+t.eur,0)+months(d.settings.start,m<d.settings.end?m:d.settings.end).reduce((s,month)=>s+planFor(d,month).limits[category],0)-d.transactions.filter(t=>t.date<=end&&t.category===category&&t.kind==='expense').reduce((s,t)=>s+t.eur,0);
  const card=d.settings.openingCard+d.transactions.filter(t=>t.date<=end).reduce((s,t)=>s+(t.kind==='topup'?t.credit:t.kind==='wash'?-t.credit:0),0);
  const cash=Object.values(spent).reduce((a,b)=>a+b,0);
  const fraction=range?range.days/periodDays(d,m):1;
- const everyday=categories.filter(c=>!['travel','emergency'].includes(c.id)).reduce((s,c)=>s+spent[c.id],0);
- return {rows,spent,received,income,cash,card,travel:fund('travel'),emergency:fund('emergency'),wash:rows.filter(t=>t.kind==='wash').reduce((s,t)=>s+t.credit,0),everydayRemaining:Math.round((p.budget-p.limits.travel-p.limits.emergency)*fraction)-everyday+income-received.travel-received.emergency,budget:Math.round(p.budget*fraction)};
+ const everyday=categories.filter(c=>c.id!=='travel').reduce((s,c)=>s+spent[c.id],0);
+ return {rows,spent,received,income,cash,card,travel:Math.round(p.limits.travel*fraction)+received.travel-spent.travel,wash:rows.filter(t=>t.kind==='wash').reduce((s,t)=>s+t.credit,0),everydayRemaining:Math.round((p.budget-p.limits.travel)*fraction)-everyday+income-received.travel,budget:Math.round(p.budget*fraction)};
 }
 export function makeTransaction(input:Omit<Transaction,'eur'|'credit'>):Transaction {
  const eur=input.currency==='EUR'?input.amount:Math.round(input.amount/input.rate);
@@ -49,7 +48,7 @@ const monthValid=(s:unknown):s is string=>typeof s==='string'&&/^20\d{2}-(0[1-9]
 const nonnegative=(n:unknown):n is number=>Number.isSafeInteger(n)&&Number(n)>=0&&Number(n)<=100000000;
 const fail=(message:string):never=>{throw new Error(message);};
 export function validateData(value:unknown):Data {
- const d=value as Data;
+ const d=migrateData(value);
  if(!d||d.version!==1||!d.settings||!d.plans||!Array.isArray(d.transactions))fail('This is not a Pocket v1 backup.');
  const s=d.settings;
  if(!monthValid(s.start)||!monthValid(s.end)||s.start>s.end||months(s.start,s.end).length>=120)fail('Choose a valid tracking period shorter than 10 years.');
@@ -61,12 +60,15 @@ export function validateData(value:unknown):Data {
   if(categories.reduce((a,c)=>a+p.limits[c.id],0)!==p.budget)fail('Category allocations must add up to your monthly budget.');
  }
  if(d.transactions.length>100000)fail('Backup is too large.');
+ let order=Math.max(0,...d.transactions.map(t=>t.addedOrder??0));
+ for(const t of d.transactions){if(t.addedOrder===undefined)t.addedOrder=++order;if(!Number.isSafeInteger(t.addedOrder)||t.addedOrder<1)fail('Invalid transaction order.');}
  const ids=new Set<string>();
  for(const t of d.transactions){
   if(!t||typeof t.id!=='string'||!t.id||t.id.length>100||ids.has(t.id))fail('Transactions need unique IDs.');ids.add(t.id);
   if(typeof t.date!=='string'||!/^20\d{2}-\d{2}-\d{2}$/.test(t.date)||!monthValid(t.date.slice(0,7))||Number(t.date.slice(8))<1||Number(t.date.slice(8))>lastDay(t.date.slice(0,7))||t.date<s.start+'-01'||t.date>monthEnd(s.end))fail('A transaction date falls outside the tracking period or is invalid.');
   if(!['expense','topup','wash','income'].includes(t.kind)||!categories.some(c=>c.id===t.category)||!['EUR','CZK'].includes(t.currency)||!nonnegative(t.amount)||!t.amount||!Number.isFinite(t.rate)||t.rate<=0||t.rate>1000||typeof t.note!=='string'||t.note.length>500)fail('Invalid transaction fields.');
   if(((t.kind==='topup'||t.kind==='wash')&&t.category!=='laundry')||(t.kind==='expense'&&t.category==='laundry'))fail('Laundry must be a top-up or wash.');
+  if(t.travelType!==undefined&&(t.category!=='travel'||!travelTypes.some(x=>x.id===t.travelType)))fail('Invalid travel subcategory.');
   const rebuilt=makeTransaction(t);
   if(!nonnegative(t.eur)||!nonnegative(t.credit)||t.eur!==rebuilt.eur||t.credit!==rebuilt.credit)fail('Transaction conversion does not match its saved rate.');
  }
@@ -86,3 +88,28 @@ export function applyGlobalPlan(d:Data,p:Plan):Data {
  }
  return validateData({...d,plans});
 }
+
+// Legacy financial values and IDs are retained; only categories and budget configuration change.
+export function migrateTransaction(t:Transaction):Transaction {
+ const category=String(t.category);
+ if(['emergency','lodging','transport'].includes(category))return {...t,category:'other',legacyCategory:category};
+ if(category==='groceries'&&/vending machine/i.test(t.note))return {...t,category:'snacks',legacyCategory:category};
+ return {...t};
+}
+export function migrateData(value:unknown):Data {
+ const raw=value as Data;
+ if(!raw||raw.version!==1||!raw.settings||!raw.plans||!Array.isArray(raw.transactions))fail('This is not a Pocket backup.');
+ if(raw.layoutVersion===2)return structuredClone(raw);
+ if(raw.layoutVersion!==undefined)fail('Unsupported budget layout.');
+ // Validate legacy plan totals before migrating instead of hiding corrupted input.
+ for(const p of Object.values(raw.plans))if(!p||!p.limits||!nonnegative(p.budget)||!Object.values(p.limits).every(nonnegative)||Object.values(p.limits).reduce((a,b)=>a+b,0)!==p.budget)fail('Invalid legacy monthly limits.');
+ const base=defaultPlan();
+ return {...structuredClone(raw),layoutVersion:2,legacy:{plans:structuredClone(raw.plans),openingTravel:raw.settings.openingTravel,openingEmergency:raw.settings.openingEmergency},plans:{'2000-01':base,...(raw.settings.start==='2026-10'?{'2026-10':octoberPlan(),'2026-11':base}:{})},transactions:raw.transactions.map(migrateTransaction)};
+}
+export function currentPeriod(d:Data,date=today()){
+ const month=date.slice(0,7)<d.settings.start?d.settings.start:date.slice(0,7)>d.settings.end?d.settings.end:date.slice(0,7);
+ const list=weeks(month,d);const week=date<list[0].start?0:date>list.at(-1)!.end?list.length-1:list.findIndex(w=>w.start<=date&&w.end>=date);
+ return {month,week};
+}
+
+export const transactionOrder=(a:Transaction,b:Transaction)=>b.date.localeCompare(a.date)||(a.addedOrder??0)-(b.addedOrder??0);

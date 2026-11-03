@@ -1,126 +1,78 @@
 # Ostrava Pocket
 
-A mobile-first React + TypeScript budget PWA for your Erasmus stay. Works without an account; optionally syncs through your own Supabase project. No bank connection, sample spending or invented bank balance.
+Mobile-first React/TypeScript PWA. Empty by default, offline local storage, optional Supabase email login and manual sync. No bank integration.
 
-## Run locally
+## Run
 
-Install Node.js 24+ (Node 24 LTS recommended). Open a terminal in this folder:
+Use Node.js 24+ in this folder:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. No environment variables are needed. To check the production PWA:
+Checks: `npm test` and `npm run build`. Production PWA: `npm run preview`. Install from your browser on HTTPS or localhost. On Android choose Install app; on iOS choose Share → Add to Home Screen. Save open forms before accepting Reload & update.
 
-```sh
-npm test
-npm run build
-npm run preview
-```
+## Two budgets
 
-The PWA service worker is enabled in production, not the development server. After the first online visit, the app shell and local data work offline. Installation needs HTTPS (or localhost). On Android/desktop use your browser's install action; on iOS use Safari → Share → Add to Home Screen. Fonts fall back to system fonts offline. When an update is ready, save any open form before accepting Reload & update.
+The default monthly total is €550:
 
-## First use
-
-1. Open **Budget & settings**. The default period is November 2026–January 2027, matching the original plan. Change it if you want to track October as well.
-2. Enter your own CZK-per-EUR exchange rate, or enter a rate for each transaction. There is deliberately no invented or automatic market rate. Use the effective rate from your bank if you want conversions to match actual debits; bank fees are not inferred.
-3. Enter existing laundry credit in CZK and existing travel/emergency reserves in EUR, if any. Defaults are zero, not assertions about your bank account.
-4. Add an expense, top-up, or wash. Edit or delete records from the transaction list.
-5. Export JSON regularly, especially before clearing browser storage.
-
-### Your monthly plan
-
-| Category | EUR |
+| Day to day | EUR |
 |---|---:|
-| Groceries | 170 |
-| Restaurants | 40 |
+| Groceries & hygiene | 100 |
+| Snacks & coffee (including vending) | 45 |
+| Restaurants & canteen | 75 |
 | Laundry top-ups | 55 |
-| Nightlife | 80 |
-| Travel | 150 |
-| Hygiene / other | 25 |
-| Emergency | 30 |
-| Lodging | 0 |
-| Local transport, covered by ISKAM | 0 |
-| **Total** | **550** |
+| Nightlife | 90 |
+| Other | 25 |
+| **Day-to-day total** | **390** |
+| **Travel & tourism** | **160** |
 
-Limits must add up to the budget. A saved plan applies from its effective month until the next saved plan. Changing a historical plan deliberately changes historical allocations. The recurring allocations are calculated once per calendar month; there is no scheduler to duplicate or miss a contribution.
+Travel uses one shared cap. Transport, accommodation, food on trips and tourism/activities describe spending within it. Existing travel records remain unclassified until you assign a travel category. Travel and everyday budgets reset each month; neither carries forward. Money received adds support to the chosen category/group in its dated month. Gross expenses and support are displayed separately, so reimbursements never hide purchases or count twice.
 
-## Accounting rules
+Monthly limits are editable globally and must sum to the budget. October 25–31 is automatically prorated; November–January use full months. Editing global limits recalculates historical comparisons. Weekly guides use actual days in the month, with Monday–Sunday weeks clipped at month boundaries.
 
-- Amounts use integer cents. Each transaction retains its original currency, amount, exchange rate and EUR conversion. Changing the default rate never revalues existing transactions.
-- **Money out** sums ordinary expenses and laundry top-ups. It excludes washes and planned savings allocations. It is not a bank balance.
-- **Everyday budget left** is monthly budget minus travel/emergency allocations minus ordinary-category cash outflows. It excludes travel/emergency spending, which is deducted from those rolling funds. Negative amounts remain visible.
-- **Travel/emergency funds** equal opening reserves + allocations from the start month through the viewed month − expenses in that category through the viewed period's end. No allocations accrue after the configured end month. These are budget envelopes, not verified savings-account balances.
-- **Laundry top-up:** money leaves the bank once; CZK credit increases. An EUR top-up converts into CZK at that entry's rate.
-- **Wash:** CZK credit decreases; bank outflow remains zero. Credit rolls over independently of months. Opening card credit does not count as spending. Negative card credit is blocked, including when editing/deleting historical top-ups. Same-day top-ups precede washes because records have dates, not times.
-- **Week view:** Monday–Sunday weeks are clipped to the selected month. Guides are prorated by actual days in that month, so boundary weeks have smaller guides. Rolling fund/card balances are shown through the selected week's end, while the month’s reserve is allocated on its first day.
-- Future months are plan previews. Future-dated transactions are allowed and labelled; they affect their future period. No expenses are prepopulated.
+The app opens at the current Ostrava month and week. It remembers Month/Week view, resets the calendar selection on reopening/resuming the app, and updates after a date change. Manual navigation is available while the app is active. Dates outside the tracking period select the nearest tracked month/week. Extend the tracking dates in settings if needed.
 
-## JSON and CSV
+## Laundry accounting
 
-**JSON** is a complete, versioned backup of settings, effective-dated plans, opening balances and transactions. Restoring replaces the current workspace after confirmation.
+Top-ups count once as bank outflows and increase CZK card credit. Washes consume credit without another bank outflow. Opening credit and leftover card credit carry forward independently of monthly budgets. Negative historical card credit is blocked, even when deleting/editing a top-up. Same-day top-ups precede washes for credit validation because entries store dates, not times. Laundry support is bank money: record a separate top-up when you load the card.
 
-**CSV** is a transaction-only exchange format. Import merges by ID, skips identical records, and rejects changed records sharing an ID. Current settings and plans are retained. Use a JSON backup to move the entire budget to another device or account. Imports validate dates, conversions, limits and laundry credit before saving.
+## Currencies, history and backups
 
-CSV columns, in order:
+Enter EUR or CZK amounts and your effective CZK-per-EUR rate. Conversion is saved on each entry and never changes when the default rate changes. There is no automatic market-rate feed. Bank fees are not inferred.
 
-```text
-id,date,kind,category,amount,currency,rate,eur,credit,note
+Transactions are grouped by day, newest day first, then first-added first within a day. Editing an entry preserves its insertion order. Older entries receive an insertion sequence based on their existing stored order; previously lost creation chronology cannot be reconstructed. Sequence numbers travel with JSON, CSV and cloud sync.
+
+JSON saves all settings, plans, history and legacy metadata. Import replaces the workspace after confirmation. CSV exports transactions, including travel categories and insertion order. CSV import merges IDs, skips identical records and rejects changed duplicates. Original 10-column and previous 12-column Pocket CSVs are also accepted. Use JSON when moving the complete budget. Export backups before clearing browser storage. Refund/negative entries are not supported; use income for support and edit/delete mistakes.
+
+## Existing budgets migrate automatically
+
+The database envelope remains version 1 with `layoutVersion: 2`, so the existing Supabase schema works unchanged. Legacy budgets get the new €550 allocation; original plans and opening travel/emergency reserves are retained under `legacy` in JSON backups. Those old reserves no longer affect monthly available money.
+
+Removed categories Emergency, Lodging and Local transport map to Other and show a review label. Groceries explicitly described as vending machine map to Snacks. Other unclassified purchases remain in Other; inspect them manually to move hygiene purchases to Groceries if appropriate. IDs, amounts, dates, notes, currency conversions and laundry credit remain intact. No purchase is invented or removed. Local storage also retains the original envelope under `pocket-v1:<workspace>:before-two-budgets` before migration. Migration is idempotent.
+
+Update both phone and PC before syncing this layout. Old clients do not understand the new categories. Read older backups through Import to migrate them. Migration is saved locally and uploaded with Sync now. The generated proposal JSON from another conversation may contain a different schema; prefer an actual Pocket export.
+
+## Optional Supabase
+
+1. Create a Supabase project and run `supabase/schema.sql` once in its SQL editor. It creates owner-only RLS policies and a revision-checked save function. If already configured, do not rerun the schema for this update.
+2. Copy `.env.example` to `.env.local` and set:
+
+```dotenv
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
-`amount` is original currency cents; `eur` is EUR cents; `credit` is CZK cents (zero for ordinary expenses). `rate` means CZK per EUR. Kinds: `expense`, `topup`, `wash`. Category IDs are in `src/model.ts`. CSV supports quoted commas/newlines; formula-like notes are escaped on export. Only Pocket-format CSV is accepted, not arbitrary bank statements. Refunds/negative transactions are not supported in this version; correct erroneous entries through edit/delete.
+Use the browser publishable key, never a secret/service-role key.
+3. Set Supabase Authentication → URL Configuration → Site URL to the app origin and add the same origin to allowed Redirect URLs. Add `http://localhost:5173` if testing locally. Keep email authentication enabled. Restart Vite after changing environment variables.
+4. In Account & sync request an email link and open it in the intended browser. The default Supabase sender restricts recipients and volume; use the project owner's authorized email while testing or configure your own SMTP.
+5. Sign in with the same email on both devices. Press Sync now before and after editing. Guest/account workspaces are separate: export guest JSON, sign in, import it and sync to migrate existing entries. Opening an account does not upload guest data automatically.
 
-## Optional Supabase authentication and sync
+Whole-document sync uses atomic revision checks. Concurrent changes prompt you to export both versions and choose which to keep. Keep local requires another Sync to upload it. Conflict snapshots remain in browser storage. Sign-out keeps the account cache on this device. Local browser storage is not encrypted. For isolation checks, use two accounts and ensure neither can read the other's document. Live cloud checks require your configured project; local unit tests do not prove live authentication works.
 
-1. Create a Supabase project. In the SQL editor run **supabase/schema.sql** once. It creates an account-owned document table, row-level security policies and an atomic revision-checking save function.
-2. Copy `.env.example` to `.env.local` and fill in your project URL and **publishable** key:
+## Vercel
 
-   ```dotenv
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
-   ```
+Push this folder's contents to GitHub and import the repository into Vercel. Framework: Vite; Node: 24; build: `npm run build`; output: `dist`. Add both VITE_SUPABASE variables in Production and redeploy after changes. Without keys it runs in local-only mode. Configure the final HTTPS origin in Supabase before signing in. Free-plan service limits and inactivity rules apply.
 
-   Never put a secret or service-role key in the browser configuration.
-3. In Supabase Authentication → URL Configuration, set the Site URL to your deployed app origin. Add `http://localhost:5173` and your production origin to allowed redirect URLs. For production-preview testing add its exact origin too.
-4. Enable email authentication. The app uses email magic links. Supabase's built-in mail sender has restrictions; configure your own SMTP provider if you need to send to other addresses or exceed those limits. Avoid link-scanning/reuse issues by opening the fresh sign-in link in your intended browser.
-5. Restart Vite after editing environment variables. Open **Budget & settings → Account & sync**, enter your email and open the link.
-6. Press **Sync now** on a new device to load its cloud budget. Press Sync before and after editing on each device. Offline edits stay local until you sync again; this version intentionally does not perform background sync.
-
-Guest and signed-in workspaces have separate browser storage. Signing in never automatically uploads guest records. To migrate, export guest JSON, sign in, import it and sync. Signing out leaves that account's cached data on the device for the next sign-in. Use a private/trusted browser; browser data is not encrypted at rest.
-
-Sync compares revisions before uploading. If both devices changed, neither is silently overwritten: export both versions if needed, then choose the local or cloud version. Choosing local requires another Sync to upload it. Conflicting snapshots are retained under `pocket-v1:<user-id>:conflict` in browser storage. This is whole-document sync, not automatic record-level merging. Concurrent-tab saves also check the local document stamp. Local storage failure is surfaced rather than reported as saved.
-
-### Verify cloud isolation after setup
-
-Use two different test accounts. Save and sync a distinct budget in each; neither should see the other's data. In the Supabase SQL editor verify RLS is enabled and the three ownership policies are present. With two browsers on the same account, change both offline, sync one, then sync the other: the second should show a conflict. Live authentication/database checks require your project and keys and are not included in the local test result.
-
-## Deploy to Vercel
-
-1. Push the project folder to your Git repository (exclude `node_modules`, `dist` and `.env.local`).
-2. Import the repository into Vercel. If this project is inside a larger repository, set Root Directory to this folder.
-3. Use framework **Vite**, build command `npm run build`, output directory `dist`, and Node.js 24.
-4. Add the two `VITE_SUPABASE_*` environment variables if you want cloud mode. You can deploy without them for local-only use.
-5. Deploy. Add the final HTTPS origin to Supabase's Site URL and redirect allowlist. Environment-variable changes require a new Vercel deployment.
-6. Visit the deployed app once online, then install it from your phone's browser.
-
-The project is prepared for personal use on free plans, but service limits and email delivery conditions still apply. No deployment or cloud account has been created for you.
-
-Official references: [Vercel Vite deployment](https://vercel.com/docs/frameworks/frontend/vite), [Vercel plans](https://vercel.com/pricing), [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys), [Supabase magic links](https://supabase.com/docs/reference/javascript/auth-signinwithotp), [Supabase row-level security](https://supabase.com/docs/guides/database/postgres/row-level-security).
-
-## Project map
-
-```text
-src/App.tsx           Screens, forms, SVG charts
-src/style.css         Responsive UI and mobile navigation
-src/model.ts          Pure accounting and validation
-src/model.test.ts     Accounting / backup regression tests
-src/transfer.ts       JSON download and CSV round trips
-src/store.ts          Local persistence, auth and revision-safe sync
-supabase/schema.sql   Database, ownership policies and save function
-vite.config.ts        Production PWA and precaching
-vercel.json           Vercel build settings and headers
-```
-
-No paid API, analytics, bank integration or server process is required. Local financial data is stored under `pocket-v1:guest`; account caches use a separate user ID key.
-
+Official references: [Vercel Vite](https://vercel.com/docs/frameworks/frontend/vite), [Supabase keys](https://supabase.com/docs/guides/getting-started/api-keys), [Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).

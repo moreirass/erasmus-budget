@@ -28,3 +28,7 @@
 @media(max-width:560px){.header-actions{gap:5px}.breadcrumb{font-size:11px;letter-spacing:0}.breadcrumb span{margin:0 5px}.location{display:none}.mini-card .tiny{font-size:11px}.category-label{flex-wrap:wrap}.transaction{flex-wrap:wrap}.transaction-description{min-width:110px}.transaction-tools{flex-wrap:wrap}.under-hero{font-size:12px}.sidebar nav button{font-size:11px}.form-grid{grid-template-columns:1fr}.mini-footer{flex-wrap:wrap}.bar-chart{gap:6px}.bar-column>span{font-size:10px}.category-list{gap:24px}.brand small{font-size:10px}}
 
 .transaction-kinds{flex-wrap:wrap}.transaction-kinds>button{flex:1 1 40%!important}
+
+.hero-grid.two-budgets{grid-template-columns:1.3fr 1fr}.two-budgets .balance-card{grid-column:auto}.travel-totals{display:flex;gap:15px;flex-wrap:wrap;font-size:13px;margin:0 0 20px}.two-budgets .balance-footer{margin-top:24px}@media(max-width:560px){.hero-grid.two-budgets{grid-template-columns:1fr}.two-budgets .mini-card .tiny{padding-top:40px}.period-right{flex-wrap:wrap}.period-right>select{max-width:160px}}
+
+.transaction-day h3{font-size:14px;color:var(--muted);padding:18px 0 8px;border-bottom:1px solid var(--border)}
