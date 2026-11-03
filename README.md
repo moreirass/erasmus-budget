@@ -2,7 +2,7 @@
 
 Mobile-first React/TypeScript PWA. Empty by default, offline local storage, optional Supabase email login and manual sync. No bank integration.
 
-Track everyday spending and trips separately, enter purchases in multiple currencies, and manage a prepaid laundry card without counting washes twice. The interface supports light and dark themes, readable system fonts and mobile navigation.
+Track everyday spending and trips separately, enter purchases in multiple currencies, and manage a prepaid laundry card without counting washes twice. The interface follows the supplied forest-green design: mint actions, gold currency/laundry accents, Plus Jakarta Sans headings, Inter body text and system-font fallbacks. Light and dark themes are supported; new devices start in dark mode and an existing saved preference is preserved.
 
 ## Run
 
@@ -15,6 +15,16 @@ npm run dev
 
 Checks: `npm test` and `npm run build`. Production PWA: `npm run preview`. Install from your browser on HTTPS or localhost. On Android choose Install app; on iOS choose Share → Add to Home Screen. Save open forms before accepting Reload & update.
 
+## Interface and navigation
+
+Desktop uses a persistent sidebar, exchange-rate badge and an account/sync status derived from the actual workspace. Mobile uses five navigation controls: Overview, Transactions, a central Add button, Budget, and Settings. Budget and Settings share the same data forms; mobile tabs expose Plan, Exchange rates, Card, Data and Account. Changing pages returns to the top.
+
+Transactions are shown as day-grouped cards with icons, original-currency amounts, incoming-support styling and each day’s net bank movement (washes excluded). The period summary shows gross spending, support and planned remainder. On desktop, laundry and charts appear alongside the ledger. All metrics are calculated from user data.
+
+The transaction editor is a centered dialog on desktop and a scrolling bottom sheet on mobile. It provides type controls, selectable budget-group cards, category chips, the full currency picker and the existing validation. The rate settings include a searchable reference-rate explorer and a simple EUR converter. Card settings include real laundry history and quick actions.
+
+The supplied mockups contain illustrative data, campus locations, service hours, cycle prices, performance trends and encryption claims. Those examples are not injected into the app. The app does not claim end-to-end encrypted storage or invent an exchange rate, transaction or cloud-sync result.
+
 ## Using the dashboard
 
 - Tap **Day to day** to filter category guides, spending charts, weekly rhythm and activity to everyday spending. The laundry panel is available in this view.
@@ -22,7 +32,7 @@ Checks: `npm test` and `npm run build`. Production PWA: `npm run preview`. Insta
 - The selected card has a green background and highlighted border; the other card stays neutral. The highlight follows your selection in both light and dark themes.
 - Tap the selected card again to show **both budgets**, or use the budget-group dropdown. Both cards remain visible so you can switch directly. The dropdown also works on the Transactions page.
 - Choose **Month** or **Week** to change the reporting period. You can browse older periods without changing the global monthly plan.
-- Use the sun/moon button in the top bar to change theme. Your device remembers the choice; the first visit follows its system theme.
+- Use the sun/moon button in the top bar to change theme. Your device remembers the choice. New devices start with the reference design’s dark theme.
 
 ## Adding money movements
 
@@ -125,6 +135,6 @@ After a code update, push the changed files and wait for Vercel to finish deploy
 
 ## Verification
 
-`npm test` currently runs 23 tests covering accounting, migration, dates, ordering, currencies and backup round trips. `npm run build` checks TypeScript and generates the production app and service worker. See [VERIFICATION.md](VERIFICATION.md) for the checks performed and their limits. The latest card-selection styling passed the production build; no new Android visual test is claimed.
+`npm test` currently runs 23 tests covering accounting, migration, dates, ordering, currencies and backup round trips. `npm run build` checks TypeScript and generates the production app and service worker. See [VERIFICATION.md](VERIFICATION.md) for the checks performed and their limits. The redesign passed a Chrome browser smoke check at 320, 390, 768 and 1440px, including mobile navigation, currency search, card filtering, expense creation/editing and light theme. These checks used isolated test data and mocked rate responses; they are not tests on a physical Android device or live Supabase accounts.
 
 Official references: [Vercel Vite](https://vercel.com/docs/frameworks/frontend/vite), [Supabase keys](https://supabase.com/docs/guides/getting-started/api-keys), [Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
