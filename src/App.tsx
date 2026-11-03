@@ -1,136 +1,1063 @@
-import {CategoryIcon,categoryInfo} from './ui';
-import {CurrencyPicker} from './CurrencyPicker';
-import {useExchangeRates} from './useExchangeRates';
-import {currencyDigits,currencyFactor,searchCurrencies} from './fx';
-import {useEffect,useRef,useState,type FormEvent,type ReactNode} from 'react';
-import {ArrowUpRight,ChevronLeft,ChevronRight,Plus,LayoutDashboard,ArrowLeftRight,SlidersHorizontal,Wallet,Plane,WashingMachine,Download,Upload,Cloud,Check,X,Trash2,Pencil,Search,MapPin,RefreshCw,LogOut,Sun,Moon,UserRound,CalendarDays,ChartPie,Settings,ArrowDownLeft,CheckCircle2} from 'lucide-react';
-import {useRegisterSW} from 'virtual:pwa-register/react';
-import {categories,travelTypes,currentPeriod,transactionOrder,globalPlan,applyGlobalPlan,periodDays,periodStart,makeTransaction,money,monthEnd,monthLabel,months,planFor,summary,today,validateData,weeks,type Category,type Data,type Transaction} from './model';
-import {download,importCSV,toCSV} from './transfer';
-import {cloud,useBudget} from './store';
-
-function Modal({title,children,close}:{title:string;children:ReactNode;close:()=>void}){const ref=useRef<HTMLDialogElement>(null);useEffect(()=>{ref.current?.showModal();},[]);return <dialog ref={ref} onCancel={close}><div className="modal-head"><h2>{title}</h2><button className="icon-button" onClick={close} aria-label="Close"><X size={20}/></button></div>{children}</dialog>;}
-function Field({label,children}:{label:string;children:ReactNode}){return <label className="field"><span>{label}</span>{children}</label>;}
-const toCents=(s:FormDataEntryValue|null)=>Math.round(Number(s)*100);
-export default function App(){
- const [dark,setDark]=useState(()=>{try{const saved=localStorage.getItem('pocket-theme');return saved?saved==='dark':true;}catch{return true;}});
- useEffect(()=>{document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#00170f':'#eaf5ee');try{localStorage.setItem('pocket-theme',dark?'dark':'light');}catch{}},[dark]);
- const fx=useExchangeRates();
- const store=useBudget(),{data,update}=store;
- const [tab,setTab]=useState('Overview'),[month,setMonth]=useState(()=>currentPeriod(data).month),[view,setView]=useState(()=>{try{return localStorage.getItem('pocket-view')==='week'?'week':'month';}catch{return 'month';}}),[week,setWeek]=useState(()=>currentPeriod(data).week);
- const [group,setGroup]=useState('all');
- const [settingsSection,setSettingsSection]=useState('plan');
- const isSettings=tab==='Budget & settings'||tab==='Budget';
- const [editor,setEditor]=useState<Transaction|'new'|null>(null),[editorKind,setEditorKind]=useState<Transaction['kind']>('expense'),[toast,setToast]=useState(''),[search,setSearch]=useState(''),[filter,setFilter]=useState('all'),[pendingImport,setPendingImport]=useState<{data:Data;type:string}|null>(null);
- const fileRef=useRef<HTMLInputElement>(null),[online,setOnline]=useState(navigator.onLine);
- const {needRefresh:[needRefresh],updateServiceWorker}=useRegisterSW();
- useEffect(()=>{const on=()=>setOnline(navigator.onLine);window.addEventListener('online',on);window.addEventListener('offline',on);return()=>{window.removeEventListener('online',on);window.removeEventListener('offline',on);};},[]);
- useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(''),5000);return()=>clearTimeout(timer);},[toast]);
- useEffect(()=>{
-  const reset=()=>{if(document.visibilityState==='hidden')return;const p=currentPeriod(data);setMonth(p.month);setWeek(p.week);};
-  reset();let date=today();const timer=setInterval(()=>{if(today()!==date){date=today();reset();}},30000);
-  window.addEventListener('pageshow',reset);window.addEventListener('focus',reset);document.addEventListener('visibilitychange',reset);
-  return()=>{clearInterval(timer);window.removeEventListener('pageshow',reset);window.removeEventListener('focus',reset);document.removeEventListener('visibilitychange',reset);};
- },[data.settings.start,data.settings.end,store.user?.id]);
- useEffect(()=>{try{localStorage.setItem('pocket-view',view);}catch{}},[view]);
- useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});},[tab]);
- const monthList=months(data.settings.start,data.settings.end),weekList=weeks(month,data),range=view==='week'?weekList[Math.min(week,weekList.length-1)]:undefined;
- const stats=summary(data,month,range),plan=planFor(data,month),isFuture=month>today().slice(0,7);
- function selectBudget(next:string){setGroup(current=>current===next?'all':next);setFilter('all');}
- const groupCash=(s:ReturnType<typeof summary>)=>group==='travel'?s.spent.travel:group==='daily'?s.cash-s.spent.travel:s.cash;
- function commit(d:Data,message='Saved'){try{update(d);setToast(message);return true;}catch(e){setToast((e as Error).message);return false;}}
- function openNew(kind:Transaction['kind']='expense'){setEditorKind(kind);setEditor('new');}
- function changeMonth(m:string){setMonth(m);const p=currentPeriod(data);setWeek(m===p.month?p.week:0);}
- async function readFile(file?:File){if(!file)return;try{if(file.size>10000000)throw new Error('Please choose a file smaller than 10 MB.');const text=await file.text();const csv=file.name.toLowerCase().endsWith('.csv');const next=csv?importCSV(text,data):validateData(JSON.parse(text));setPendingImport({data:next,type:csv?'Merge CSV transactions':'Restore full JSON backup'});}catch(e){setToast((e as Error).message);}if(fileRef.current)fileRef.current.value='';}
- const rows=stats.rows.filter(t=>(group==='all'||(group==='travel'?t.category==='travel':t.category!=='travel'))&&(filter==='all'||t.category===filter)&&`${t.note} ${t.category} ${t.kind}`.toLowerCase().includes(search.toLowerCase())).sort(transactionOrder);
- const exportJSON=()=>download(`pocket-${today()}.json`,JSON.stringify(data,null,2));
- return <div className="app-shell">
-  <aside className="sidebar"><a className="brand" href="#" onClick={e=>{e.preventDefault();setTab('Overview');}}><span className="brand-icon"><Wallet size={24}/></span><span>Pocket<small>Your Erasmus Companion</small></span></a><div className="active-term"><MapPin size={17}/><div><span>ACTIVE TERM</span><strong>Erasmus · {data.settings.start.slice(0,4)}/{data.settings.end.slice(2,4)}</strong></div></div><nav>{[{name:'Overview',icon:LayoutDashboard},{name:'Transactions',icon:ArrowLeftRight},{name:'Budget & settings',icon:SlidersHorizontal}].map(({name,icon:Icon})=><button key={name} className={tab===name||(name==='Budget & settings'&&isSettings)?'active':''} onClick={()=>setTab(name)}><Icon size={20}/><span>{name}</span></button>)}</nav><button className="sidebar-laundry" onClick={()=>{setTab('Overview');setGroup('daily');}}><WashingMachine size={20}/><span>Lavandaria<strong>{money(stats.card,'CZK')}</strong></span><ChevronRight size={16}/></button><div className="storage-badge"><MapPin size={14}/><span>Ostrava, Czechia</span><span className={online?'status-dot':'status-dot offline'}/><small>{store.user?.email??'Guardado neste dispositivo'}</small></div></aside>
-  <nav className="mobile-nav" aria-label="Mobile navigation"><button className={tab==='Overview'?'active':''} onClick={()=>setTab('Overview')}><LayoutDashboard size={21}/><span>Overview</span></button><button className={tab==='Transactions'?'active':''} onClick={()=>setTab('Transactions')}><ArrowLeftRight size={21}/><span>Transactions</span></button><button className="quick-add" aria-label="Add transaction" onClick={()=>openNew()} disabled={!store.ready||store.corrupt}><Plus size={29}/></button><button className={tab==='Budget'?'active':''} onClick={()=>{setTab('Budget');setSettingsSection('plan');}}><ChartPie size={21}/><span>Budget</span></button><button className={tab==='Budget & settings'?'active':''} onClick={()=>{setTab('Budget & settings');setSettingsSection('rates');}}><Settings size={21}/><span>Settings</span></button></nav>
-  <main><header className="topbar"><div className="breadcrumb"><span className="desktop-crumb"><LayoutDashboard size={15}/> / Erasmus Hub / <b>{tab}</b></span><span className="mobile-brand"><span className="brand-icon"><Wallet size={22}/></span><span>Pocket <em>Erasmus+</em><small>ERASMUS · OSTRAVA</small></span></span></div><div className="header-actions"><span className="fx-pill" title={fx.cache?.rates.CZK?`Publicado em ${fx.cache.rates.CZK.date}`:'Sem taxa em cache'}><RefreshCw size={16}/> {fx.cache?.rates.CZK?<><span>1 EUR ≈ </span><strong>{fx.cache.rates.CZK.rate.toFixed(2)} CZK</strong></>:<strong>EUR / CZK</strong>}</span><button className="sync-pill" onClick={()=>{setTab('Budget & settings');setSettingsSection('sync');}}><span className={store.user&&!store.dirty&&store.status==='Synced just now'?'status-dot':'status-dot offline'}/>{!online?'Offline':!store.user?'Local workspace':store.dirty?'Sync pending':store.status}</button><button className="icon-button theme-toggle" aria-label={dark?'Switch to light theme':'Switch to dark theme'} onClick={()=>setDark(!dark)}>{dark?<Sun size={19}/>:<Moon size={19}/>}</button><button className="primary top-add" onClick={()=>openNew()} disabled={!store.ready||store.corrupt}><Plus size={18}/> Add transaction</button><button className="avatar" aria-label="Account settings" onClick={()=>{setTab('Budget & settings');setSettingsSection('sync');}}><UserRound size={19}/></button></div></header>
-  <div className={`content screen-${tab==='Transactions'?'transactions':isSettings?'settings':'overview'}`}><div className="page-heading"><div><div className="eyebrow">ERASMUS · OSTRAVA 2026/27</div><h1>{tab==='Overview'?'Your adventure, in balance.':tab==='Transactions'?'The little things add up.':'A plan that fits your life.'}</h1><p>{tab==='Overview'?'A clear view of your money. More headspace for Erasmus.':tab==='Transactions'?'Every coffee, train ride and laundry day, in one place.':'Your monthly budgets, laundry credit and data — all in your hands.'}</p></div><button className="primary" onClick={()=>openNew()} disabled={!store.ready||store.corrupt}><Plus size={18}/> Add transaction</button></div>
-  {store.corrupt&&<div className="notice error">Saved data needs recovery. <button onClick={()=>download('pocket-recovery.txt',store.recovery(),'text/plain')}>Export recovery file</button> Then restore a JSON backup below.</div>}
-  {store.error&&<div role="alert" className="notice error">{store.error}<button onClick={()=>store.setError('')} aria-label="Dismiss error"><X size={16}/></button></div>}
-  {needRefresh&&<div className="notice">An app update is ready. Save any open form first. <button onClick={()=>updateServiceWorker(true)}>Reload & update</button></div>}
-  {!isSettings&&<div className="period-bar"><div className="month-picker"><button className="icon-button" aria-label="Previous month" disabled={month===monthList[0]} onClick={()=>changeMonth(monthList[monthList.indexOf(month)-1])}><ChevronLeft size={18}/></button><select aria-label="Selected month" value={month} onChange={e=>changeMonth(e.target.value)}>{monthList.map(m=><option key={m} value={m}>{monthLabel(m)}</option>)}</select><button className="icon-button" aria-label="Next month" disabled={month===monthList.at(-1)} onClick={()=>changeMonth(monthList[monthList.indexOf(month)+1])}><ChevronRight size={18}/></button>{isFuture&&<span className="pill">Plan preview</span>}</div><div className="period-right"><select aria-label="Budget group" value={group} onChange={e=>{setGroup(e.target.value);setFilter('all');}}><option value="all">Both budgets</option><option value="daily">Day to day</option><option value="travel">Travel & tourism</option></select>{view==='week'&&<select aria-label="Selected week" value={Math.min(week,weekList.length-1)} onChange={e=>setWeek(Number(e.target.value))}>{weekList.map((w,i)=><option key={w.start} value={i}>{w.start.slice(8)}–{w.end.slice(8)} {new Date(month+'-15').toLocaleDateString('en',{month:'short'})}</option>)}</select>}<div className="segmented"><button className={view==='month'?'selected':''} onClick={()=>setView('month')}>Month</button><button className={view==='week'?'selected':''} onClick={()=>{setView('week');const p=currentPeriod(data);if(month===p.month)setWeek(p.week);}}>Week</button></div></div></div>}
-  {tab==='Overview'&&<>
-   <section className="welcome-card"><div><span className="tiny">OSTRAVA · {monthLabel(month).toUpperCase()}</span><h2>{stats.rows.length?'O teu Erasmus, em equilíbrio.':'Uma página em branco para novas aventuras.'}</h2><p>{stats.rows.length?`${stats.rows.length} movimentos neste período · ${money(stats.cash)} em saídas`:'Sem movimentos neste período. Regista a primeira compra quando estiveres pronto.'}</p></div><Wallet size={24}/></section>
-   <section className="hero-grid two-budgets"><div className={`balance-card budget-card ${group==='daily'?'budget-selected':''}`}><button type="button" className="budget-card-button" aria-label="View Day to day budget" aria-pressed={group==='daily'} onClick={()=>selectBudget('daily')}/><div className="card-kicker"><span>DAY TO DAY · LEFT {view==='week'?'THIS WEEK':'THIS MONTH'}</span><Wallet size={20}/></div><div className="balance-number">{money(stats.everydayRemaining)}</div><div className="track"><span style={{width:`${Math.max(0,Math.min(100,(stats.cash-stats.spent.travel)/Math.max(1,Math.round((plan.budget-plan.limits.travel)*(range?range.days/periodDays(data,month):1)))*100))}%`}}/></div><p>Groceries, snacks, meals, laundry, nightlife and other spending</p><div className="balance-footer"><span>Period budget<strong>{money(Math.round((plan.budget-plan.limits.travel)*(range?range.days/periodDays(data,month):1)))}</strong></span><span>Money out<strong>{money(stats.cash-stats.spent.travel)}</strong></span><span>Support received<strong>{money(stats.income-stats.received.travel)}</strong></span></div></div>
-   <div className={`mini-card budget-card ${group==='travel'?'budget-selected':''}`}><button type="button" className="budget-card-button" aria-label="View Travel and tourism budget" aria-pressed={group==='travel'} onClick={()=>selectBudget('travel')}/><div className="mini-icon blue"><Plane size={21}/></div><span className="tiny">TRAVEL & TOURISM · LEFT {view==='week'?'THIS WEEK':'THIS MONTH'}</span><h2>{money(stats.travel)}</h2><div className="track"><span style={{width:`${Math.max(0,Math.min(100,stats.spent.travel/Math.max(1,Math.round(plan.limits.travel*(range?range.days/periodDays(data,month):1)))*100))}%`}}/></div><p>One shared limit for transport, accommodation, food and activities.</p><div className="mini-footer"><span>{money(plan.limits.travel)} for this month · no rollover</span></div><div className="travel-totals"><span>Out: {money(stats.spent.travel)}</span><span>Support: {money(stats.received.travel)}</span></div></div></section>
-   <div className="under-hero"><span><Check size={14}/> {group==='all'?'Tap a budget card to filter · tap again for both':group==='daily'?'Viewing Day to day · tap its card again for both':'Viewing Travel & tourism · tap its card again for both'}</span><span>Laundry credit through {range?.end??monthEnd(month)}{isFuture?' · plan preview':''}</span></div>
-   <section className="dashboard-grid"><div className="panel category-panel"><div className="section-heading"><div><h2>Where it’s going</h2><p>Your {view==='week'?'prorated weekly':'monthly'} category guide</p></div><button className="text-button" onClick={()=>{setTab('Budget & settings');setSettingsSection('plan');}}>Edit limits <ArrowUpRight size={15}/></button></div><div className="category-list">{categories.filter(c=>group==='all'||(group==='travel'?c.id==='travel':c.id!=='travel')).map(c=>{const cap=Math.round(plan.limits[c.id]*(range?range.days/periodDays(data,month):1))+stats.received[c.id],spent=stats.spent[c.id];return <div className="category-row" key={c.id}><div className={`category-emoji cat-${c.id}`}><CategoryIcon category={c.id}/></div><div className="category-main"><div className="category-label"><strong>{c.name}</strong><span><b>{money(spent)}</b> <span className="muted">/ {money(cap)}</span></span></div><div className="track"><span style={{width:`${Math.min(100,spent/Math.max(1,cap)*100)}%`,background:spent>cap?'#b86148':c.color}}/></div><small>{c.id==='laundry'?'Top-ups only · washes use card credit':spent>cap?`${money(spent-cap)} above this period’s guide`:`${money(cap-spent)} left in this period · no rollover`}</small></div></div>;})}</div></div>
-   <div className="right-stack">{group!=='daily'&&<TravelBreakdown rows={stats.rows}/>}<div className="panel"><div className="section-heading"><div><h2>Spending mix</h2><p>Money leaving your bank</p></div><span className="pill">{view==='week'?'This week':'This month'}</span></div><SpendingChart spent={Object.fromEntries(categories.map(c=>[c.id,group==='all'||(group==='travel'?c.id==='travel':c.id!=='travel')?stats.spent[c.id]:0])) as Record<Category,number>}/></div>{group!=='travel'&&<div className="laundry-card"><div className="section-heading"><span className="laundry-title"><WashingMachine size={21}/> Laundry card</span><span className="pill">CZK CREDIT</span></div><div className="laundry-value">{money(stats.card,'CZK')}</div><p>Credit carries over. Washes aren’t counted twice.</p><div className="laundry-meta"><span>Top-ups this period <b>{money(stats.spent.laundry)}</b></span><span>Credit used <b>{money(stats.wash,'CZK')}</b></span></div><div className="button-pair"><button onClick={()=>openNew('topup')}><Plus size={16}/> Top up</button><button onClick={()=>openNew('wash')}><WashingMachine size={16}/> Log wash</button></div></div>}<div className="panel weekly-panel"><div className="section-heading"><h2>Weekly rhythm</h2><span className="muted">{money(groupCash(summary(data,month)))} total</span></div><div className="bar-chart">{weekList.map(w=>{const s=summary(data,month,w);const max=Math.max(1,...weekList.map(x=>groupCash(summary(data,month,x))));return <div className="bar-column" key={w.start}><span>{money(groupCash(s))}</span><div className="bar-slot"><div style={{height:`${groupCash(s)/max*100}%`}}/></div><small>{w.start.slice(8)}–{w.end.slice(8)}</small></div>;})}</div></div></div></section>
-   <section className="panel"><div className="section-heading"><div><h2>Recent activity</h2><p>Small moments, clearly recorded.</p></div><button className="text-button" onClick={()=>setTab('Transactions')}>View all <ArrowUpRight size={15}/></button></div><TransactionList rows={rows.slice(0,5)} edit={setEditor} remove={t=>{if(confirm(`Delete “${t.note||t.kind}” on ${t.date}?`))commit({...data,transactions:data.transactions.filter(x=>x.id!==t.id)},'Transaction removed');}} add={()=>openNew()}/></section>
-  </>}
-  {tab==='Transactions'&&<><PeriodSummary stats={stats} plan={plan} month={month} range={range} group={group} selectGroup={value=>{setGroup(value);setFilter('all');}}/><section className="transactions-layout"><div className="transaction-stream"><div className="transaction-tools"><label className="search"><Search size={19}/><input aria-label="Search transactions" placeholder="Pesquisar notas, cafés, comboios…" value={search} onChange={e=>setSearch(e.target.value)}/></label><select aria-label="Filter category" value={filter} onChange={e=>setFilter(e.target.value)}><option value="all">All categories</option>{categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select><button className="secondary export-csv" onClick={()=>download(`pocket-transactions-${today()}.csv`,toCSV(data),'text/csv;charset=utf-8')}><Download size={16}/> Export CSV</button></div><div className="ledger-heading"><span>HISTÓRICO DE TRANSAÇÕES</span><span>{rows.length} movimentos</span></div><TransactionList rows={rows} edit={setEditor} remove={t=>{if(confirm('Eliminar este movimento?'))commit({...data,transactions:data.transactions.filter(x=>x.id!==t.id)},'Transaction removed');}} add={()=>openNew()}/></div><aside className="ledger-aside"><LaundryPanel stats={stats} openNew={openNew}/><div className="panel"><h2>Spending mix</h2><SpendingChart spent={Object.fromEntries(categories.map(c=>[c.id,group==='all'||(group==='travel'?c.id==='travel':c.id!=='travel')?stats.spent[c.id]:0])) as Record<Category,number>}/></div><div className="panel fx-detail"><h2><RefreshCw size={18}/> EUR / CZK</h2><strong>{fx.cache?.rates.CZK?`1 EUR ≈ ${fx.cache.rates.CZK.rate.toFixed(2)} CZK`:'Sem taxa disponível'}</strong><p>{fx.cache?.rates.CZK?`Referência publicada em ${fx.cache.rates.CZK.date}. Cada movimento guarda a taxa utilizada.`:'Atualiza as taxas nas definições ou introduz a taxa do banco.'}</p></div></aside></section></>}
-  {isSettings&&<><div className="settings-tabs"><button className={settingsSection==='plan'?'selected':''} onClick={()=>setSettingsSection('plan')}><Wallet size={18}/> Plano</button><button className={settingsSection==='rates'?'selected':''} onClick={()=>setSettingsSection('rates')}><RefreshCw size={18}/> Câmbio</button><button className={settingsSection==='tracking'?'selected':''} onClick={()=>setSettingsSection('tracking')}><WashingMachine size={18}/> Cartão</button><button className={settingsSection==='data'?'selected':''} onClick={()=>setSettingsSection('data')}><Download size={18}/> Dados</button><button className={settingsSection==='sync'?'selected':''} onClick={()=>setSettingsSection('sync')}><Cloud size={18}/> Conta</button></div><div className={`settings-grid section-${settingsSection}`} ><div className="panel plan-panel"><div className="section-heading"><div><h2>Your monthly plan</h2><p>One plan for all months, including past months. October 25–31 is automatically prorated. Day-to-day and travel limits restart every month.</p></div></div><BudgetForm key={JSON.stringify(globalPlan(data))} data={data} save={d=>commit(d,'Monthly plan saved for all months')}/><p className="help">Day to day and travel are independent budgets. Only laundry card credit rolls over. Weekly guides are prorated to the days in the month.</p><div className="semester-plan"><h3><CalendarDays size={17}/> Semester trajectory</h3><div>{monthList.map(m=><span key={m} className={m===today().slice(0,7)?'current':''}><small>{monthLabel(m)}</small><b>{money(planFor(data,m).budget)}</b></span>)}</div></div></div><div className="right-stack"><div className="panel rates-panel"><ExchangePanel fx={fx}/></div><div className="panel tracking-panel"><h2>Tracking & opening balances</h2><p className="help">Only enter laundry credit you actually have. It is not a new expense. Previous travel and emergency reserves are retained in backups and no longer increase your monthly budgets.</p><LaundryPanel stats={stats} openNew={openNew}/><SettingsForm key={JSON.stringify(data.settings)} data={data} save={d=>commit(d,'Settings saved')}/><div className="laundry-history"><h3><WashingMachine size={18}/> Histórico do cartão</h3><p className="help">Até {range?.end??monthEnd(month)} · apenas carregamentos e consumo do cartão.</p><TransactionList rows={data.transactions.filter(t=>(t.kind==='topup'||t.kind==='wash')&&t.date<=(range?.end??monthEnd(month)))} edit={setEditor} remove={t=>{if(confirm('Eliminar este movimento do cartão?'))commit({...data,transactions:data.transactions.filter(x=>x.id!==t.id)},'Transaction removed');}} add={()=>openNew('topup')}/></div></div><div className="panel data-panel"><h2>Your data, your way</h2><p className="help">JSON saves everything. CSV exports transactions and merges them by ID. Imports are validated before any changes.</p><div className="export-buttons"><button onClick={exportJSON}><Download size={16}/> Full JSON backup</button><button onClick={()=>download(`pocket-transactions-${today()}.csv`,toCSV(data),'text/csv;charset=utf-8')}><Download size={16}/> Transactions CSV</button><button onClick={()=>fileRef.current?.click()}><Upload size={16}/> Import JSON / CSV</button></div><input type="file" ref={fileRef} hidden onChange={e=>readFile(e.target.files?.[0])}/><p className="help">Local data stays in this browser. Export a backup before clearing browser data or moving devices.</p></div><div className="panel sync-panel"><h2><Cloud size={20}/> Account & sync</h2>{!cloud?<><p className="help">Local mode is ready to use. Add your Supabase project URL and publishable key to enable sign-in and sync. Setup instructions are in README.md.</p><span className="pill">No account required</span></>:store.user?<><p className="help">Signed in as {store.user.email}. Account data is separate from the local workspace. To transfer local records, export there and import here.</p><p className="sync-status">{store.status}</p><div className="button-pair"><button onClick={()=>store.sync()} disabled={store.busy||!online}><RefreshCw size={16} className={store.busy?'spin':''}/> Sync now</button><button onClick={async()=>{if(store.dirty&&!confirm('Unsynced changes stay on this device. Sign out anyway?'))return;const result=await cloud!.auth.signOut();if(result.error)setToast(result.error.message);}}><LogOut size={16}/> Sign out</button></div><p className="help">Press Sync on each device before and after editing. Offline changes stay local until synced. If both versions changed, you choose which to keep.</p></>:<form onSubmit={async e=>{e.preventDefault();const email=String(new FormData(e.currentTarget).get('email'));const {error}=await cloud!.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin}});setToast(error?.message??'Check your email for a sign-in link.');}}><Field label="Email address"><input type="email" name="email" required placeholder="you@example.com"/></Field><button className="primary" type="submit">Send sign-in link</button><p className="help">Signing in opens a separate account workspace. Your local records stay on this device.</p></form>}</div></div></div></>}
-  <footer><span>pocket. <span className="muted">Made for your Ostrava chapter.</span></span><span className="muted">EUR budget · multiple currencies · CZK laundry card</span></footer></div></main>
-  {editor&&<Modal title={editor==='new'?'Novo movimento':'Editar movimento'} close={()=>setEditor(null)}><TransactionForm data={data} month={month} initial={editor==='new'?undefined:editor} initialKind={editorKind} fx={fx} save={t=>{if(commit({...data,transactions:[...data.transactions.filter(x=>x.id!==t.id),t]},'Transaction saved'))setEditor(null);}}/></Modal>}
-  {pendingImport&&<Modal title={pendingImport.type} close={()=>setPendingImport(null)}><p>{pendingImport.data.transactions.length} transactions in the resulting workspace.</p><p className="help">JSON replaces the full workspace, including plans and balances. CSV keeps current settings and merges transactions. Download a backup first if you want to preserve the current version.</p><div className="button-pair"><button onClick={exportJSON}><Download size={16}/> Back up current</button><button className="primary" onClick={()=>{try{store.restore(pendingImport.data);setPendingImport(null);setToast('Import complete · saved locally');}catch(e){setToast((e as Error).message);}}}>Confirm import</button></div></Modal>}
-  {store.conflict&&<Modal title="Two versions need your choice" close={()=>store.resolveConflict('local')}><div className="conflict-banner"><Cloud size={23}/><div><span className="tiny">ATENÇÃO NECESSÁRIA</span><h3>Conflito de sincronização</h3><p>O documento foi alterado neste dispositivo e na nuvem. Escolhe a versão a manter.</p></div></div><p className="help">Local: {data.transactions.length} records. Cloud: {store.conflict.data.transactions.length} records. Both versions are retained in a local recovery snapshot. Export both if you need to combine them manually.</p><div className="export-buttons"><button onClick={exportJSON}>Export local JSON</button><button onClick={()=>download('pocket-cloud-conflict.json',JSON.stringify(store.conflict?.data,null,2))}>Export cloud JSON</button></div><div className="button-pair"><button onClick={()=>store.resolveConflict('remote')}><Cloud size={18}/> Use cloud version <small>{store.conflict.data.transactions.length} movimentos</small></button><button className="primary" onClick={()=>store.resolveConflict('local')}><Wallet size={18}/> Keep local version <small>{data.transactions.length} movimentos · sincronizar depois</small></button></div></Modal>}
-  {toast&&<div className="toast" role="status">{toast}<button onClick={()=>setToast('')} aria-label="Dismiss notification"><X size={16}/></button></div>}
- </div>;
+import {
+  ArrowLeftRight,
+  CalendarDays,
+  ChartPie,
+  ChevronLeft,
+  ChevronRight,
+  Cloud,
+  Download,
+  LayoutDashboard,
+  LogOut,
+  MapPin,
+  Moon,
+  Plus,
+  RefreshCw,
+  Settings,
+  SlidersHorizontal,
+  Sun,
+  Upload,
+  UserRound,
+  Wallet,
+  WashingMachine,
+  X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useRegisterSW } from "virtual:pwa-register/react";
+import {
+  BudgetForm,
+  ExchangePanel,
+  LaundryPanel,
+  SettingsForm,
+  TransactionList,
+} from "./components/Panels";
+import { Field, Modal } from "./components/Primitives";
+import { TransactionForm } from "./components/TransactionEditor";
+import {
+  currentPeriod,
+  globalPlan,
+  money,
+  monthEnd,
+  monthLabel,
+  months,
+  planFor,
+  summary,
+  today,
+  transactionOrder,
+  validateData,
+  weeks,
+  type Data,
+  type Transaction,
+} from "./model";
+import { cloud, useBudget } from "./store";
+import { download, importCSV, toCSV } from "./transfer";
+import { useExchangeRates } from "./useExchangeRates";
+import { OverviewView } from "./views/Overview";
+import { TransactionsView } from "./views/Transactions";
+const toCents = (s: FormDataEntryValue | null) => Math.round(Number(s) * 100);
+export default function App() {
+  const [dark, setDark] = useState(() => {
+    try {
+      const saved = localStorage.getItem("pocket-theme");
+      return saved ? saved === "dark" : true;
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", dark ? "#00170f" : "#eaf5ee");
+    try {
+      localStorage.setItem("pocket-theme", dark ? "dark" : "light");
+    } catch {}
+  }, [dark]);
+  const fx = useExchangeRates();
+  const store = useBudget(),
+    { data, update } = store;
+  const [tab, setTab] = useState("Overview"),
+    [month, setMonth] = useState(() => currentPeriod(data).month),
+    [view, setView] = useState(() => {
+      try {
+        return localStorage.getItem("pocket-view") === "week"
+          ? "week"
+          : "month";
+      } catch {
+        return "month";
+      }
+    }),
+    [week, setWeek] = useState(() => currentPeriod(data).week);
+  const [group, setGroup] = useState("all");
+  const [pendingDelete, setPendingDelete] = useState<Transaction | null>(null),
+    [removed, setRemoved] = useState<Transaction | null>(null);
+  const [settingsSection, setSettingsSection] = useState("plan");
+  const isSettings = tab === "Budget & settings" || tab === "Budget";
+  const [editor, setEditor] = useState<Transaction | "new" | null>(null),
+    [editorKind, setEditorKind] = useState<Transaction["kind"]>("expense"),
+    [toast, setToast] = useState(""),
+    [search, setSearch] = useState(""),
+    [filter, setFilter] = useState("all"),
+    [pendingImport, setPendingImport] = useState<{
+      data: Data;
+      type: string;
+    } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null),
+    [online, setOnline] = useState(navigator.onLine);
+  useEffect(() => {
+    // Pending actions belong to the workspace in which they were started.
+    setRemoved(null);
+    setPendingDelete(null);
+    setPendingImport(null);
+    setEditor(null);
+  }, [store.user?.id]);
+  const {
+    needRefresh: [needRefresh],
+    updateServiceWorker,
+  } = useRegisterSW();
+  useEffect(() => {
+    const on = () => setOnline(navigator.onLine);
+    window.addEventListener("online", on);
+    window.addEventListener("offline", on);
+    return () => {
+      window.removeEventListener("online", on);
+      window.removeEventListener("offline", on);
+    };
+  }, []);
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(""), 5000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+  useEffect(() => {
+    const reset = () => {
+      if (document.visibilityState === "hidden") return;
+      const p = currentPeriod(data);
+      setMonth(p.month);
+      setWeek(p.week);
+    };
+    reset();
+    let date = today();
+    const timer = setInterval(() => {
+      if (today() !== date) {
+        date = today();
+        reset();
+      }
+    }, 30000);
+    window.addEventListener("pageshow", reset);
+    window.addEventListener("focus", reset);
+    document.addEventListener("visibilitychange", reset);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("pageshow", reset);
+      window.removeEventListener("focus", reset);
+      document.removeEventListener("visibilitychange", reset);
+    };
+  }, [
+    data.settings.start,
+    data.settings.end,
+    data.settings.firstDay,
+    store.user?.id,
+  ]);
+  useEffect(() => {
+    try {
+      localStorage.setItem("pocket-view", view);
+    } catch {}
+  }, [view]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [tab]);
+  const monthList = months(data.settings.start, data.settings.end),
+    weekList = weeks(month, data),
+    range =
+      view === "week"
+        ? weekList[Math.min(week, weekList.length - 1)]
+        : undefined;
+  const stats = summary(data, month, range),
+    plan = planFor(data, month),
+    isFuture = month > today().slice(0, 7);
+  function selectBudget(next: string) {
+    setGroup((current) => (current === next ? "all" : next));
+    setFilter("all");
+  }
+  const groupCash = (s: ReturnType<typeof summary>) =>
+    group === "travel"
+      ? s.spent.travel
+      : group === "daily"
+        ? s.cash - s.spent.travel
+        : s.cash;
+  function commit(d: Data, message = "Saved") {
+    try {
+      update(d);
+      setToast(message);
+      return true;
+    } catch (e) {
+      setToast((e as Error).message);
+      return false;
+    }
+  }
+  function openNew(kind: Transaction["kind"] = "expense") {
+    setEditorKind(kind);
+    setEditor("new");
+  }
+  function changeMonth(m: string) {
+    setMonth(m);
+    const p = currentPeriod(data);
+    setWeek(m === p.month ? p.week : 0);
+  }
+  async function readFile(file?: File) {
+    if (!file) return;
+    try {
+      if (file.size > 10000000)
+        throw new Error("Please choose a file smaller than 10 MB.");
+      const text = await file.text();
+      const csv = file.name.toLowerCase().endsWith(".csv");
+      const next = csv ? importCSV(text, data) : validateData(JSON.parse(text));
+      setPendingImport({
+        data: next,
+        type: csv ? "Merge CSV transactions" : "Restore full JSON backup",
+      });
+    } catch (e) {
+      setToast((e as Error).message);
+    }
+    if (fileRef.current) fileRef.current.value = "";
+  }
+  const rows = stats.rows
+    .filter(
+      (t) =>
+        (group === "all" ||
+          (group === "travel"
+            ? t.category === "travel"
+            : t.category !== "travel")) &&
+        (filter === "all" || t.category === filter) &&
+        `${t.note} ${t.category} ${t.kind}`
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+    )
+    .sort(transactionOrder);
+  const exportJSON = () =>
+    download(`pocket-${today()}.json`, JSON.stringify(data, null, 2));
+  const viewProps = {
+    data,
+    month,
+    view,
+    range,
+    group,
+    stats,
+    plan,
+    weekList,
+    rows,
+    isFuture,
+    fx,
+    search,
+    filter,
+    setTab,
+    setSettingsSection,
+    selectBudget,
+    groupCash,
+    openNew,
+    setEditor,
+    setPendingDelete,
+    setSearch,
+    setFilter,
+    setGroup,
+  };
+  return (
+    <div className="app-shell">
+      <aside className="sidebar">
+        <a
+          className="brand"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            setTab("Overview");
+          }}
+        >
+          <span className="brand-icon">
+            <Wallet size={24} />
+          </span>
+          <span>
+            Pocket<small>Your Erasmus Companion</small>
+          </span>
+        </a>
+        <div className="active-term">
+          <MapPin size={17} />
+          <div>
+            <span>ACTIVE TERM</span>
+            <strong>
+              Erasmus · {data.settings.start.slice(0, 4)}/
+              {data.settings.end.slice(2, 4)}
+            </strong>
+          </div>
+        </div>
+        <nav>
+          {[
+            { name: "Overview", icon: LayoutDashboard },
+            { name: "Transactions", icon: ArrowLeftRight },
+            { name: "Budget & settings", icon: SlidersHorizontal },
+          ].map(({ name, icon: Icon }) => (
+            <button
+              key={name}
+              className={
+                tab === name || (name === "Budget & settings" && isSettings)
+                  ? "active"
+                  : ""
+              }
+              onClick={() => setTab(name)}
+            >
+              <Icon size={20} />
+              <span>{name}</span>
+            </button>
+          ))}
+        </nav>
+        <button
+          className="sidebar-laundry"
+          onClick={() => {
+            setTab("Overview");
+            setGroup("daily");
+          }}
+        >
+          <WashingMachine size={20} />
+          <span>
+            Lavandaria<strong>{money(stats.card, "CZK")}</strong>
+          </span>
+          <ChevronRight size={16} />
+        </button>
+        <div className="storage-badge">
+          <MapPin size={14} />
+          <span>Ostrava, Czechia</span>
+          <span className={online ? "status-dot" : "status-dot offline"} />
+          <small>{store.user?.email ?? "Guardado neste dispositivo"}</small>
+        </div>
+      </aside>
+      <nav className="mobile-nav" aria-label="Mobile navigation">
+        <button
+          className={tab === "Overview" ? "active" : ""}
+          onClick={() => setTab("Overview")}
+        >
+          <LayoutDashboard size={21} />
+          <span>Overview</span>
+        </button>
+        <button
+          className={tab === "Transactions" ? "active" : ""}
+          onClick={() => setTab("Transactions")}
+        >
+          <ArrowLeftRight size={21} />
+          <span>Transactions</span>
+        </button>
+        <button
+          className="quick-add"
+          aria-label="Add transaction"
+          onClick={() => openNew()}
+          disabled={!store.ready || store.corrupt}
+        >
+          <Plus size={29} />
+        </button>
+        <button
+          className={tab === "Budget" ? "active" : ""}
+          onClick={() => {
+            setTab("Budget");
+            setSettingsSection("plan");
+          }}
+        >
+          <ChartPie size={21} />
+          <span>Budget</span>
+        </button>
+        <button
+          className={tab === "Budget & settings" ? "active" : ""}
+          onClick={() => {
+            setTab("Budget & settings");
+            setSettingsSection("rates");
+          }}
+        >
+          <Settings size={21} />
+          <span>Settings</span>
+        </button>
+      </nav>
+      <main>
+        <header className="topbar">
+          <div className="breadcrumb">
+            <span className="desktop-crumb">
+              <LayoutDashboard size={15} /> / Erasmus Hub / <b>{tab}</b>
+            </span>
+            <span className="mobile-brand">
+              <span className="brand-icon">
+                <Wallet size={22} />
+              </span>
+              <span>
+                Pocket <em>Erasmus+</em>
+                <small>ERASMUS · OSTRAVA</small>
+              </span>
+            </span>
+          </div>
+          <div className="header-actions">
+            <span
+              className="fx-pill"
+              title={
+                fx.cache?.rates.CZK
+                  ? `Publicado em ${fx.cache.rates.CZK.date}`
+                  : "Sem taxa em cache"
+              }
+            >
+              <RefreshCw size={16} />{" "}
+              {fx.cache?.rates.CZK ? (
+                <>
+                  <span>1 EUR ≈ </span>
+                  <strong>{fx.cache.rates.CZK.rate.toFixed(2)} CZK</strong>
+                </>
+              ) : (
+                <strong>EUR / CZK</strong>
+              )}
+            </span>
+            <button
+              className="sync-pill"
+              onClick={() => {
+                setTab("Budget & settings");
+                setSettingsSection("sync");
+              }}
+            >
+              <span
+                className={
+                  store.user &&
+                  !store.dirty &&
+                  store.status === "Synced just now"
+                    ? "status-dot"
+                    : "status-dot offline"
+                }
+              />
+              {!online
+                ? "Offline"
+                : !store.user
+                  ? "Local workspace"
+                  : store.dirty
+                    ? "Sync pending"
+                    : store.status}
+            </button>
+            <button
+              className="icon-button theme-toggle"
+              aria-label={
+                dark ? "Switch to light theme" : "Switch to dark theme"
+              }
+              onClick={() => setDark(!dark)}
+            >
+              {dark ? <Sun size={19} /> : <Moon size={19} />}
+            </button>
+            <button
+              className="primary top-add"
+              onClick={() => openNew()}
+              disabled={!store.ready || store.corrupt}
+            >
+              <Plus size={18} /> Add transaction
+            </button>
+            <button
+              className="avatar"
+              aria-label="Account settings"
+              onClick={() => {
+                setTab("Budget & settings");
+                setSettingsSection("sync");
+              }}
+            >
+              <UserRound size={19} />
+            </button>
+          </div>
+        </header>
+        <div
+          className={`content screen-${tab === "Transactions" ? "transactions" : isSettings ? "settings" : "overview"}`}
+        >
+          <div className="page-heading">
+            <div>
+              <div className="eyebrow">ERASMUS · OSTRAVA 2026/27</div>
+              <h1>
+                {tab === "Overview"
+                  ? "Your adventure, in balance."
+                  : tab === "Transactions"
+                    ? "The little things add up."
+                    : "A plan that fits your life."}
+              </h1>
+              <p>
+                {tab === "Overview"
+                  ? "A clear view of your money. More headspace for Erasmus."
+                  : tab === "Transactions"
+                    ? "Every coffee, train ride and laundry day, in one place."
+                    : "Your monthly budgets, laundry credit and data — all in your hands."}
+              </p>
+            </div>
+            <button
+              className="primary"
+              onClick={() => openNew()}
+              disabled={!store.ready || store.corrupt}
+            >
+              <Plus size={18} /> Add transaction
+            </button>
+          </div>
+          {store.corrupt && (
+            <div className="notice error">
+              Saved data needs recovery.{" "}
+              <button
+                onClick={() =>
+                  download(
+                    "pocket-recovery.txt",
+                    store.recovery(),
+                    "text/plain",
+                  )
+                }
+              >
+                Export recovery file
+              </button>{" "}
+              Then restore a JSON backup below.
+            </div>
+          )}
+          {store.error && (
+            <div role="alert" className="notice error">
+              {store.error}
+              <button
+                onClick={() => store.setError("")}
+                aria-label="Dismiss error"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
+          {needRefresh && (
+            <div className="notice">
+              An app update is ready. Save any open form first.{" "}
+              <button onClick={() => updateServiceWorker(true)}>
+                Reload & update
+              </button>
+            </div>
+          )}
+          {!isSettings && (
+            <div className="period-bar">
+              <div className="month-picker">
+                <button
+                  className="icon-button"
+                  aria-label="Previous month"
+                  disabled={month === monthList[0]}
+                  onClick={() =>
+                    changeMonth(monthList[monthList.indexOf(month) - 1])
+                  }
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <select
+                  aria-label="Selected month"
+                  value={month}
+                  onChange={(e) => changeMonth(e.target.value)}
+                >
+                  {monthList.map((m) => (
+                    <option key={m} value={m}>
+                      {monthLabel(m)}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className="icon-button"
+                  aria-label="Next month"
+                  disabled={month === monthList.at(-1)}
+                  onClick={() =>
+                    changeMonth(monthList[monthList.indexOf(month) + 1])
+                  }
+                >
+                  <ChevronRight size={18} />
+                </button>
+                {isFuture && <span className="pill">Plan preview</span>}
+              </div>
+              <div className="period-right">
+                <select
+                  aria-label="Budget group"
+                  value={group}
+                  onChange={(e) => {
+                    setGroup(e.target.value);
+                    setFilter("all");
+                  }}
+                >
+                  <option value="all">Both budgets</option>
+                  <option value="daily">Day to day</option>
+                  <option value="travel">Travel & tourism</option>
+                </select>
+                {view === "week" && (
+                  <select
+                    aria-label="Selected week"
+                    value={Math.min(week, weekList.length - 1)}
+                    onChange={(e) => setWeek(Number(e.target.value))}
+                  >
+                    {weekList.map((w, i) => (
+                      <option key={w.start} value={i}>
+                        {w.start.slice(8)}–{w.end.slice(8)}{" "}
+                        {new Date(month + "-15").toLocaleDateString("en", {
+                          month: "short",
+                        })}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <div className="segmented">
+                  <button
+                    className={view === "month" ? "selected" : ""}
+                    onClick={() => setView("month")}
+                  >
+                    Month
+                  </button>
+                  <button
+                    className={view === "week" ? "selected" : ""}
+                    onClick={() => {
+                      setView("week");
+                      const p = currentPeriod(data);
+                      if (month === p.month) setWeek(p.week);
+                    }}
+                  >
+                    Week
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {tab === "Overview" && <OverviewView {...viewProps} />}
+          {tab === "Transactions" && <TransactionsView {...viewProps} />}
+          {isSettings && (
+            <>
+              <div className="settings-tabs">
+                <button
+                  className={settingsSection === "plan" ? "selected" : ""}
+                  onClick={() => setSettingsSection("plan")}
+                >
+                  <Wallet size={18} /> Plano
+                </button>
+                <button
+                  className={settingsSection === "rates" ? "selected" : ""}
+                  onClick={() => setSettingsSection("rates")}
+                >
+                  <RefreshCw size={18} /> Câmbio
+                </button>
+                <button
+                  className={settingsSection === "tracking" ? "selected" : ""}
+                  onClick={() => setSettingsSection("tracking")}
+                >
+                  <WashingMachine size={18} /> Cartão
+                </button>
+                <button
+                  className={settingsSection === "data" ? "selected" : ""}
+                  onClick={() => setSettingsSection("data")}
+                >
+                  <Download size={18} /> Dados
+                </button>
+                <button
+                  className={settingsSection === "sync" ? "selected" : ""}
+                  onClick={() => setSettingsSection("sync")}
+                >
+                  <Cloud size={18} /> Conta
+                </button>
+              </div>
+              <div className={`settings-grid section-${settingsSection}`}>
+                <div className="panel plan-panel">
+                  <div className="section-heading">
+                    <div>
+                      <h2>Your monthly plan</h2>
+                      <p>
+                        One plan for all months, including past months. The
+                        first month follows your configured start day.
+                        Day-to-day and travel limits restart every month.
+                      </p>
+                    </div>
+                  </div>
+                  <BudgetForm
+                    key={JSON.stringify(globalPlan(data))}
+                    data={data}
+                    save={(d) => commit(d, "Monthly plan saved for all months")}
+                  />
+                  <p className="help">
+                    Day to day and travel are independent budgets. Only laundry
+                    card credit rolls over. Weekly guides are prorated to the
+                    days in the month.
+                  </p>
+                  <div className="semester-plan">
+                    <h3>
+                      <CalendarDays size={17} /> Semester trajectory
+                    </h3>
+                    <div>
+                      {monthList.map((m) => (
+                        <span
+                          key={m}
+                          className={m === today().slice(0, 7) ? "current" : ""}
+                        >
+                          <small>{monthLabel(m)}</small>
+                          <b>{money(planFor(data, m).budget)}</b>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="right-stack">
+                  <div className="panel rates-panel">
+                    <ExchangePanel fx={fx} />
+                  </div>
+                  <div className="panel tracking-panel">
+                    <h2>Tracking & opening balances</h2>
+                    <p className="help">
+                      Only enter laundry credit you actually have. It is not a
+                      new expense. Previous travel and emergency reserves are
+                      retained in backups and no longer increase your monthly
+                      budgets.
+                    </p>
+                    <LaundryPanel stats={stats} openNew={openNew} />
+                    <SettingsForm
+                      key={JSON.stringify(data.settings)}
+                      data={data}
+                      save={(d) => commit(d, "Settings saved")}
+                    />
+                    <div className="laundry-history">
+                      <h3>
+                        <WashingMachine size={18} /> Histórico do cartão
+                      </h3>
+                      <p className="help">
+                        Até {range?.end ?? monthEnd(month)} · apenas
+                        carregamentos e consumo do cartão.
+                      </p>
+                      <TransactionList
+                        rows={data.transactions.filter(
+                          (t) =>
+                            (t.kind === "topup" || t.kind === "wash") &&
+                            t.date <= (range?.end ?? monthEnd(month)),
+                        )}
+                        edit={setEditor}
+                        remove={setPendingDelete}
+                        add={() => openNew("topup")}
+                      />
+                    </div>
+                  </div>
+                  <div className="panel data-panel">
+                    <h2>Your data, your way</h2>
+                    <p className="help">
+                      JSON e CSV são exportados em texto simples, sem
+                      encriptação. Guarda-os num local privado. CSV funde
+                      transações por ID. Imports are validated before any
+                      changes.
+                    </p>
+                    <div className="export-buttons">
+                      <button onClick={exportJSON}>
+                        <Download size={16} /> Full JSON backup
+                      </button>
+                      <button
+                        onClick={() =>
+                          download(
+                            `pocket-transactions-${today()}.csv`,
+                            toCSV(data),
+                            "text/csv;charset=utf-8",
+                          )
+                        }
+                      >
+                        <Download size={16} /> Transactions CSV
+                      </button>
+                      <button onClick={() => fileRef.current?.click()}>
+                        <Upload size={16} /> Import JSON / CSV
+                      </button>
+                    </div>
+                    <input
+                      type="file"
+                      ref={fileRef}
+                      hidden
+                      onChange={(e) => readFile(e.target.files?.[0])}
+                    />
+                    <p className="help">
+                      Local data stays in this browser. Export a backup before
+                      clearing browser data or moving devices.
+                    </p>
+                  </div>
+                  <div className="panel sync-panel">
+                    <h2>
+                      <Cloud size={20} /> Account & sync
+                    </h2>
+                    {!cloud ? (
+                      <>
+                        <p className="help">
+                          Local mode is ready to use. Add your Supabase project
+                          URL and publishable key to enable sign-in and sync.
+                          Setup instructions are in README.md.
+                        </p>
+                        <span className="pill">No account required</span>
+                      </>
+                    ) : store.user ? (
+                      <>
+                        <p className="help">
+                          Signed in as {store.user.email}. Account data is
+                          separate from the local workspace. To transfer local
+                          records, export there and import here.
+                        </p>
+                        <p className="sync-status">{store.status}</p>
+                        <div className="button-pair">
+                          <button
+                            onClick={() => store.sync()}
+                            disabled={store.busy || !online}
+                          >
+                            <RefreshCw
+                              size={16}
+                              className={store.busy ? "spin" : ""}
+                            />{" "}
+                            Sync now
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (
+                                store.dirty &&
+                                !confirm(
+                                  "Unsynced changes stay on this device. Sign out anyway?",
+                                )
+                              )
+                                return;
+                              const result = await cloud!.auth.signOut();
+                              if (result.error) setToast(result.error.message);
+                            }}
+                          >
+                            <LogOut size={16} /> Sign out
+                          </button>
+                        </div>
+                        <p className="help">
+                          Press Sync on each device before and after editing.
+                          Offline changes stay local until synced. If both
+                          versions changed, you choose which to keep.
+                        </p>
+                      </>
+                    ) : (
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const email = String(
+                            new FormData(e.currentTarget).get("email"),
+                          );
+                          const { error } = await cloud!.auth.signInWithOtp({
+                            email,
+                            options: { emailRedirectTo: location.origin },
+                          });
+                          setToast(
+                            error?.message ??
+                              "Check your email for a sign-in link.",
+                          );
+                        }}
+                      >
+                        <Field label="Email address">
+                          <input
+                            type="email"
+                            name="email"
+                            required
+                            placeholder="you@example.com"
+                          />
+                        </Field>
+                        <button className="primary" type="submit">
+                          Send sign-in link
+                        </button>
+                        <p className="help">
+                          Signing in opens a separate account workspace. Your
+                          local records stay on this device.
+                        </p>
+                      </form>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+          <footer>
+            <span>
+              pocket.{" "}
+              <span className="muted">Made for your Ostrava chapter.</span>
+            </span>
+            <span className="muted">
+              EUR budget · multiple currencies · CZK laundry card
+            </span>
+          </footer>
+        </div>
+      </main>
+      {editor && (
+        <Modal
+          title={editor === "new" ? "Novo movimento" : "Editar movimento"}
+          close={() => setEditor(null)}
+        >
+          <TransactionForm
+            data={data}
+            month={month}
+            initial={editor === "new" ? undefined : editor}
+            initialKind={editorKind}
+            fx={fx}
+            save={(t) => {
+              if (
+                commit(
+                  {
+                    ...data,
+                    transactions: [
+                      ...data.transactions.filter((x) => x.id !== t.id),
+                      t,
+                    ],
+                  },
+                  "Transaction saved",
+                )
+              )
+                setEditor(null);
+            }}
+          />
+        </Modal>
+      )}
+      {pendingImport && (
+        <Modal title={pendingImport.type} close={() => setPendingImport(null)}>
+          <p>
+            {pendingImport.data.transactions.length} transactions in the
+            resulting workspace.
+          </p>
+          <p className="help">
+            JSON replaces the full workspace, including plans and balances. CSV
+            keeps current settings and merges transactions. Download a backup
+            first if you want to preserve the current version.
+          </p>
+          <div className="button-pair">
+            <button onClick={exportJSON}>
+              <Download size={16} /> Back up current
+            </button>
+            <button
+              className="primary"
+              onClick={() => {
+                try {
+                  store.restore(pendingImport.data);
+                  setRemoved(null);
+                  setPendingImport(null);
+                  setToast("Import complete · saved locally");
+                } catch (e) {
+                  setToast((e as Error).message);
+                }
+              }}
+            >
+              Confirm import
+            </button>
+          </div>
+        </Modal>
+      )}
+      {store.conflict && (
+        <Modal
+          title="Two versions need your choice"
+          close={() => store.resolveConflict("local")}
+        >
+          <div className="conflict-banner">
+            <Cloud size={23} />
+            <div>
+              <span className="tiny">ATENÇÃO NECESSÁRIA</span>
+              <h3>Conflito de sincronização</h3>
+              <p>
+                O documento foi alterado neste dispositivo e na nuvem. Escolhe a
+                versão a manter.
+              </p>
+            </div>
+          </div>
+          <p className="help">
+            Local: {data.transactions.length} records. Cloud:{" "}
+            {store.conflict.data.transactions.length} records. Both versions are
+            retained in a local recovery snapshot. Export both if you need to
+            combine them manually.
+          </p>
+          <div className="export-buttons">
+            <button onClick={exportJSON}>Export local JSON</button>
+            <button
+              onClick={() =>
+                download(
+                  "pocket-cloud-conflict.json",
+                  JSON.stringify(store.conflict?.data, null, 2),
+                )
+              }
+            >
+              Export cloud JSON
+            </button>
+          </div>
+          <div className="button-pair">
+            <button onClick={() => store.resolveConflict("remote")}>
+              <Cloud size={18} /> Use cloud version{" "}
+              <small>
+                {store.conflict.data.transactions.length} movimentos
+              </small>
+            </button>
+            <button
+              className="primary"
+              onClick={() => store.resolveConflict("local")}
+            >
+              <Wallet size={18} /> Keep local version{" "}
+              <small>
+                {data.transactions.length} movimentos · sincronizar depois
+              </small>
+            </button>
+          </div>
+        </Modal>
+      )}
+      {pendingDelete && (
+        <Modal title="Eliminar movimento?" close={() => setPendingDelete(null)}>
+          <p>
+            {pendingDelete.note || pendingDelete.kind} · {pendingDelete.date} ·{" "}
+            {money(pendingDelete.eur)}
+          </p>
+          <p className="help">
+            Podes anular a eliminação neste dispositivo. A validação do cartão
+            continua ativa.
+          </p>
+          <div className="button-pair">
+            <button onClick={() => setPendingDelete(null)}>Cancelar</button>
+            <button
+              className="primary"
+              onClick={() => {
+                const item = pendingDelete;
+                if (
+                  commit(
+                    {
+                      ...data,
+                      transactions: data.transactions.filter(
+                        (t) => t.id !== item.id,
+                      ),
+                    },
+                    "Movimento eliminado",
+                  )
+                ) {
+                  setRemoved(item);
+                  setPendingDelete(null);
+                }
+              }}
+            >
+              Eliminar
+            </button>
+          </div>
+        </Modal>
+      )}
+      {removed && (
+        <div className="undo-notice" role="status">
+          Movimento eliminado.
+          <button
+            onClick={() => {
+              if (data.transactions.some((t) => t.id === removed.id)) {
+                setToast("Este movimento já existe.");
+                return;
+              }
+              if (
+                commit(
+                  { ...data, transactions: [...data.transactions, removed] },
+                  "Eliminação anulada",
+                )
+              )
+                setRemoved(null);
+            }}
+          >
+            Anular
+          </button>
+          <button
+            aria-label="Fechar opção de anular"
+            onClick={() => setRemoved(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      {toast && (
+        <div className="toast" role="status">
+          {toast}
+          <button
+            onClick={() => setToast("")}
+            aria-label="Dismiss notification"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
-
-function ExchangePanel({fx}:{fx:ReturnType<typeof useExchangeRates>}){
- const [query,setQuery]=useState(''),[code,setCode]=useState('CZK'),[amount,setAmount]=useState('10');
- const quote=code==='EUR'?{rate:1,date:today()}:fx.cache?.rates[code];
- return <><div className="section-heading"><div><h2><RefreshCw size={21}/> Exchange rates</h2><p>Referências Frankfurter · base EUR</p></div><button className="icon-button" onClick={()=>fx.refresh(true)} disabled={fx.busy} aria-label="Refresh rates"><RefreshCw size={18} className={fx.busy?'spin':''}/></button></div><div className="rate-hero"><span className="tiny">TAXA DE REFERÊNCIA</span><strong>€1,00 <span>≈ {quote?quote.rate.toLocaleString('pt-PT',{maximumFractionDigits:6}):'—'} {code}</span></strong><p>{quote?`Publicada em ${quote.date}`:'Sem taxa guardada para esta moeda.'}</p><button className="primary full" disabled={fx.busy} onClick={()=>fx.refresh(true)}><RefreshCw size={18}/>{fx.busy?'A atualizar…':'Atualizar taxas online'}</button><small>{fx.cache?`Última consulta: ${new Date(fx.cache.fetchedAt).toLocaleString('pt-PT')}`:'Ainda sem consulta concluída.'}</small></div><div className="rate-calculator"><Field label="Montante EUR"><input type="number" min="0" step="0.01" value={amount} onChange={e=>setAmount(e.target.value)}/></Field><Field label={`Equivalente ${code}`}><output>{quote?(Number(amount||0)*quote.rate).toLocaleString('pt-PT',{maximumFractionDigits:currencyDigits(code)??2}):'—'}</output></Field></div><p className="help">Cada movimento guarda a taxa utilizada. Esta referência pode diferir da taxa do banco. As taxas em cache estão disponíveis offline.</p>{fx.error&&<p className="form-error">{fx.error}</p>}<label className="search"><Search size={19}/><input aria-label="Search exchange currencies" placeholder="Pesquisar moeda, nome ou código…" value={query} onChange={e=>setQuery(e.target.value)}/></label><div className="exchange-list">{searchCurrencies(fx.currencies,query).map(c=><button key={c.code} className={code===c.code?'selected':''} onClick={()=>setCode(c.code)} aria-pressed={code===c.code}><span className="currency-symbol">{c.code.slice(0,1)}</span><span><b>{c.code}</b><small>{c.name}</small></span><strong>{c.code==='EUR'?'1,0000':fx.cache?.rates[c.code]?.rate.toLocaleString('pt-PT',{maximumFractionDigits:4})??'—'}</strong>{code===c.code&&<CheckCircle2 size={17}/>}</button>)}</div><p className="help">{fx.currencies.length} moedas pesquisáveis. A consulta automática usa cache de seis horas; o botão força uma nova tentativa.</p></>;
-}
-
-function PeriodSummary({stats,plan,month,range,group,selectGroup}:{stats:ReturnType<typeof summary>;plan:ReturnType<typeof planFor>;month:string;range?:{days:number;start:string;end:string};group:string;selectGroup:(group:string)=>void}){
- const remaining=stats.budget+stats.income-stats.cash,used=stats.cash/Math.max(1,stats.budget)*100;
- return <section className="period-summary"><div className="summary-top"><span className="tiny">TOTAL GASTO {range?'NA SEMANA':'NO MÊS'}</span><span className="pill"><span className="status-dot"/>{stats.rows.length} movimentos</span></div><div className="summary-values"><div><strong>{money(stats.cash)}</strong><span> / {money(stats.budget)}</span></div><span>Restam {money(remaining)}</span></div><div className="track"><span style={{width:`${Math.min(100,used)}%`,background:used>100?'var(--error)':'var(--primary)'}}/></div><div className="summary-foot"><span>{range?`${range.start.slice(8)}–${range.end.slice(8)}`:monthLabel(month)} · apoio {money(stats.income)}</span><span>{remaining>=0?'Dentro do orçamento':'Acima do orçamento'}</span></div><div className="budget-pills"><button className={group==='all'?'selected':''} onClick={()=>selectGroup('all')}>Todos</button><button className={group==='daily'?'selected':''} onClick={()=>selectGroup('daily')}>Dia a dia <small>({money(stats.everydayRemaining)} rest.)</small></button><button className={group==='travel'?'selected':''} onClick={()=>selectGroup('travel')}>Viagens <small>({money(stats.travel)} rest.)</small></button></div></section>;
-}
-function LaundryPanel({stats,openNew}:{stats:ReturnType<typeof summary>;openNew:(kind:Transaction['kind'])=>void}){return <div className="laundry-card"><div className="section-heading"><span className="laundry-title"><WashingMachine size={22}/> CZK CARD CREDIT</span></div><div className="laundry-value">{money(stats.card,'CZK')}</div><p>Crédito acumulado do cartão. As lavagens usam o saldo já carregado.</p><div className="button-pair"><button onClick={()=>openNew('topup')}><Plus size={16}/> Top up</button><button onClick={()=>openNew('wash')}><WashingMachine size={16}/> Log wash</button></div></div>;}
-
-function SpendingChart({spent}:{spent:Record<Category,number>}){const total=Object.values(spent).reduce((a,b)=>a+b,0);let offset=0;return <div className="spending-chart"><div className="donut-wrap"><svg viewBox="0 0 160 160" role="img" aria-label={total?`Spending by category. Total ${money(total)}.`:'No spending recorded'}><circle cx="80" cy="80" r="61" fill="none" stroke="#edf0e9" strokeWidth="17"/>{categories.filter(c=>spent[c.id]>0).map(c=>{const length=spent[c.id]/total*383.274;const node=<circle key={c.id} cx="80" cy="80" r="61" fill="none" stroke={c.color} strokeWidth="17" strokeDasharray={`${length} ${383.274-length}`} strokeDashoffset={-offset} transform="rotate(-90 80 80)"/>;offset+=length;return node;})}</svg><div className="donut-label"><strong>{money(total)}</strong><span>{total?'MONEY OUT':'A FRESH START'}</span></div></div>{total?<div className="legend">{categories.filter(c=>spent[c.id]>0).map(c=><div key={c.id}><span style={{background:c.color}}/>{c.name}<b>{Math.round(spent[c.id]/total*100)}%</b></div>)}</div>:<p className="empty-caption">Your story starts with your first expense.<br/>No spending recorded yet.</p>}</div>;}
-
-function TransactionList({rows,edit,remove,add}:{rows:Transaction[];edit:(t:Transaction)=>void;remove:(t:Transaction)=>void;add:()=>void}){
- if(!rows.length)return <div className="empty-state"><span><ArrowLeftRight size={26}/></span><h3>A fresh page for your adventures.</h3><p>No transactions in this view.</p><button className="text-button" onClick={add}><Plus size={16}/> Add expense</button></div>;
- const ordered=[...rows].sort(transactionOrder),days=[...new Set(ordered.map(t=>t.date))];
- return <div className="transactions">{days.map(day=><section className="transaction-day" key={day}><h3><span className="day-dot"/>{day===today()?'Hoje, ':''}{new Date(day+'T12:00:00').toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'})}<span className="day-total">{money(ordered.filter(t=>t.date===day&&t.kind!=='wash').reduce((sum,t)=>sum+(t.kind==='income'?t.eur:-t.eur),0))}</span></h3>{ordered.filter(t=>t.date===day).map(t=>{const c=categories.find(c=>c.id===t.category)!;return <div className={`transaction kind-${t.kind} cat-${c.id}`} key={t.id}><span className={`category-emoji cat-${c.id}`}><CategoryIcon category={c.id} travelType={t.travelType}/></span><div className="transaction-description"><strong>{t.note||(t.kind==='income'?'Money received':t.kind==='topup'?'Laundry top-up':t.kind==='wash'?'Laundry wash':c.name)}</strong><small>{c.name}{t.category==='travel'?` · ${travelTypes.find(x=>x.id===(t.travelType??'unclassified'))?.name}`:''}{t.kind==='income'?' · RECEBIDO':t.kind==='topup'?` · +${money(t.credit,'CZK')} cartão`:''}{t.legacyCategory?` · Rever: ${t.legacyCategory}`:''}{t.date>today()?' · Future dated':''}</small></div><div className="transaction-amount"><strong>{t.kind==='wash'?`− ${money(t.credit,'CZK')}`:`${t.kind==='income'?'+':'−'} ${money(t.eur)}`}</strong><small>{t.kind==='wash'?'€0,00 na conta':t.currency!=='EUR'?money(t.amount,t.currency):t.kind==='income'?'Apoio recebido':'Saída da conta'}</small></div><button className="icon-button" onClick={()=>edit(t)} aria-label={`Edit ${t.note||t.kind}`}><Pencil size={16}/></button><button className="icon-button" onClick={()=>remove(t)} aria-label={`Delete ${t.note||t.kind}`}><Trash2 size={16}/></button></div>;})}</section>)}</div>;
-}
-
-function TransactionForm({data,month,initial,initialKind,fx,save}:{data:Data;month:string;initial?:Transaction;initialKind:Transaction['kind'];fx:ReturnType<typeof useExchangeRates>;save:(t:Transaction)=>void}){
- const [kind,setKind]=useState(initial?.kind??initialKind),[group,setGroup]=useState(initial?.category==='travel'?'travel':'daily');
- const [category,setCategory]=useState<Category>(initial?.category&&initial.category!=='travel'&&(initial.kind==='income'||initial.category!=='laundry')?initial.category:'groceries');
- const [currency,setCurrency]=useState(initial?.currency??'CZK'),[amount,setAmount]=useState(initial?String(initial.amount/100):''),[rate,setRate]=useState(initial?String(initial.rate):data.settings.rate?String(data.settings.rate):''),[error,setError]=useState('');
- const [rateMode,setRateMode]=useState(initial?'saved':'auto');
- const laundry=kind==='topup'||kind==='wash';
- const needsRate=currency!=='EUR'||laundry;
- const quote=fx.cache?.rates[laundry?'CZK':currency];
- useEffect(()=>{if(rateMode==='auto')setRate(needsRate&&quote?String(quote.rate):needsRate?'':'1');},[currency,rateMode,quote?.rate,needsRate]);
- const chooseCurrency=(code:string)=>{setCurrency(code);setRateMode('auto');setRate('');};
- const chooseKind=(k:Transaction['kind'])=>{setKind(k);if(k==='expense'&&category==='laundry')setCategory('groceries');if((k==='topup'||k==='wash')&&!['EUR','CZK'].includes(currency))chooseCurrency('CZK');};
- const digits=currencyDigits(currency),factor=currencyFactor(currency);
- const entered=Math.round(Number(amount)*factor),eur=currency==='EUR'?entered:Math.round(entered/factor*100/Number(rate));
-
- const defaultDate=today()<periodStart(data,data.settings.start)?periodStart(data,data.settings.start):today()>monthEnd(data.settings.end)?monthEnd(data.settings.end):today();
- function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();setError('');try{
-  const f=new FormData(e.currentTarget),laundry=kind==='topup'||kind==='wash';
-  const category=laundry?'laundry':group==='travel'?'travel':String(f.get('category')) as Category;
-  const t=makeTransaction({addedOrder:initial?.addedOrder??Math.max(0,...data.transactions.map(t=>t.addedOrder??0))+1,id:initial?.id??crypto.randomUUID(),date:String(f.get('date')),kind,category,amount:Math.round(Number(amount)*currencyFactor(currency)),currency,rate:needsRate?Number(rate):1,...(rateMode==='auto'&&quote&&needsRate?{rateSource:'Frankfurter' as const,rateDate:quote.date}:rateMode==='saved'?{rateSource:initial?.rateSource,rateDate:initial?.rateDate}:{rateSource:'manual' as const}),note:String(f.get('note')).trim(),...(category==='travel'?{travelType:String(f.get('travelType')) as Transaction['travelType']}:{} )});
-  validateData({...data,transactions:[...data.transactions.filter(x=>x.id!==t.id),t]});save(t);
- }catch(e){setError((e as Error).message);}}
- return <form onSubmit={submit}><div className="segmented full transaction-kinds">{(['expense','income','topup','wash'] as const).map(k=><button type="button" key={k} className={kind===k?'selected':''} onClick={()=>chooseKind(k)}>{k==='expense'?<Wallet size={20}/>:k==='income'?<ArrowDownLeft size={20}/>:k==='topup'?<Plus size={20}/>:<WashingMachine size={20}/>}<span>{{expense:'Despesa',income:'Apoio',topup:'Carregar',wash:'Lavagem'}[k]}</span></button>)}</div>
- {(kind==='expense'||kind==='income')&&<div className="form-section"><div className="field-label">ENVELOPE GLOBAL</div><div className="group-options"><button type="button" className={group==='daily'?'selected':''} onClick={()=>setGroup('daily')}><Wallet size={19}/><b>Dia a dia</b><small>Despesas correntes</small></button><button type="button" className={group==='travel'?'selected':''} onClick={()=>setGroup('travel')}><Plane size={19}/><b>Viagens & turismo</b><small>Um limite independente</small></button></div></div>}
- <CurrencyPicker value={currency} onChange={chooseCurrency} currencies={laundry?fx.currencies.filter(c=>['EUR','CZK'].includes(c.code)):fx.currencies}/>
- <div className="amount-hero"><Field label={`Amount (${currency})`}><input autoFocus type="number" inputMode="decimal" min={1/factor} max={100000000/factor} step={1/factor} required placeholder={(0).toFixed(digits)} value={amount} onChange={e=>setAmount(e.target.value)}/></Field></div>
- {needsRate&&<><Field label="Exchange rate source"><select value={rateMode} onChange={e=>{const m=e.target.value;setRateMode(m);if(m==='manual'&&!rate&&currency==='CZK'&&data.settings.rate)setRate(String(data.settings.rate));}}><option value="auto">Automatic reference rate</option><option value="manual">My bank / manual rate</option>{initial&&<option value="saved">Saved transaction rate</option>}</select></Field>
- <Field label={`Rate · ${laundry?'CZK':currency} for €1`}><input type="number" min="0.000000000001" max="1000000000000" step="any" required readOnly={rateMode==='auto'} value={rate} onChange={e=>setRate(e.target.value)} placeholder={fx.busy?'Loading reference rate…':'Choose manual if no reference rate is available'}/></Field>
- <p className="help">{rateMode==='auto'?quote?`Frankfurter · published ${quote.date}. Last fetched ${new Date(fx.cache!.fetchedAt).toLocaleString()}. Cached rates remain available offline. This is the latest reference, including for backdated entries.`:'No cached rate for this currency. Refresh online or choose a manual bank rate.':rateMode==='saved'?`This entry keeps its saved rate${initial?.rateDate?` from ${initial.rateDate}`:''}.`:'Enter your effective bank rate. It may differ from the reference rate.'}</p><button type="button" disabled={fx.busy} onClick={()=>fx.refresh(true)}><RefreshCw size={15}/> {fx.busy?'Refreshing…':'Refresh rates'}</button>{fx.error&&<p className="form-error" role="status">{fx.error}</p>}</>}
- {amount&&Number(rate)>0&&<p className="conversion">{kind==='wash'?'Card consumption only':`${kind==='income'?'Money received':'Bank outflow'}: ${money(eur)}`}{laundry?` · CZK card ${kind==='topup'?'+':'−'} ${money(currency==='CZK'?entered:Math.round(entered*Number(rate)),'CZK')}`:''}</p>}
- <div className="form-grid">{(kind==='expense'||kind==='income')&&(group==='travel'?<Field label="Travel category"><select name="travelType" defaultValue={initial?.travelType??'unclassified'}>{travelTypes.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></Field>:<div className="form-section category-picker"><div className="field-label">CATEGORIA</div><input type="hidden" name="category" value={category}/><div className="category-chips">{categories.filter(c=>c.id!=='travel'&&(kind==='income'||c.id!=='laundry')).map(c=><button type="button" key={c.id} className={category===c.id?'selected':''} onClick={()=>setCategory(c.id)}><CategoryIcon category={c.id}/><span>{c.name}</span></button>)}</div></div>)}<Field label="Date"><input type="date" name="date" required min={periodStart(data,data.settings.start)} max={monthEnd(data.settings.end)} defaultValue={initial?.date??defaultDate}/></Field></div>
- <Field label="Note (optional)"><input name="note" maxLength={500} defaultValue={initial?.note} placeholder={kind==='income'?'e.g. Parents · food reimbursement':'What was it for?'}/></Field>
- <p className="help">{kind==='income'?'Support adds to this month’s available money in the selected budget. The original purchases stay visible. Laundry support is cash: record a top-up when you load the card.':kind==='topup'?'Counts once as bank outflow and adds CZK credit.':kind==='wash'?'Uses existing card credit without adding another bank expense.':'Saved in EUR using this entry’s rate. Travel categories share one monthly limit.'}</p>{error&&<p className="form-error" role="alert">{error}</p>}<button className="primary full" type="submit"><Check size={18}/> Save {{expense:'expense',income:'money received',topup:'top-up',wash:'wash'}[kind]}</button></form>;
-}
-function TravelBreakdown({rows}:{rows:Transaction[]}){return <div className="panel"><h2>Inside your travel budget</h2><p className="help">One shared limit. Subcategories describe spending, not separate caps.</p>{travelTypes.map(t=><div className="allocation-total" key={t.id}><span>{t.name}</span><b>{money(rows.filter(x=>x.category==='travel'&&x.kind==='expense'&&(x.travelType??'unclassified')===t.id).reduce((s,x)=>s+x.eur,0))}</b></div>)}</div>;}
-
-function BudgetForm({data,save}:{data:Data;save:(d:Data)=>boolean}){const p=globalPlan(data),[budget,setBudget]=useState(p.budget/100),[limits,setLimits]=useState({...p.limits});const total=Object.values(limits).reduce((a,b)=>a+b,0);return <form onSubmit={e=>{e.preventDefault();save(applyGlobalPlan(data,{budget:Math.round(budget*100),limits}));}}><div className="plan-total-label"><ChartPie size={22}/><span>TETO MENSAL · TODOS OS MESES</span></div><Field label="Monthly budget (€)"><input type="number" min="0" max="1000000" step="0.01" required value={budget} onChange={e=>setBudget(Number(e.target.value))}/></Field>{categories.map(c=><label className="limit-input" key={c.id}><span className="limit-description"><span className={`category-emoji cat-${c.id}`}><CategoryIcon category={c.id}/></span><span><b>{c.name}</b><small>{categoryInfo[c.id].description}</small></span></span><span>€ <input aria-label={`${c.name} monthly limit`} type="number" min="0" max="1000000" step="0.01" required value={limits[c.id]/100} onChange={e=>setLimits({...limits,[c.id]:Math.round(Number(e.target.value)*100)})}/></span></label>)}<div className={'allocation-total '+(total!==Math.round(budget*100)?'form-error':'')}><span>Allocated</span><b>{money(total)} / {money(Math.round(budget*100))}</b></div>{total!==Math.round(budget*100)&&<p className="form-error">Adjust allocations by {money(Math.round(budget*100)-total)} to match the budget.</p>}<p className="budget-rule"><CheckCircle2 size={18}/> Dois orçamentos independentes. Só o crédito da lavandaria transita.</p><button className="primary full" disabled={total!==Math.round(budget*100)}><Check size={18}/> Save plan for all months</button></form>;}
-
-function SettingsForm({data,save}:{data:Data;save:(d:Data)=>boolean}){const s=data.settings;return <form onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);save({...data,settings:{start:String(f.get('start')),end:String(f.get('end')),rate:f.get('rate')?Number(f.get('rate')):null,openingCard:toCents(f.get('card')),openingTravel:s.openingTravel,openingEmergency:s.openingEmergency}});}}><div className="form-grid"><Field label="Start month"><input type="month" name="start" required defaultValue={s.start}/></Field><Field label="End month"><input type="month" name="end" required defaultValue={s.end}/></Field></div><Field label="Manual fallback · CZK for €1"><input type="number" name="rate" min="0.0001" max="1000" step="0.0001" defaultValue={s.rate??''} placeholder="Optional · entered manually"/></Field><Field label="Opening laundry credit (CZK)"><input type="number" name="card" min="0" max="1000000" step="0.01" required defaultValue={s.openingCard/100}/></Field><button className="secondary full">Save settings</button></form>;}
-
-
-
-
