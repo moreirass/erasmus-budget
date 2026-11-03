@@ -2,6 +2,8 @@
 
 Mobile-first React/TypeScript PWA. Empty by default, offline local storage, optional Supabase email login and manual sync. No bank integration.
 
+Track everyday spending and trips separately, enter purchases in multiple currencies, and manage a prepaid laundry card without counting washes twice. The interface supports light and dark themes, readable system fonts and mobile navigation.
+
 ## Run
 
 Use Node.js 24+ in this folder:
@@ -12,6 +14,28 @@ npm run dev
 ```
 
 Checks: `npm test` and `npm run build`. Production PWA: `npm run preview`. Install from your browser on HTTPS or localhost. On Android choose Install app; on iOS choose Share → Add to Home Screen. Save open forms before accepting Reload & update.
+
+## Using the dashboard
+
+- Tap **Day to day** to filter category guides, spending charts, weekly rhythm and activity to everyday spending. The laundry panel is available in this view.
+- Tap **Travel & tourism** to switch to trip spending and its subcategory breakdown.
+- The selected card has a green background and highlighted border; the other card stays neutral. The highlight follows your selection in both light and dark themes.
+- Tap the selected card again to show **both budgets**, or use the budget-group dropdown. Both cards remain visible so you can switch directly. The dropdown also works on the Transactions page.
+- Choose **Month** or **Week** to change the reporting period. You can browse older periods without changing the global monthly plan.
+- Use the sun/moon button in the top bar to change theme. Your device remembers the choice; the first visit follows its system theme.
+
+## Adding money movements
+
+Choose **Add transaction**, then the type:
+
+| Type | Effect |
+|---|---|
+| Expense | Deducts from the selected everyday category or shared travel budget |
+| Money received | Adds support, such as money from parents, to that category and budget in the dated month |
+| Card top-up | Counts as a laundry cash outflow and increases prepaid CZK credit |
+| Wash | Decreases existing laundry credit without another cash expense |
+
+For expenses and support, select **Day to day** or **Travel & tourism**, then the category. Choose the original currency, enter the amount, check the reference or manual rate, and save. The date defaults to today within your tracking period. Use the pencil to edit an entry or the bin to delete it.
 
 ## Two budgets
 
@@ -44,6 +68,8 @@ Choose a currency from the searchable list when adding an expense or income. The
 
 Latest EUR reference rates come from Frankfurter v2, refreshed at app opening, reconnection or resumption when the cache is older than six hours. You can also press Refresh rates. The publication date and fetch time are shown; weekends or holidays may return an earlier published rate. This is a reference rate, not guaranteed to match your bank. Choose My bank / manual rate to override it. Backdated entries use the latest reference unless manually overridden; automatic historical-date lookup is not included.
 
+On 3 November 2026 the service returned 165 searchable non-crypto currencies. Coverage can change. No additional API key or Supabase configuration is needed for exchange rates. The settings page provides a rate summary and refresh button; the searchable selector is in the transaction form.
+
 Rates and catalog are cached separately from the financial document, so refreshes do not create Supabase conflicts. Offline entries can use cached rates; without a rate you must enter one manually. Each entry saves its currency, EUR conversion, rate and optional publication/source metadata. Editing starts with the entry’s saved rate, preserving historical valuations. Foreign amounts use currency-specific integer minor units (JPY has no fractional digits, KWD has three). Budgets stay in EUR; the laundry card stays in CZK with EUR/CZK-only top-ups and washes. Bank fees are not inferred.
 
 Transactions are grouped by day, newest day first, then first-added first within a day. Editing an entry preserves its insertion order. Older entries receive an insertion sequence based on their existing stored order; previously lost creation chronology cannot be reconstructed. Sequence numbers travel with JSON, CSV and cloud sync.
@@ -75,8 +101,30 @@ Use the browser publishable key, never a secret/service-role key.
 
 Whole-document sync uses atomic revision checks. Concurrent changes prompt you to export both versions and choose which to keep. Keep local requires another Sync to upload it. Conflict snapshots remain in browser storage. Sign-out keeps the account cache on this device. Local browser storage is not encrypted. For isolation checks, use two accounts and ensure neither can read the other's document. Live cloud checks require your configured project; local unit tests do not prove live authentication works.
 
+### Move phone changes to your PC
+
+1. On your phone, press **Sync now** and wait for **Synced just now**.
+2. On your PC, sign in with the same email and press **Sync now**.
+3. Before making further changes on either device, sync to load the latest cloud version.
+
+If both devices have unsynced changes, export their JSON backups before choosing a version. **Use cloud version** replaces local changes; **Keep local version** followed by Sync replaces the cloud document. Sync does not automatically merge two independently edited budgets.
+
 ## Vercel
 
 Push this folder's contents to GitHub and import the repository into Vercel. Framework: Vite; Node: 24; build: `npm run build`; output: `dist`. Add both VITE_SUPABASE variables in Production and redeploy after changes. Without keys it runs in local-only mode. Configure the final HTTPS origin in Supabase before signing in. Free-plan service limits and inactivity rules apply.
+
+After a code update, push the changed files and wait for Vercel to finish deployment. After environment-variable changes, redeploy to rebuild the app. Update the app on both phone and PC before syncing new transaction features.
+
+## Troubleshooting
+
+- **A device shows an older interface:** accept **Reload & update** if offered, then close and reopen the app. On desktop, try Ctrl + Shift + R. A private window can confirm whether the deployed version is newer. Export JSON before any action that clears site data.
+- **Account & sync still shows local mode:** confirm both `VITE_SUPABASE_*` variables are configured for Production and rebuild the deployment. Supabase integration variables with other names do not replace these two.
+- **Android cannot find an import file:** download it to internal Downloads and browse that folder in the file picker. The picker permits all file types to avoid Android MIME-filter issues; the app validates content before importing. If the budget already exists on your PC, import there and sync to your phone instead.
+- **Reference rates fail to load:** use the cached quote or select **My bank / manual rate**. An uncached currency needs a manual rate while offline.
+- **A wash or deletion is rejected:** the change would make historical laundry credit negative. Correct the missing top-up or opening credit first.
+
+## Verification
+
+`npm test` currently runs 23 tests covering accounting, migration, dates, ordering, currencies and backup round trips. `npm run build` checks TypeScript and generates the production app and service worker. See [VERIFICATION.md](VERIFICATION.md) for the checks performed and their limits. The latest card-selection styling passed the production build; no new Android visual test is claimed.
 
 Official references: [Vercel Vite](https://vercel.com/docs/frameworks/frontend/vite), [Supabase keys](https://supabase.com/docs/guides/getting-started/api-keys), [Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
