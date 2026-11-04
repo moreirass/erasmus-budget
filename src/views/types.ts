@@ -1,0 +1,28 @@
+import type { Dispatch, SetStateAction } from "react";
+import type { Data, Plan, summary, Transaction, weeks } from "../model";
+import type { useExchangeRates } from "../useExchangeRates";
+export type ViewProps = {
+  data: Data;
+  month: string;
+  view: string;
+  range?: ReturnType<typeof weeks>[number];
+  group: string;
+  stats: ReturnType<typeof summary>;
+  plan: Plan;
+  weekList: ReturnType<typeof weeks>;
+  rows: Transaction[];
+  isFuture: boolean;
+  fx: ReturnType<typeof useExchangeRates>;
+  search: string;
+  filter: string;
+  setTab: (s: string) => void;
+  setSettingsSection: (s: string) => void;
+  selectBudget: (s: string) => void;
+  groupCash: (s: ReturnType<typeof summary>) => number;
+  openNew: (kind?: Transaction["kind"]) => void;
+  setEditor: (t: Transaction | "new" | null) => void;
+  setPendingDelete: (t: Transaction | null) => void;
+  setSearch: (s: string) => void;
+  setFilter: (s: string) => void;
+  setGroup: Dispatch<SetStateAction<string>>;
+};

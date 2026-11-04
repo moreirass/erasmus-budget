@@ -1,0 +1,121 @@
+import { appLocale } from "./i18n.ts";
+export type CurrencyInfo = { code: string; name: string };
+export type Rate = { rate: number; date: string };
+export type RateCache = { fetchedAt: number; rates: Record<string, Rate> };
+export const validCurrency = (code: string) => /^[A-Z]{3}$/.test(code);
+export const validRate = (rate: number) =>
+  Number.isFinite(rate) && rate > 0 && rate <= 1e12;
+export function currencyDigits(code: string) {
+  return (
+    new Intl.NumberFormat("en", {
+      style: "currency",
+      currency: code,
+    }).resolvedOptions().maximumFractionDigits ?? 2
+  );
+}
+export const currencyFactor = (code: string) => 10 ** currencyDigits(code);
+export function currencyName(code: string, locale = appLocale()) {
+  try {
+    return (
+      new Intl.DisplayNames([locale], { type: "currency" }).of(code) ?? code
+    );
+  } catch {
+    return code;
+  }
+}
+export function fallbackCurrencies(): CurrencyInfo[] {
+  const intl = Intl as typeof Intl & {
+    supportedValuesOf?: (key: string) => string[];
+  };
+  return [
+    ...new Set([
+      "EUR",
+      "CZK",
+      ...(intl.supportedValuesOf?.("currency") ?? [
+        "USD",
+        "GBP",
+        "PLN",
+        "HUF",
+        "CHF",
+        "JPY",
+      ]),
+    ]),
+  ]
+    .sort()
+    .map((code) => ({ code, name: currencyName(code) }));
+}
+export function searchCurrencies(list: CurrencyInfo[], query: string) {
+  const normalize = (s: string) =>
+    s
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase();
+  const q = normalize(query.trim());
+  return list.filter((c) =>
+    normalize(
+      `${c.code} ${c.name} ${currencyName(c.code)} ${currencyName(c.code, "en")} ${currencyName(c.code, "pt")}`,
+    ).includes(q),
+  );
+}
+export function parseCurrencies(value: unknown): CurrencyInfo[] {
+  if (!Array.isArray(value)) throw new Error("Invalid currency list.");
+  const crypto = new Set(["BTC", "BCH", "ETH", "LTC", "XRP"]);
+  const list = value.flatMap((v) => {
+    const code = String(v?.iso_code ?? v?.code ?? "").toUpperCase();
+    return validCurrency(code) &&
+      !crypto.has(code) &&
+      typeof v.name === "string"
+      ? [{ code, name: v.name }]
+      : [];
+  });
+  if (!list.length) throw new Error("Empty currency list.");
+  return [
+    ...new Map(
+      [
+        ...list,
+        { code: "EUR", name: "Euro" },
+        { code: "CZK", name: "Czech Koruna" },
+      ].map((c) => [c.code, c]),
+    ).values(),
+  ].sort((a, b) => a.code.localeCompare(b.code));
+}
+export function parseRates(value: unknown): Record<string, Rate> {
+  if (!Array.isArray(value)) throw new Error("Invalid exchange-rate response.");
+  const rates: Record<string, Rate> = {};
+  for (const row of value) {
+    if (
+      row?.base === "EUR" &&
+      validCurrency(row.quote) &&
+      validRate(row.rate) &&
+      /^\d{4}-\d{2}-\d{2}$/.test(row.date)
+    ) {
+      const previous = rates[row.quote];
+      if (!previous || row.date > previous.date)
+        rates[row.quote] = { rate: row.rate, date: row.date };
+    }
+  }
+  if (!Object.keys(rates).length)
+    throw new Error("No valid EUR rates returned.");
+  return rates;
+}
+export function parseRateCache(value: unknown): RateCache | null {
+  const c = value as RateCache;
+  if (
+    !c ||
+    !Number.isFinite(c.fetchedAt) ||
+    !c.rates ||
+    typeof c.rates !== "object"
+  )
+    return null;
+  const rates: Record<string, Rate> = {};
+  for (const [code, row] of Object.entries(c.rates)) {
+    if (
+      validCurrency(code) &&
+      row &&
+      validRate(row.rate) &&
+      /^\d{4}-\d{2}-\d{2}$/.test(row.date)
+    )
+      rates[code] = row;
+  }
+  return Object.keys(rates).length ? { fetchedAt: c.fetchedAt, rates } : null;
+}
