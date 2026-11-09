@@ -1,3 +1,4 @@
+import { RecurringManager, RecurringOverview } from "./components/Recurring";
 import {
   ArrowLeftRight,
   CalendarDays,
@@ -661,10 +662,24 @@ export default function App() {
               </div>
             </div>
           )}
+          <div hidden={tab !== "Overview"}>
+            <RecurringOverview
+              key={store.user?.id ?? "guest"}
+              data={data}
+              save={commit}
+              fx={fx}
+            />
+          </div>
           {tab === "Overview" && <OverviewView {...viewProps} />}
           {tab === "Transactions" && <TransactionsView {...viewProps} />}
           {isSettings && (
             <>
+              <RecurringManager
+                key={store.user?.id ?? "guest"}
+                data={data}
+                save={commit}
+                fx={fx}
+              />
               <section className="panel language-settings">
                 <div>
                   <h2>{tr("Language")}</h2>

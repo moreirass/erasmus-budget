@@ -67,6 +67,7 @@ export type Transaction = {
   rateSource?: "Frankfurter" | "manual";
 };
 export type Data = {
+  recurring?: RecurringRule[];
   version: 1;
   layoutVersion?: 2;
   legacy?: { plans: unknown; openingTravel: number; openingEmergency: number };
@@ -283,6 +284,7 @@ export function validateData(value: unknown): Data {
   )
     fail("This is not a Pocket v1 backup.");
   const s = d.settings;
+  validateRecurring(d);
   if (
     !monthValid(s.start) ||
     !monthValid(s.end) ||
@@ -533,4 +535,174 @@ export function resizePlan(plan: Plan, budget: number): Plan {
     assigned += limits[c.id];
   });
   return { budget, limits };
+}
+
+export type RecurringRule = {
+  id: string;
+  kind: "expense" | "income" | "topup";
+  amount: number;
+  currency: string;
+  category: Category;
+  travelType?: TravelType;
+  note: string;
+  frequency: "monthly" | "weekly";
+  day: number;
+  start: string;
+  end?: string;
+  mode: "confirm" | "auto";
+  manualRate?: number;
+  generated: string[];
+  ignored: string[];
+};
+export type Occurrence = { rule: RecurringRule; date: string; id: string };
+export type Quotes = Record<string, { rate: number; date: string }>;
+export const validDate = (date: unknown): date is string =>
+  typeof date === "string" &&
+  /^20\d{2}-(0[1-9]|1[0-2])-\d{2}$/.test(date) &&
+  Number(date.slice(8)) >= 1 &&
+  Number(date.slice(8)) <= lastDay(date.slice(0, 7));
+function validateRecurring(d: Data) {
+  if (d.recurring === undefined) return;
+  if (!Array.isArray(d.recurring) || d.recurring.length > 1000)
+    throw new Error("Invalid recurring rules.");
+  const ids = new Set<string>();
+  for (const r of d.recurring) {
+    if (
+      !r ||
+      typeof r.id !== "string" ||
+      !/^[a-zA-Z0-9-]{1,60}$/.test(r.id) ||
+      ids.has(r.id) ||
+      !["expense", "income", "topup"].includes(r.kind) ||
+      !["monthly", "weekly"].includes(r.frequency) ||
+      !Number.isInteger(r.day) ||
+      r.day < (r.frequency === "weekly" ? 0 : 1) ||
+      r.day > (r.frequency === "weekly" ? 6 : 31) ||
+      !validDate(r.start) ||
+      (r.end !== undefined && (!validDate(r.end) || r.end < r.start)) ||
+      !["confirm", "auto"].includes(r.mode) ||
+      (r.manualRate !== undefined && !validRate(r.manualRate)) ||
+      !Array.isArray(r.generated) ||
+      !Array.isArray(r.ignored) ||
+      ![...r.generated, ...r.ignored].every(validDate)
+    )
+      throw new Error("Invalid recurring rules.");
+    ids.add(r.id);
+    // Reuse transaction validation, without recursively validating rules.
+    validateData({
+      ...d,
+      recurring: undefined,
+      transactions: [
+        makeTransaction({
+          id: r.id,
+          date: periodStart(d, d.settings.start),
+          kind: r.kind,
+          category: r.category,
+          amount: r.amount,
+          currency: r.currency,
+          rate: r.manualRate ?? 1,
+          note: r.note,
+          ...(r.travelType ? { travelType: r.travelType } : {}),
+        }),
+      ],
+    });
+  }
+}
+export function dueOccurrences(d: Data, through = today()): Occurrence[] {
+  const due: Occurrence[] = [];
+  for (const rule of d.recurring ?? []) {
+    const start = [rule.start, periodStart(d, d.settings.start)].sort().at(-1)!;
+    const end = [
+      through,
+      rule.end ?? monthEnd(d.settings.end),
+      monthEnd(d.settings.end),
+    ].sort()[0];
+    for (const month of months(start.slice(0, 7), end.slice(0, 7))) {
+      for (let day = 1; day <= lastDay(month); day++) {
+        const date = month + "-" + String(day).padStart(2, "0");
+        const matches =
+          rule.frequency === "monthly"
+            ? day === Math.min(rule.day, lastDay(month))
+            : new Date(date + "T12:00:00Z").getUTCDay() === rule.day;
+        const id = "rec-" + rule.id + "-" + date;
+        if (
+          matches &&
+          date >= start &&
+          date <= end &&
+          !rule.generated.includes(date) &&
+          !rule.ignored.includes(date) &&
+          !d.transactions.some((t) => t.id === id)
+        )
+          due.push({ rule, date, id });
+      }
+    }
+  }
+  return due.sort(
+    (a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id),
+  );
+}
+export function occurrenceTransaction(
+  o: Occurrence,
+  d: Data,
+  quotes: Quotes,
+): Transaction | null {
+  const r = o.rule;
+  const quote = quotes[r.kind === "topup" ? "CZK" : r.currency];
+  const rate =
+    r.currency === "EUR" && r.kind !== "topup"
+      ? 1
+      : (r.manualRate ??
+        quote?.rate ??
+        (r.currency === "CZK" ? d.settings.rate : null));
+  if (!rate || !validRate(rate)) return null;
+  return makeTransaction({
+    id: o.id,
+    date: o.date,
+    kind: r.kind,
+    category: r.category,
+    currency: r.currency,
+    amount: r.amount,
+    rate,
+    note: r.note,
+    ...(r.travelType ? { travelType: r.travelType } : {}),
+    ...(r.manualRate || !quote
+      ? { rateSource: "manual" as const }
+      : { rateSource: "Frankfurter" as const, rateDate: quote.date }),
+  });
+}
+export function settleOccurrence(
+  d: Data,
+  o: Occurrence,
+  transaction?: Transaction,
+): Data {
+  if (!d.recurring?.some((r) => r.id === o.rule.id))
+    throw new Error("Invalid recurring rules.");
+  const field = transaction ? "generated" : "ignored";
+  return validateData({
+    ...d,
+    recurring: d.recurring.map((r) =>
+      r.id === o.rule.id
+        ? { ...r, [field]: [...new Set([...r[field], o.date])] }
+        : r,
+    ),
+    transactions:
+      transaction && !d.transactions.some((t) => t.id === o.id)
+        ? [...d.transactions, { ...transaction, id: o.id, date: o.date }]
+        : d.transactions,
+  });
+}
+export function generateRecurring(d: Data, quotes: Quotes, through = today()) {
+  let data = d;
+  const added: Transaction[] = [];
+  for (const o of dueOccurrences(d, through)) {
+    if (o.rule.mode !== "auto") continue;
+    const t = occurrenceTransaction(o, data, quotes);
+    if (!t) continue;
+    try {
+      data = settleOccurrence(data, o, t);
+      added.push(t);
+    } catch {
+      /* Keep invalid entries pending. */
+    }
+  }
+  return { data, added, pending: dueOccurrences(data, through) };
 }

@@ -7,7 +7,7 @@ import {
   Wallet,
   WashingMachine,
 } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { CurrencyPicker } from "../CurrencyPicker";
 import { currencyDigits, currencyFactor } from "../fx";
 import { appLocale, displayDate, tr } from "../i18n";
@@ -34,6 +34,8 @@ export function TransactionForm({
   initialKind,
   fx,
   save,
+  extraFields,
+  ruleMode = false,
 }: {
   data: Data;
   month: string;
@@ -41,6 +43,8 @@ export function TransactionForm({
   initialKind: Transaction["kind"];
   fx: ReturnType<typeof useExchangeRates>;
   save: (t: Transaction) => void;
+  extraFields?: ReactNode;
+  ruleMode?: boolean;
 }) {
   const [kind, setKind] = useState(initial?.kind ?? initialKind),
     [group, setGroup] = useState(
@@ -117,7 +121,7 @@ export function TransactionForm({
         category,
         amount: Math.round(Number(amount) * currencyFactor(currency)),
         currency,
-        rate: needsRate ? Number(rate) : 1,
+        rate: ruleMode ? 1 : needsRate ? Number(rate) : 1,
         ...(rateMode === "auto" && quote && needsRate
           ? { rateSource: "Frankfurter" as const, rateDate: quote.date }
           : rateMode === "saved"
@@ -144,34 +148,36 @@ export function TransactionForm({
   return (
     <form onSubmit={submit}>
       <div className="segmented full transaction-kinds">
-        {(["expense", "income", "topup", "wash"] as const).map((k) => (
-          <button
-            type="button"
-            key={k}
-            className={kind === k ? "selected" : ""}
-            onClick={() => chooseKind(k)}
-          >
-            {k === "expense" ? (
-              <Wallet size={20} />
-            ) : k === "income" ? (
-              <ArrowDownLeft size={20} />
-            ) : k === "topup" ? (
-              <Plus size={20} />
-            ) : (
-              <WashingMachine size={20} />
-            )}
-            <span>
-              {
+        {(["expense", "income", "topup", "wash"] as const)
+          .filter((k) => !ruleMode || k !== "wash")
+          .map((k) => (
+            <button
+              type="button"
+              key={k}
+              className={kind === k ? "selected" : ""}
+              onClick={() => chooseKind(k)}
+            >
+              {k === "expense" ? (
+                <Wallet size={20} />
+              ) : k === "income" ? (
+                <ArrowDownLeft size={20} />
+              ) : k === "topup" ? (
+                <Plus size={20} />
+              ) : (
+                <WashingMachine size={20} />
+              )}
+              <span>
                 {
-                  expense: tr("Expense"),
-                  income: tr("Support"),
-                  topup: tr("Top up"),
-                  wash: tr("Wash"),
-                }[k]
-              }
-            </span>
-          </button>
-        ))}
+                  {
+                    expense: tr("Expense"),
+                    income: tr("Support"),
+                    topup: tr("Top up"),
+                    wash: tr("Wash"),
+                  }[k]
+                }
+              </span>
+            </button>
+          ))}
       </div>
       {(kind === "expense" || kind === "income") && (
         <div className="form-section">
@@ -398,6 +404,7 @@ export function TransactionForm({
                   "Saved in EUR using this entry’s rate. Travel categories share one monthly limit.",
                 )}
       </p>
+      {extraFields}
       {error && (
         <p className="form-error" role="alert">
           {tr(error)}

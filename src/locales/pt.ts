@@ -467,4 +467,32 @@ export const portuguese = {
   "Monthly plan saved": "Plano mensal guardado",
   "Choose a month, adjust its budgets and decide whether to apply the plan to following months.":
     "Escolhe um mês, ajusta os orçamentos e decide se queres aplicar o plano aos meses seguintes.",
+  "Recurring transactions": "Movimentos recorrentes",
+  "Rules run when you open or resume the app. Missing exchange rates require confirmation.":
+    "As regras são processadas ao abrir ou retomar a app. Sem taxa de câmbio, é necessária confirmação.",
+  Monthly: "Mensal",
+  Weekly: "Semanal",
+  "Add recurring rule": "Adicionar regra recorrente",
+  Schedule: "Calendário",
+  Frequency: "Frequência",
+  "Day of month": "Dia do mês",
+  "Day of week (0 Sunday, 6 Saturday)": "Dia da semana (0 domingo, 6 sábado)",
+  "The transaction date is the rule start date. Day 31 uses the last day in shorter months.":
+    "A data do movimento é o início da regra. O dia 31 passa para o último dia nos meses mais curtos.",
+  "End date (optional)": "Data de fim (opcional)",
+  "Generation mode": "Modo de lançamento",
+  "Ask for confirmation": "Pedir confirmação",
+  "Add automatically": "Lançar automaticamente",
+  "Fixed manual rate (optional)": "Taxa manual fixa (opcional)",
+  "Leave empty to use cached rates or the manual CZK fallback at generation time.":
+    "Deixa vazio para usar as taxas guardadas ou a taxa manual CZK no momento do lançamento.",
+  "Recurring rule saved": "Regra recorrente guardada",
+  "Recurring transactions added": "Movimentos recorrentes lançados",
+  "Automatic entries undone": "Lançamentos automáticos anulados",
+  "Pending recurring transactions": "Movimentos recorrentes pendentes",
+  "Confirm / edit": "Confirmar / editar",
+  Ignore: "Ignorar",
+  "Occurrence ignored": "Ocorrência ignorada",
+  "Invalid recurring rules.": "Regras recorrentes inválidas.",
+  Edit: "Editar",
 } as const;
