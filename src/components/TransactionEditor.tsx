@@ -1,3 +1,4 @@
+import { lastEntry } from "../quickEntry";
 import {
   ArrowDownLeft,
   Check,
@@ -36,6 +37,7 @@ export function TransactionForm({
   save,
   extraFields,
   ruleMode = false,
+  expenseOnly = false,
 }: {
   data: Data;
   month: string;
@@ -45,20 +47,35 @@ export function TransactionForm({
   save: (t: Transaction) => void;
   extraFields?: ReactNode;
   ruleMode?: boolean;
+  expenseOnly?: boolean;
 }) {
+  const remembered = lastEntry(fx.currencies.map((c) => c.code));
   const [kind, setKind] = useState(initial?.kind ?? initialKind),
     [group, setGroup] = useState(
-      initial?.category === "travel" ? "travel" : "daily",
+      initial
+        ? initial.category === "travel"
+          ? "travel"
+          : "daily"
+        : initialKind === "expense"
+          ? remembered.group
+          : "daily",
     );
   const [category, setCategory] = useState<Category>(
     initial?.category &&
       initial.category !== "travel" &&
       (initial.kind === "income" || initial.category !== "laundry")
       ? initial.category
-      : "groceries",
+      : !initial && initialKind === "expense"
+        ? remembered.category
+        : "groceries",
   );
-  const [currency, setCurrency] = useState(initial?.currency ?? "CZK"),
-    [amount, setAmount] = useState(initial ? String(initial.amount / 100) : ""),
+  const [currency, setCurrency] = useState(
+      initial?.currency ??
+        (["topup", "wash"].includes(initialKind) ? "CZK" : remembered.currency),
+    ),
+    [amount, setAmount] = useState(
+      initial ? String(initial.amount / currencyFactor(initial.currency)) : "",
+    ),
     [rate, setRate] = useState(
       initial
         ? String(initial.rate)
@@ -83,7 +100,10 @@ export function TransactionForm({
   const chooseKind = (k: Transaction["kind"]) => {
     setKind(k);
     if (k === "expense" && category === "laundry") setCategory("groceries");
-    if ((k === "topup" || k === "wash") && !["EUR", "CZK"].includes(currency))
+    if (
+      (k === "topup" || k === "wash") &&
+      (!initial || !["EUR", "CZK"].includes(currency))
+    )
       chooseCurrency("CZK");
   };
   const digits = currencyDigits(currency),
@@ -149,7 +169,9 @@ export function TransactionForm({
     <form onSubmit={submit}>
       <div className="segmented full transaction-kinds">
         {(["expense", "income", "topup", "wash"] as const)
-          .filter((k) => !ruleMode || k !== "wash")
+          .filter((k) =>
+            expenseOnly ? k === "expense" : !ruleMode || k !== "wash",
+          )
           .map((k) => (
             <button
               type="button"
@@ -209,7 +231,9 @@ export function TransactionForm({
         onChange={chooseCurrency}
         currencies={
           laundry
-            ? fx.currencies.filter((c) => ["EUR", "CZK"].includes(c.code))
+            ? fx.currencies.filter((c) =>
+                (initial ? ["EUR", "CZK"] : ["CZK"]).includes(c.code),
+              )
             : fx.currencies
         }
       />
@@ -229,7 +253,7 @@ export function TransactionForm({
           />
         </Field>
       </div>
-      {needsRate && (
+      {needsRate && !ruleMode && (
         <>
           <Field label={tr("Exchange rate source")}>
             <select
@@ -308,7 +332,7 @@ export function TransactionForm({
           )}
         </>
       )}
-      {amount && Number(rate) > 0 && (
+      {amount && Number(rate) > 0 && !ruleMode && (
         <p className="conversion">
           {kind === "wash"
             ? tr("Card consumption only")

@@ -499,4 +499,12 @@ export const portuguese = {
   "Monthly limit: {0}% reached": "Limite mensal: {0}% atingido",
   "{0}: {1}% of monthly limit reached": "{0}: {1}% do limite mensal atingido",
   "Invalid alert setting.": "Definição de alertas inválida.",
+  Favorites: "Favoritos",
+  "Add favorite": "Adicionar favorito",
+  "Favorite name": "Nome do favorito",
+  "Favorites use today's date and their own currency. Leave the rate empty to use cached rates.":
+    "Os favoritos usam a data de hoje e a sua própria moeda. Deixa a taxa vazia para usar as taxas guardadas.",
+  "Favorite saved": "Favorito guardado",
+  "Favorite added": "Favorito lançado",
+  "Invalid favorites.": "Favoritos inválidos.",
 } as const;

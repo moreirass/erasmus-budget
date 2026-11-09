@@ -67,6 +67,7 @@ export type Transaction = {
   rateSource?: "Frankfurter" | "manual";
 };
 export type Data = {
+  favorites?: Favorite[];
   recurring?: RecurringRule[];
   version: 1;
   layoutVersion?: 2;
@@ -288,6 +289,7 @@ export function validateData(value: unknown): Data {
   if (s.limitAlerts !== undefined && typeof s.limitAlerts !== "boolean")
     throw new Error("Invalid alert setting.");
   validateRecurring(d);
+  validateFavorites(d);
   if (
     !monthValid(s.start) ||
     !monthValid(s.end) ||
@@ -594,6 +596,7 @@ function validateRecurring(d: Data) {
     validateData({
       ...d,
       recurring: undefined,
+      favorites: undefined,
       transactions: [
         makeTransaction({
           id: r.id,
@@ -746,4 +749,79 @@ export function crossedLimits(
         : [];
     }),
   );
+}
+
+export type Favorite = {
+  id: string;
+  name: string;
+  amount: number;
+  currency: string;
+  category: Category;
+  travelType?: TravelType;
+  manualRate?: number;
+};
+function validateFavorites(d: Data) {
+  if (d.favorites === undefined) return;
+  if (!Array.isArray(d.favorites) || d.favorites.length > 1000)
+    throw new Error("Invalid favorites.");
+  const ids = new Set<string>();
+  for (const f of d.favorites) {
+    if (
+      !f ||
+      typeof f.id !== "string" ||
+      !f.id ||
+      f.id.length > 60 ||
+      ids.has(f.id) ||
+      typeof f.name !== "string" ||
+      !f.name.trim() ||
+      f.name.length > 100 ||
+      (f.manualRate !== undefined && !validRate(f.manualRate))
+    )
+      throw new Error("Invalid favorites.");
+    ids.add(f.id);
+    validateData({
+      ...d,
+      recurring: undefined,
+      favorites: undefined,
+      transactions: [
+        makeTransaction({
+          id: f.id,
+          date: periodStart(d, d.settings.start),
+          kind: "expense",
+          category: f.category,
+          currency: f.currency,
+          amount: f.amount,
+          rate: f.manualRate ?? 1,
+          note: f.name,
+          travelType: f.travelType,
+        }),
+      ],
+    });
+  }
+}
+export function favoriteTransaction(
+  f: Favorite,
+  d: Data,
+  quotes: Quotes,
+  date = today(),
+): Transaction | null {
+  const o: Occurrence = {
+    id: crypto.randomUUID(),
+    date,
+    rule: {
+      ...f,
+      id: f.id,
+      note: f.name,
+      kind: "expense",
+      frequency: "monthly",
+      day: 1,
+      start: date,
+      generated: [],
+      ignored: [],
+      mode: "confirm",
+    },
+  };
+  const t = occurrenceTransaction(o, d, quotes);
+  if (t) validateData({ ...d, transactions: [...d.transactions, t] });
+  return t;
 }

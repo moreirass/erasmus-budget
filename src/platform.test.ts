@@ -33,3 +33,9 @@ it("ships separate maskable assets and accurate install screenshots", () => {
   }
   assert.ok(!config.includes("navigateFallbackDenylist"));
 });
+
+it("provides an installed PWA shortcut to the expense editor", () => {
+  const config = readFileSync("vite.config.ts", "utf8");
+  assert.match(config, /shortcuts:/);
+  assert.ok(config.includes('url: "/?add=1"'));
+});

@@ -31,6 +31,16 @@ export default defineConfig({
         background_color: "#f6f7f3",
         display: "standalone",
         start_url: "/",
+        shortcuts: [
+          {
+            name: "Add expense",
+            short_name: "Add",
+            url: "/?add=1",
+            icons: [
+              { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
+            ],
+          },
+        ],
         icons: [
           { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
           {

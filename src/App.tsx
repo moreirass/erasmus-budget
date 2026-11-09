@@ -1,3 +1,5 @@
+import { rememberEntry, consumeAddShortcut } from "./quickEntry";
+import { FavoriteManager, FavoriteButtons } from "./components/Favorites";
 import { crossedLimits } from "./model";
 import { RecurringManager, RecurringOverview } from "./components/Recurring";
 import {
@@ -134,6 +136,14 @@ export default function App() {
       data: Data;
       type: string;
     } | null>(null);
+  useEffect(() => {
+    const shortcut = consumeAddShortcut(location.href);
+    if (shortcut.open) {
+      setEditorKind("expense");
+      setEditor("new");
+      history.replaceState(history.state, "", shortcut.url);
+    }
+  }, []);
   const fileRef = useRef<HTMLInputElement>(null),
     [online, setOnline] = useState(navigator.onLine);
   useEffect(() => {
@@ -716,7 +726,17 @@ export default function App() {
               fx={fx}
             />
           </div>
-          {tab === "Overview" && <OverviewView {...viewProps} />}
+          {tab === "Overview" && (
+            <>
+              <FavoriteButtons
+                key={store.user?.id ?? "guest"}
+                data={data}
+                fx={fx}
+                save={commit}
+              />
+              <OverviewView {...viewProps} />
+            </>
+          )}
           {tab === "Transactions" && <TransactionsView {...viewProps} />}
           {isSettings && (
             <>
@@ -738,6 +758,12 @@ export default function App() {
                   {tr("Enable monthly limit alerts")}
                 </label>
               </section>
+              <FavoriteManager
+                key={store.user?.id ?? "guest"}
+                data={data}
+                fx={fx}
+                save={commit}
+              />
               <RecurringManager
                 key={store.user?.id ?? "guest"}
                 data={data}
@@ -1057,8 +1083,10 @@ export default function App() {
                   },
                   "Transaction saved",
                 )
-              )
+              ) {
+                rememberEntry(t, editor === "new" ? "new" : "edit");
                 setEditor(null);
+              }
             }}
           />
         </Modal>
