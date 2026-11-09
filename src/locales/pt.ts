@@ -507,4 +507,17 @@ export const portuguese = {
   "Favorite saved": "Favorito guardado",
   "Favorite added": "Favorito lançado",
   "Invalid favorites.": "Favoritos inválidos.",
+  "Time to export a backup.":
+    "Está na altura de exportar uma cópia de segurança.",
+  "Last export: {0}": "Última exportação: {0}",
+  "No export recorded on this device.":
+    "Ainda não há exportações registadas neste dispositivo.",
+  "Backup reminder interval (days)": "Intervalo do lembrete de backup (dias)",
+  "Export both versions": "Exportar ambas as versões",
+  "Unsynced changes": "Alterações por sincronizar",
+  "No pending changes": "Sem alterações pendentes",
+  "Last sync: {0}": "Última sincronização: {0}",
+  "Not synced yet": "Ainda sem sincronização",
+  "Invalid backup interval.": "Intervalo de backup inválido.",
+  "Invalid cloud revision.": "Revisão da cloud inválida.",
 } as const;

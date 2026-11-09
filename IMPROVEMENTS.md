@@ -27,3 +27,14 @@ Após publicar, aceitar a atualização no PC e no telemóvel. Exportar uma cóp
 ## Validação
 
 27 testes automáticos, build de produção e verificação de formatação aprovados. Testes Chrome com CSP e resoluções 320–1440 px aprovados, incluindo picker com teclado e apagar/anular. Limites e auditoria detalhados em VERIFICATION.md.
+
+## Funcionalidades — 9 de novembro de 2026
+
+- Recorrências mensais/semanais, confirmação/edição/ignorar, recuperação de atrasos e geração com IDs determinísticos. O dia 31 adapta-se ao mês. Lançamentos automáticos oferecem Anular; sem câmbio ficam pendentes. Regras opcionais em JSON mantêm os backups antigos compatíveis.
+- Alertas mensais de 80%/100%, indicadores acessíveis e aviso após guardar despesas. Histórico de avisos por dispositivo, espaço, mês, categoria e limiar; opção para desativar.
+- Última moeda de despesas/apoios novos guardada por dispositivo, categoria/grupo de despesas memorizados, favoritos com moeda própria e Anular, atalho PWA para abrir o editor. Edições e lançamentos gerados não alteram a última moeda.
+- Lembrete de exportação configurável (7 dias por omissão), último export e estado/hora de sincronização. Conflitos já eram protegidos por revisões e pela função SQL save_budget; comportamento documentado e testado com alterações diferentes em PC/telemóvel. Exportação conjunta das versões e fecho sem escolher silenciosamente a versão local. Sem alteração ao schema Supabase.
+
+Validação desta atualização: 48 testes automáticos, build e format:check. Percurso Chrome com dados isolados e taxas simuladas: atalho, moeda/categoria memorizadas, regra automática, favorito com Anular, alerta e lembrete, sem erros de página ou overflow a 320/390/768/1440 px. Verificação do servidor SQL por inspeção do contrato e testes da decisão de sincronização; não equivale a um ensaio com dois dispositivos ligados ao Supabase real.
+
+Limites: recorrências só são processadas com a app aberta/retomada; taxas em cache podem ser antigas e não são taxas históricas. Anular lançamentos que sustentam lavagens posteriores pode falhar a validação do cartão. Favoritos sem taxa exigem atualização das taxas ou taxa manual nas definições. JSON completo inclui regras/favoritos, CSV inclui apenas movimentos. Exportações são texto simples; o registo indica o pedido de download, não confirma a conservação do ficheiro. Lembretes, preferências e avisos são locais ao dispositivo. A sincronização é manual e substitui documentos completos após escolha em caso de conflito, sem combinação automática. Atualizar ambos os dispositivos antes de sincronizar.

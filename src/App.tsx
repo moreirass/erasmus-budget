@@ -1,3 +1,4 @@
+import { BackupReminder, recordExport } from "./components/BackupReminder";
 import { rememberEntry, consumeAddShortcut } from "./quickEntry";
 import { FavoriteManager, FavoriteButtons } from "./components/Favorites";
 import { crossedLimits } from "./model";
@@ -136,14 +137,6 @@ export default function App() {
       data: Data;
       type: string;
     } | null>(null);
-  useEffect(() => {
-    const shortcut = consumeAddShortcut(location.href);
-    if (shortcut.open) {
-      setEditorKind("expense");
-      setEditor("new");
-      history.replaceState(history.state, "", shortcut.url);
-    }
-  }, []);
   const fileRef = useRef<HTMLInputElement>(null),
     [online, setOnline] = useState(navigator.onLine);
   useEffect(() => {
@@ -153,6 +146,15 @@ export default function App() {
     setPendingImport(null);
     setEditor(null);
   }, [store.user?.id]);
+  useEffect(() => {
+    if (!store.ready) return;
+    const shortcut = consumeAddShortcut(location.href);
+    if (shortcut.open) {
+      setEditorKind("expense");
+      setEditor("new");
+      history.replaceState(history.state, "", shortcut.url);
+    }
+  }, [store.ready, store.user?.id]);
   const {
     needRefresh: [needRefresh],
     updateServiceWorker,
@@ -322,8 +324,10 @@ export default function App() {
           .includes(search.toLowerCase()),
     )
     .sort(transactionOrder);
-  const exportJSON = () =>
+  const exportJSON = () => {
     download(`pocket-${today()}.json`, JSON.stringify(data, null, 2));
+    recordExport(store.user?.id ?? "guest");
+  };
   const viewProps = {
     data,
     month,
@@ -529,6 +533,16 @@ export default function App() {
                   : store.dirty
                     ? tr("Sync pending")
                     : tr(store.status)}
+              {store.user && store.lastSyncedAt && (
+                <small>
+                  {tr("Last sync: {0}", [
+                    new Date(store.lastSyncedAt).toLocaleTimeString(
+                      appLocale(),
+                      { hour: "2-digit", minute: "2-digit" },
+                    ),
+                  ])}
+                </small>
+              )}
             </button>
             <button
               className="icon-button theme-toggle"
@@ -593,6 +607,17 @@ export default function App() {
               <Plus size={18} /> {tr("Add transaction")}{" "}
             </button>
           </div>
+          {store.user && (
+            <p className="help sync-summary" role="status">
+              {store.dirty ? tr("Unsynced changes") : tr("No pending changes")}{" "}
+              ·{" "}
+              {store.lastSyncedAt
+                ? tr("Last sync: {0}", [
+                    new Date(store.lastSyncedAt).toLocaleString(appLocale()),
+                  ])
+                : tr("Not synced yet")}
+            </p>
+          )}
           {store.corrupt && (
             <div className="notice error">
               {tr("Saved data needs recovery.")}{" "}
@@ -720,12 +745,22 @@ export default function App() {
           )}
           <div hidden={tab !== "Overview"}>
             <RecurringOverview
+              enabled={store.ready && !store.corrupt}
               key={store.user?.id ?? "guest"}
               data={data}
               save={commit}
               fx={fx}
             />
           </div>
+          {tab === "Overview" && (
+            <BackupReminder
+              key={store.user?.id ?? "guest"}
+              data={data}
+              scope={store.user?.id ?? "guest"}
+              save={commit}
+              exportJSON={exportJSON}
+            />
+          )}
           {tab === "Overview" && (
             <>
               <FavoriteButtons
@@ -910,6 +945,14 @@ export default function App() {
                   </div>
                   <div className="panel data-panel">
                     <h2>{tr("Your data, your way")}</h2>
+                    <BackupReminder
+                      key={store.user?.id ?? "guest"}
+                      data={data}
+                      scope={store.user?.id ?? "guest"}
+                      save={commit}
+                      exportJSON={exportJSON}
+                      settings
+                    />
                     <p className="help">
                       {tr(
                         "JSON and CSV exports are plain text, without encryption. Keep them somewhere private. CSV merges transactions by ID. Imports are validated before any changes.",
@@ -920,13 +963,14 @@ export default function App() {
                         <Download size={16} /> {tr("Full JSON backup")}{" "}
                       </button>
                       <button
-                        onClick={() =>
+                        onClick={() => {
                           download(
                             `pocket-transactions-${today()}.csv`,
                             toCSV(data),
                             "text/csv;charset=utf-8",
-                          )
-                        }
+                          );
+                          recordExport(store.user?.id ?? "guest");
+                        }}
                       >
                         <Download size={16} /> {tr("Transactions CSV")}{" "}
                       </button>
@@ -1131,7 +1175,7 @@ export default function App() {
       {store.conflict && (
         <Modal
           title={tr("Two versions need your choice")}
-          close={() => store.resolveConflict("local")}
+          close={store.dismissConflict}
         >
           <div className="conflict-banner">
             <Cloud size={23} />
@@ -1155,6 +1199,20 @@ export default function App() {
             )}
           </p>
           <div className="export-buttons">
+            <button
+              onClick={() =>
+                download(
+                  "pocket-both-versions.json",
+                  JSON.stringify(
+                    { local: data, cloud: store.conflict?.data },
+                    null,
+                    2,
+                  ),
+                )
+              }
+            >
+              {tr("Export both versions")}
+            </button>
             <button onClick={exportJSON}>{tr("Export local JSON")}</button>
             <button
               onClick={() =>

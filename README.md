@@ -96,6 +96,26 @@ Removed categories Emergency, Lodging and Local transport map to Other and show 
 
 Update both phone and PC before syncing this layout. Old clients do not understand the new categories. Read older backups through Import to migrate them. Migration is saved locally and uploaded with Sync now. The generated proposal JSON from another conversation may contain a different schema; prefer an actual Pocket export.
 
+## Recurring entries, alerts and quick entry
+
+Settings includes recurring rules for expenses, support and laundry top-ups. Choose monthly (day 1–31) or weekly (Sunday 0–Saturday 6), a start date, optional end date and confirmation or automatic mode. Day 31 clamps to the month's last day. Rules catch up only inside the tracking period when the app opens/resumes; the app does not run scheduled work while closed. Pending occurrences appear in Overview and can be confirmed/edited or ignored. Rule IDs plus dates produce deterministic transaction IDs. Generated/ignored dates survive JSON backups and prevent regeneration, including after undoing an automatic batch. Deleting a rule keeps existing transactions. Editing a rule affects occurrences that have not been generated or ignored.
+
+Rates are saved with each entry using the existing conversion rules. A fixed manual rule rate takes precedence, then cached rates, then the configured manual CZK fallback where applicable. Missing rates leave automatic occurrences pending for manual confirmation; no rate is invented. Cached reference rates are the latest saved quotes, not historical-date quotes. Laundry entries reuse the existing historical credit checks. Automatic launches offer Undo in Overview; undoing a top-up can be rejected if later washes require its credit.
+
+Overview category cards show accessible 80%/100% monthly limit indicators, even when viewing a week. They use gross expenses/top-ups and the same support-adjusted cap as the monthly category guide. Saving a new or changed expense across a threshold shows a toast once per workspace, month, category and threshold on this device. Disable alerts in Settings. Notification history is local to the browser; it does not sync or export.
+
+New manual expenses and support remember the last successfully saved currency on this device, defaulting to CZK when unavailable. New expenses also remember their category and day-to-day/travel group. Editing records, recurring/favorite launches, top-ups and washes do not change these choices. New laundry entries use CZK; historical EUR card entries remain editable. Recurring rule creation also starts with the remembered currency.
+
+Manage favorite expense templates in Settings. Each keeps its own name, amount, currency and category, plus an optional fixed manual rate. Overview buttons create an expense dated today and offer Undo. With no cached/manual rate, the favorite reports the missing rate; edit its fixed rate in Settings or refresh rates before retrying. Favorites cannot launch outside the tracking period. Installed PWAs expose an Add expense shortcut at `/?add=1`; the app consumes the parameter and opens the editor. Shortcut availability depends on the browser/OS.
+
+## Backup reminders and sync status
+
+The default backup reminder is seven days; change it to 1–365 days in the Data panel. Tracking starts when this version first opens in a workspace. Overview and Data show overdue reminders with a full JSON export button. The last export date is recorded per browser and workspace when a JSON/CSV download is requested; the browser cannot verify that you retained the file. CSV only includes transactions: use JSON to retain rules, favorites and settings. JSON and CSV are plain text, without encryption. Reminder/export timestamps and last-entry preferences remain on the device.
+
+Signed-in workspaces show pending changes and the time of the last successful sync. Sync remains manual and transfers the complete document. The existing Supabase schema and `save_budget` RPC are unchanged: a local envelope stores the last cloud revision, fetch compares it with the current cloud revision, and the RPC atomically checks `expected_revision` before writing. If phone and PC both edit revision N, the first upload becomes N+1 and the second detects a conflict. A race between fetch and upload is rejected by the RPC; press Sync again to display the conflicting versions. Changes made locally during upload remain dirty for another sync.
+
+A conflict offers Keep local, Use cloud or Export both versions before deciding. Closing the dialog leaves both versions unchanged. Keep local adopts the fetched revision and requires a further Sync; a newer cloud write still triggers another conflict. Recovery snapshots preserve both versions locally. The combined export contains `local` and `cloud` documents for inspection; import either individual document after deciding. There is no automatic merge. Tests cover two different device edits, explicit choices, concurrent-upload guards and local edits during upload; live Supabase authentication/network behavior still requires configured accounts.
+
 ## Optional Supabase
 
 1. Create a Supabase project and run `supabase/schema.sql` once in its SQL editor. It creates owner-only RLS policies and a revision-checked save function. If already configured, do not rerun the schema for this update.
@@ -134,7 +154,9 @@ After a code update, push the changed files and wait for Vercel to finish deploy
 
 ## Verification
 
-`npm test` currently runs 27 tests covering accounting, migration, dates, ordering, currencies, backup round trips and platform configuration. `npm run build` checks TypeScript and generates the production app and service worker. See [VERIFICATION.md](VERIFICATION.md) for the checks performed and their limits. The redesign passed a Chrome browser smoke check at 320, 390, 768 and 1440px, including mobile navigation, currency search, card filtering, expense creation/editing and light theme. These checks used isolated test data and mocked rate responses; they are not tests on a physical Android device or live Supabase accounts.
+The November 9 feature checks also passed a headless Chrome walkthrough of shortcut opening, remembered entry choices, automatic recurring generation, favorites with undo, alerts and backup reminders at 320, 390, 768 and 1440 px, with isolated browser data and mocked rate responses.
+
+`npm test` currently runs 48 tests covering accounting, migration, dates, ordering, currencies, backup round trips and platform configuration. `npm run build` checks TypeScript and generates the production app and service worker. See [VERIFICATION.md](VERIFICATION.md) for the checks performed and their limits. The redesign passed a Chrome browser smoke check at 320, 390, 768 and 1440px, including mobile navigation, currency search, card filtering, expense creation/editing and light theme. These checks used isolated test data and mocked rate responses; they are not tests on a physical Android device or live Supabase accounts.
 
 Official references: [Vercel Vite](https://vercel.com/docs/frameworks/frontend/vite), [Supabase keys](https://supabase.com/docs/guides/getting-started/api-keys), [Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
 

@@ -17,6 +17,7 @@ import type { useExchangeRates } from "../useExchangeRates";
 import { TransactionForm } from "./TransactionEditor";
 import { Field, Modal } from "./Primitives";
 type Props = {
+  enabled?: boolean;
   data: Data;
   save: (d: Data, message?: string) => boolean;
   fx: ReturnType<typeof useExchangeRates>;
@@ -210,7 +211,7 @@ function RuleEditor({
     </Modal>
   );
 }
-export function RecurringOverview({ data, save, fx }: Props) {
+export function RecurringOverview({ data, save, fx, enabled = true }: Props) {
   const [wake, setWake] = useState(0),
     [editing, setEditing] = useState<Occurrence | null>(null),
     [undo, setUndo] = useState<Transaction[]>([]);
@@ -228,13 +229,14 @@ export function RecurringOverview({ data, save, fx }: Props) {
     };
   }, []);
   useEffect(() => {
+    if (!enabled) return;
     const result = generateRecurring(data, fx.cache?.rates ?? {});
     if (
       result.added.length &&
       save(result.data, "Recurring transactions added")
     )
       setUndo(result.added);
-  }, [data, fx.cache, wake]);
+  }, [data, fx.cache, wake, enabled]);
   const pending = dueOccurrences(data);
   const draft = editing
     ? (occurrenceTransaction(editing, data, fx.cache?.rates ?? {}) ?? {

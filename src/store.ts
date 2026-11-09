@@ -1,12 +1,17 @@
+import {
+  syncAction,
+  uploadedEnvelope,
+  resolveEnvelope,
+  type Envelope,
+} from "./sync";
 import { createClient, type User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { freshData, validateData, type Data } from "./model";
 const env = import.meta.env;
 export const cloud =
   env.VITE_SUPABASE_URL && env.VITE_SUPABASE_PUBLISHABLE_KEY
     ? createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_PUBLISHABLE_KEY)
     : null;
-type Envelope = { data: Data; revision: number; dirty: boolean; stamp: string };
 const key = (scope: string) => "pocket-v1:" + scope;
 function read(scope: string): Envelope {
   const raw = localStorage.getItem(key(scope));
@@ -28,6 +33,8 @@ export function useBudget() {
   const [user, setUser] = useState<User | null>(null),
     [ready, setReady] = useState(!cloud),
     [scope, setScope] = useState("guest");
+  const activeScope = useRef(scope);
+  activeScope.current = user?.id ?? "guest";
   const [error, setError] = useState(""),
     [envelope, setEnvelope] = useState<Envelope>(() => {
       try {
@@ -60,6 +67,7 @@ export function useBudget() {
   useEffect(() => {
     const next = user?.id ?? "guest";
     setScope(next);
+    setBusy(false);
     setConflict(null);
     setStatus(user ? "Ready to sync" : "Local only");
     try {
@@ -125,23 +133,25 @@ export function useBudget() {
     setBusy(true);
     setError("");
     setStatus("Syncing…");
-    const before = read(scope);
     try {
+      const before = read(scope);
       const { data: row, error } = await cloud
         .from("budget_documents")
         .select("payload,revision")
         .eq("user_id", user.id)
         .maybeSingle();
+      if (activeScope.current !== scope) return;
       if (error) throw error;
       const remote: Envelope = {
         data: row ? validateData(row.payload) : freshData(),
         revision: row?.revision ?? 0,
         dirty: !!row && row.payload.layoutVersion !== 2,
         stamp: crypto.randomUUID(),
+        lastSyncedAt: Date.now(),
       };
       if (read(scope).stamp !== before.stamp)
         throw new Error("Local data changed while syncing. Sync again.");
-      if (before.dirty && remote.revision !== before.revision) {
+      if (syncAction(before, remote.revision) === "conflict") {
         localStorage.setItem(
           key(scope) + ":conflict",
           JSON.stringify({ local: before, remote }),
@@ -150,18 +160,15 @@ export function useBudget() {
         setStatus("Changes on both devices");
         return;
       }
-      if (before.dirty) {
+      if (syncAction(before, remote.revision) === "upload") {
         const { data: revision, error: writeError } = await cloud.rpc(
           "save_budget",
           { expected_revision: before.revision, document: before.data },
         );
+        if (activeScope.current !== scope) return;
         if (writeError) throw writeError;
         const latest = read(scope);
-        save({
-          ...latest,
-          revision: Number(revision),
-          dirty: latest.stamp !== before.stamp,
-        });
+        save(uploadedEnvelope(latest, before, Number(revision)));
         setStatus(
           latest.stamp === before.stamp
             ? "Synced just now"
@@ -172,6 +179,7 @@ export function useBudget() {
         setStatus("Synced just now");
       }
     } catch (e) {
+      if (activeScope.current !== scope) return;
       setError(
         e instanceof Error
           ? e.message
@@ -184,14 +192,7 @@ export function useBudget() {
   }
   function resolveConflict(choice: "local" | "remote") {
     if (!conflict) return;
-    if (choice === "remote") save({ ...conflict, stamp: crypto.randomUUID() });
-    else
-      save({
-        ...envelope,
-        revision: conflict.revision,
-        dirty: true,
-        stamp: crypto.randomUUID(),
-      });
+    save(resolveEnvelope(read(scope), conflict, choice));
     setConflict(null);
     setStatus(
       choice === "local"
@@ -202,7 +203,7 @@ export function useBudget() {
   return {
     data: envelope.data,
     user,
-    ready,
+    ready: ready && scope === (user?.id ?? "guest"),
     update,
     restore,
     sync,
@@ -212,6 +213,8 @@ export function useBudget() {
     setError,
     conflict,
     resolveConflict,
+    dismissConflict: () => setConflict(null),
+    lastSyncedAt: envelope.lastSyncedAt,
     corrupt: envelope.stamp === "corrupt",
     recovery: () => localStorage.getItem(key(scope)) ?? "",
     dirty: envelope.dirty,

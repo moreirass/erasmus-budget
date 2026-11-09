@@ -73,6 +73,7 @@ export type Data = {
   layoutVersion?: 2;
   legacy?: { plans: unknown; openingTravel: number; openingEmergency: number };
   settings: {
+    backupDays?: number;
     limitAlerts?: boolean;
     firstDay?: number;
     start: string;
@@ -288,6 +289,11 @@ export function validateData(value: unknown): Data {
   const s = d.settings;
   if (s.limitAlerts !== undefined && typeof s.limitAlerts !== "boolean")
     throw new Error("Invalid alert setting.");
+  if (
+    s.backupDays !== undefined &&
+    (!Number.isInteger(s.backupDays) || s.backupDays < 1 || s.backupDays > 365)
+  )
+    throw new Error("Invalid backup interval.");
   validateRecurring(d);
   validateFavorites(d);
   if (
