@@ -459,4 +459,15 @@ export const portuguese = {
     "Um orçamento partilhado entre transportes, alojamento, alimentação em viagem e atividades.",
   "Travel monthly budget (€)": "Orçamento mensal de viagens (€)",
   "Combined monthly total": "Total mensal dos dois orçamentos",
+  "Plan month": "Mês do plano",
+  "Monthly total (€)": "Total mensal (€)",
+  "Changing the total distributes it proportionally. You can adjust each budget below.":
+    "Ao alterar o total, a distribuição é ajustada proporcionalmente. Podes ajustar cada orçamento abaixo.",
+  "Apply changes to": "Aplicar alterações a",
+  "Only this month": "Apenas este mês",
+  "This month and all following months": "Este mês e todos os seguintes",
+  "Save monthly plan": "Guardar plano mensal",
+  "Monthly plan saved": "Plano mensal guardado",
+  "Choose a month, adjust its budgets and decide whether to apply the plan to following months.":
+    "Escolhe um mês, ajusta os orçamentos e decide se queres aplicar o plano aos meses seguintes.",
 } as const;

@@ -499,3 +499,38 @@ export function currentPeriod(d: Data, date = today()) {
 
 export const transactionOrder = (a: Transaction, b: Transaction) =>
   b.date.localeCompare(a.date) || (a.addedOrder ?? 0) - (b.addedOrder ?? 0);
+
+export function applyMonthlyPlan(
+  d: Data,
+  month: string,
+  plan: Plan,
+  scope: "month" | "following",
+): Data {
+  const plans = structuredClone(d.plans);
+  const next = nextMonth(month);
+  if (scope === "month" && !plans[next])
+    plans[next] = structuredClone(planFor(d, next));
+  if (scope === "following") {
+    for (const key of Object.keys(plans)) if (key > month) delete plans[key];
+  }
+  plans[month] = structuredClone(plan);
+  return validateData({ ...d, plans });
+}
+
+export function resizePlan(plan: Plan, budget: number): Plan {
+  const limits = {} as Plan["limits"];
+  let previous = 0,
+    assigned = 0;
+  categories.forEach((c, index) => {
+    previous += plan.budget ? plan.limits[c.id] : 1;
+    const cumulative = Math.round(
+      (budget * previous) / (plan.budget || categories.length),
+    );
+    limits[c.id] =
+      index === categories.length - 1
+        ? budget - assigned
+        : cumulative - assigned;
+    assigned += limits[c.id];
+  });
+  return { budget, limits };
+}

@@ -14,6 +14,8 @@ import {
   summary,
   validateData,
   applyGlobalPlan,
+  applyMonthlyPlan,
+  resizePlan,
   globalPlan,
   currentPeriod,
   transactionOrder,
@@ -466,4 +468,27 @@ it("rejects start-day changes that exclude entries", () => {
   d.transactions = [tx({ date: "2026-11-03" })];
   d.settings.firstDay = 10;
   assert.throws(() => validateData(d), /date/);
+});
+
+it("edits one month without leaking into the next and replaces future overrides on request", () => {
+  const d = actualFreshData();
+  const original = structuredClone(planFor(d, "2026-11"));
+  const changed = resizePlan(original, 70001);
+  assert.equal(
+    Object.values(changed.limits).reduce((a, b) => a + b, 0),
+    70001,
+  );
+  const once = applyMonthlyPlan(d, "2026-11", changed, "month");
+  assert.deepEqual(planFor(once, "2026-10"), planFor(d, "2026-10"));
+  assert.deepEqual(planFor(once, "2026-11"), changed);
+  assert.deepEqual(planFor(once, "2026-12"), original);
+  const future = applyMonthlyPlan(once, "2026-11", changed, "following");
+  assert.deepEqual(planFor(future, "2027-01"), changed);
+  assert.deepEqual(planFor(future, "2026-10"), planFor(d, "2026-10"));
+  const zero = resizePlan(original, 0);
+  assert.equal(resizePlan(zero, 101).budget, 101);
+  assert.equal(
+    Object.values(resizePlan(zero, 101).limits).reduce((a, b) => a + b, 0),
+    101,
+  );
 });

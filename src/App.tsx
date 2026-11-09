@@ -720,15 +720,15 @@ export default function App() {
                       <h2>{tr("Your monthly plan")}</h2>
                       <p>
                         {tr(
-                          "One plan for all months, including past months. The first month follows your configured start day. Day-to-day and travel limits restart every month.",
+                          "Choose a month, adjust its budgets and decide whether to apply the plan to following months.",
                         )}{" "}
                       </p>
                     </div>
                   </div>
                   <BudgetForm
-                    key={JSON.stringify(globalPlan(data))}
+                    key={JSON.stringify(data.plans)}
                     data={data}
-                    save={(d) => commit(d, "Monthly plan saved for all months")}
+                    save={(d) => commit(d, "Monthly plan saved")}
                   />
                   <p className="help">
                     {tr(

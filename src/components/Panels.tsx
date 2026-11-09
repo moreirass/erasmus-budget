@@ -15,6 +15,10 @@ import { currencyDigits, currencyName, searchCurrencies } from "../fx";
 import { appLocale, displayDate, kindLabel, tr, trCount } from "../i18n";
 import {
   applyGlobalPlan,
+  applyMonthlyPlan,
+  resizePlan,
+  currentPeriod,
+  months,
   categories,
   globalPlan,
   money,
@@ -509,7 +513,9 @@ export function BudgetForm({
   data: Data;
   save: (d: Data) => boolean;
 }) {
-  const p = globalPlan(data),
+  const [month, setMonth] = useState(currentPeriod(data).month),
+    [scope, setScope] = useState<"month" | "following">("month");
+  const p = planFor(data, month),
     [budget, setBudget] = useState((p.budget - p.limits.travel) / 100),
     [limits, setLimits] = useState({ ...p.limits });
   const total = categories
@@ -522,13 +528,59 @@ export function BudgetForm({
         e.preventDefault();
         if (balanced)
           save(
-            applyGlobalPlan(data, {
-              budget: Math.round(budget * 100) + limits.travel,
-              limits,
-            }),
+            applyMonthlyPlan(
+              data,
+              month,
+              {
+                budget: Math.round(budget * 100) + limits.travel,
+                limits,
+              },
+              scope,
+            ),
           );
       }}
     >
+      <Field label={tr("Plan month")}>
+        <select
+          value={month}
+          onChange={(e) => {
+            const selected = e.target.value;
+            const plan = planFor(data, selected);
+            setMonth(selected);
+            setBudget((plan.budget - plan.limits.travel) / 100);
+            setLimits({ ...plan.limits });
+          }}
+        >
+          {months(data.settings.start, data.settings.end).map((m) => (
+            <option key={m} value={m}>
+              {monthLabel(m)}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field label={tr("Monthly total (€)")}>
+        <input
+          type="number"
+          min="0"
+          max="1000000"
+          step="0.01"
+          required
+          value={Math.round(budget * 100 + limits.travel) / 100}
+          onChange={(e) => {
+            const updated = resizePlan(
+              { budget: total + limits.travel, limits },
+              Math.round(Number(e.target.value) * 100),
+            );
+            setLimits(updated.limits);
+            setBudget((updated.budget - updated.limits.travel) / 100);
+          }}
+        />
+      </Field>
+      <p className="help">
+        {tr(
+          "Changing the total distributes it proportionally. You can adjust each budget below.",
+        )}
+      </p>
       <fieldset className="plan-budget-group">
         <legend>{tr("Day to day")}</legend>
         <p className="help">
@@ -632,9 +684,20 @@ export function BudgetForm({
         <CheckCircle2 size={18} />
         {tr("Two independent budgets. Only laundry credit carries over.")}
       </p>
+      <Field label={tr("Apply changes to")}>
+        <select
+          value={scope}
+          onChange={(e) => setScope(e.target.value as "month" | "following")}
+        >
+          <option value="month">{tr("Only this month")}</option>
+          <option value="following">
+            {tr("This month and all following months")}
+          </option>
+        </select>
+      </Field>
       <button className="primary full" disabled={!balanced}>
         <Check size={18} />
-        {tr("Save plan for all months")}
+        {tr("Save monthly plan")}
       </button>
     </form>
   );
