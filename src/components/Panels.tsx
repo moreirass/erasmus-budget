@@ -510,91 +510,131 @@ export function BudgetForm({
   save: (d: Data) => boolean;
 }) {
   const p = globalPlan(data),
-    [budget, setBudget] = useState(p.budget / 100),
+    [budget, setBudget] = useState((p.budget - p.limits.travel) / 100),
     [limits, setLimits] = useState({ ...p.limits });
-  const total = Object.values(limits).reduce((a, b) => a + b, 0);
+  const total = categories
+    .filter((c) => c.id !== "travel")
+    .reduce((sum, c) => sum + limits[c.id], 0);
+  const balanced = total === Math.round(budget * 100);
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        save(
-          applyGlobalPlan(data, { budget: Math.round(budget * 100), limits }),
-        );
+        if (balanced)
+          save(
+            applyGlobalPlan(data, {
+              budget: Math.round(budget * 100) + limits.travel,
+              limits,
+            }),
+          );
       }}
     >
-      <div className="plan-total-label">
-        <ChartPie size={22} />
-        <span>{tr("MONTHLY LIMIT · ALL MONTHS")}</span>
-      </div>
-      <Field label={tr("Monthly budget (€)")}>
-        <input
-          type="number"
-          min="0"
-          max="1000000"
-          step="0.01"
-          required
-          value={budget}
-          onChange={(e) => setBudget(Number(e.target.value))}
-        />
-      </Field>
-      {categories.map((c) => (
-        <label className="limit-input" key={c.id}>
-          <span className="limit-description">
-            <span className={`category-emoji cat-${c.id}`}>
-              <CategoryIcon category={c.id} />
-            </span>
-            <span>
-              <b>{tr(c.name)}</b>
-              <small>{tr(categoryInfo[c.id].description)}</small>
-            </span>
-          </span>
-          <span>
-            €{" "}
-            <input
-              aria-label={tr("{0} monthly limit", [tr(c.name)])}
-              type="number"
-              min="0"
-              max="1000000"
-              step="0.01"
-              required
-              value={limits[c.id] / 100}
-              onChange={(e) =>
-                setLimits({
-                  ...limits,
-                  [c.id]: Math.round(Number(e.target.value) * 100),
-                })
-              }
-            />
-          </span>
-        </label>
-      ))}
-      <div
-        className={
-          "allocation-total " +
-          (total !== Math.round(budget * 100) ? "form-error" : "")
-        }
-      >
-        <span>{tr("Allocated")}</span>
-        <b>
-          {money(total)} / {money(Math.round(budget * 100))}
-        </b>
-      </div>
-      {total !== Math.round(budget * 100) && (
-        <p className="form-error">
-          {tr("Adjust allocations by {0} to match the budget.", [
-            money(Math.round(budget * 100) - total),
-          ])}
+      <fieldset className="plan-budget-group">
+        <legend>{tr("Day to day")}</legend>
+        <p className="help">
+          {tr(
+            "Set your everyday budget and distribute it across the categories below.",
+          )}
         </p>
-      )}
+        <Field label={tr("Day-to-day monthly budget (€)")}>
+          <input
+            type="number"
+            min="0"
+            max="1000000"
+            step="0.01"
+            required
+            value={budget}
+            onChange={(e) => setBudget(Number(e.target.value))}
+          />
+        </Field>
+        {categories
+          .filter((c) => c.id !== "travel")
+          .map((c) => (
+            <label className="limit-input" key={c.id}>
+              <span className="limit-description">
+                <span className={"category-emoji cat-" + c.id}>
+                  <CategoryIcon category={c.id} />
+                </span>
+                <span>
+                  <b>{tr(c.name)}</b>
+                  <small>{tr(categoryInfo[c.id].description)}</small>
+                </span>
+              </span>
+              <span>
+                €{" "}
+                <input
+                  aria-label={tr("{0} monthly limit", [tr(c.name)])}
+                  type="number"
+                  min="0"
+                  max="1000000"
+                  step="0.01"
+                  required
+                  value={limits[c.id] / 100}
+                  onChange={(e) =>
+                    setLimits({
+                      ...limits,
+                      [c.id]: Math.round(Number(e.target.value) * 100),
+                    })
+                  }
+                />
+              </span>
+            </label>
+          ))}
+        <div
+          className={"allocation-total " + (!balanced ? "form-error" : "")}
+          aria-live="polite"
+        >
+          <span>{tr("Allocated to day to day")}</span>
+          <b>
+            {money(total)} / {money(Math.round(budget * 100))}
+          </b>
+        </div>
+        {!balanced && (
+          <p className="form-error" role="status">
+            {tr("Adjust day-to-day allocations by {0} to match this budget.", [
+              money(Math.round(budget * 100) - total),
+            ])}
+          </p>
+        )}
+      </fieldset>
+      <fieldset className="plan-budget-group">
+        <legend>{tr("Travel")}</legend>
+        <p className="help">
+          {tr(
+            "One shared budget for transport, accommodation, food on trips and activities.",
+          )}
+        </p>
+        <Field label={tr("Travel monthly budget (€)")}>
+          <input
+            type="number"
+            min="0"
+            max="1000000"
+            step="0.01"
+            required
+            value={limits.travel / 100}
+            onChange={(e) =>
+              setLimits({
+                ...limits,
+                travel: Math.round(Number(e.target.value) * 100),
+              })
+            }
+          />
+        </Field>
+      </fieldset>
+      <div className="allocation-total">
+        <span className="plan-total-label">
+          <ChartPie size={22} />
+          {tr("Combined monthly total")}
+        </span>
+        <b>{money(Math.round(budget * 100) + limits.travel)}</b>
+      </div>
       <p className="budget-rule">
-        <CheckCircle2 size={18} />{" "}
-        {tr("Two independent budgets. Only laundry credit carries over.")}{" "}
+        <CheckCircle2 size={18} />
+        {tr("Two independent budgets. Only laundry credit carries over.")}
       </p>
-      <button
-        className="primary full"
-        disabled={total !== Math.round(budget * 100)}
-      >
-        <Check size={18} /> {tr("Save plan for all months")}{" "}
+      <button className="primary full" disabled={!balanced}>
+        <Check size={18} />
+        {tr("Save plan for all months")}
       </button>
     </form>
   );

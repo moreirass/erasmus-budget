@@ -449,4 +449,14 @@ export const portuguese = {
   "Ostrava Pocket · Erasmus budget": "Ostrava Pocket · Orçamento Erasmus",
   "Your Erasmus budget, one little adventure at a time. Private EUR and CZK expense tracking.":
     "O teu orçamento Erasmus, uma pequena aventura de cada vez. Registo privado de despesas em EUR e CZK.",
+  "Set your everyday budget and distribute it across the categories below.":
+    "Define o orçamento do dia a dia e distribui-o pelas categorias abaixo.",
+  "Day-to-day monthly budget (€)": "Orçamento mensal do dia a dia (€)",
+  "Allocated to day to day": "Distribuído pelo dia a dia",
+  "Adjust day-to-day allocations by {0} to match this budget.":
+    "Ajusta a distribuição do dia a dia em {0} para corresponder a este orçamento.",
+  "One shared budget for transport, accommodation, food on trips and activities.":
+    "Um orçamento partilhado entre transportes, alojamento, alimentação em viagem e atividades.",
+  "Travel monthly budget (€)": "Orçamento mensal de viagens (€)",
+  "Combined monthly total": "Total mensal dos dois orçamentos",
 } as const;
