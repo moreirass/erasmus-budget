@@ -10,7 +10,7 @@ import {
   Trash2,
   WashingMachine,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { currencyDigits, currencyName, searchCurrencies } from "../fx";
 import { appLocale, displayDate, kindLabel, tr, trCount } from "../i18n";
 import {
@@ -509,19 +509,27 @@ export function TravelBreakdown({ rows }: { rows: Transaction[] }) {
 export function BudgetForm({
   data,
   save,
+  month,
+  setMonth,
+  scope,
+  setScope,
 }: {
   data: Data;
   save: (d: Data) => boolean;
+  month: string;
+  setMonth: (month: string) => void;
+  scope: "month" | "following";
+  setScope: (scope: "month" | "following") => void;
 }) {
-  const [month, setMonth] = useState(currentPeriod(data).month),
-    [scope, setScope] = useState<"month" | "following">("month");
   const p = planFor(data, month),
     [budget, setBudget] = useState((p.budget - p.limits.travel) / 100),
     [limits, setLimits] = useState({ ...p.limits });
+  const resizeBase = useRef(p);
+  const [totalDraft, setTotalDraft] = useState<string | null>(null);
   const total = categories
     .filter((c) => c.id !== "travel")
     .reduce((sum, c) => sum + limits[c.id], 0);
-  const balanced = total === Math.round(budget * 100);
+  const balanced = totalDraft !== "" && total === Math.round(budget * 100);
   return (
     <form
       onSubmit={(e) => {
@@ -565,10 +573,19 @@ export function BudgetForm({
           max="1000000"
           step="0.01"
           required
-          value={Math.round(budget * 100 + limits.travel) / 100}
+          value={totalDraft ?? Math.round(budget * 100 + limits.travel) / 100}
+          onFocus={() => {
+            resizeBase.current = {
+              budget: total + limits.travel,
+              limits: { ...limits },
+            };
+          }}
+          onBlur={() => setTotalDraft(null)}
           onChange={(e) => {
+            setTotalDraft(e.target.value);
+            if (e.target.value === "") return;
             const updated = resizePlan(
-              { budget: total + limits.travel, limits },
+              resizeBase.current,
               Math.round(Number(e.target.value) * 100),
             );
             setLimits(updated.limits);
@@ -695,6 +712,14 @@ export function BudgetForm({
           </option>
         </select>
       </Field>
+      {scope === "following" &&
+        Object.keys(data.plans).some((m) => m > month) && (
+          <p className="help" role="status">
+            {tr(
+              "Saving will replace all later monthly plans, including any manual adjustments.",
+            )}
+          </p>
+        )}
       <button className="primary full" disabled={!balanced}>
         <Check size={18} />
         {tr("Save monthly plan")}

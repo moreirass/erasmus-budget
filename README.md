@@ -33,7 +33,7 @@ The supplied mockups contain illustrative data, campus locations, service hours,
 - Tap **Travel & tourism** to switch to trip spending and its subcategory breakdown.
 - The selected card has a green background and highlighted border; the other card stays neutral. The highlight follows your selection in both light and dark themes.
 - Tap the selected card again to show **both budgets**, or use the budget-group dropdown. Both cards remain visible so you can switch directly. The dropdown also works on the Transactions page.
-- Choose **Month** or **Week** to change the reporting period. You can browse older periods without changing the global monthly plan.
+- Choose **Month** or **Week** to change the reporting period. You can browse older periods without changing the selected monthly plan.
 - Use the sun/moon button in the top bar to change theme. Your device remembers the choice. New devices start with the reference design’s dark theme.
 
 ## Adding money movements
@@ -66,7 +66,7 @@ The default monthly total is €550:
 
 Travel uses one shared cap. Transport, accommodation, food on trips and tourism/activities describe spending within it. Existing travel records remain unclassified until you assign a travel category. Travel and everyday budgets reset each month; neither carries forward. Money received adds support to the chosen category/group in its dated month. Gross expenses and support are displayed separately, so reimbursements never hide purchases or count twice.
 
-Monthly limits are editable globally and must sum to the budget. New workspaces start in the current month and cover four months. Start/end months and the first tracked day are configurable. A partial first month is prorated using its actual number of days, including leap years. Existing Erasmus workspaces retain October 25–31 and their original end month. Editing global limits recalculates historical comparisons. Weekly guides use actual days in the month, with Monday–Sunday weeks clipped at month boundaries.
+Monthly limits are editable for one month or for that month and all following months, and must sum to the budget. Applying to following months replaces their saved overrides; the form displays a warning when later plans exist. New workspaces start in the current month and cover four months. Start/end months and the first tracked day are configurable. A partial first month is prorated using its actual number of days, including leap years. Existing Erasmus workspaces retain October 25–31 and their original end month. Editing a monthly plan recalculates comparisons for the affected months. The selected month and application scope remain selected after saving. Changing the total preserves the proportions from when the field receives focus, including when clearing and retyping it. Weekly guides use actual days in the month, with Monday–Sunday weeks clipped at month boundaries.
 
 The app opens at the current Ostrava month and week. It remembers Month/Week view, resets the calendar selection on reopening/resuming the app, and updates after a date change. Manual navigation is available while the app is active. Dates outside the tracking period select the nearest tracked month/week. Extend the tracking dates in settings if needed.
 

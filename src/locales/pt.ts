@@ -70,10 +70,6 @@ export const portuguese = {
   Data: "Dados",
   Account: "Conta",
   "Your monthly plan": "O teu plano mensal",
-  "One plan for all months, including past months. The first month follows your configured start day. Day-to-day and travel limits restart every month.":
-    "Um plano para todos os meses, incluindo os anteriores. O primeiro mês respeita o dia de início definido. Os limites de dia a dia e viagens reiniciam todos os meses.",
-  "Monthly plan saved for all months":
-    "Plano mensal guardado para todos os meses",
   "Day to day and travel are independent budgets. Only laundry card credit rolls over. Weekly guides are prorated to the days in the month.":
     "Dia a dia e viagens são orçamentos independentes. Só o crédito da lavandaria transita. Os valores semanais são proporcionais aos dias do mês.",
   "Semester trajectory": "Evolução do semestre",
@@ -320,7 +316,6 @@ export const portuguese = {
     "Ajusta a distribuição em {0} para corresponder ao orçamento.",
   "Two independent budgets. Only laundry credit carries over.":
     "Dois orçamentos independentes. Só o crédito da lavandaria transita.",
-  "Save plan for all months": "Guardar plano para todos os meses",
   "Start month": "Mês inicial",
   "End month": "Mês final",
   "First tracked day (in the starting month)":
@@ -466,6 +461,8 @@ export const portuguese = {
   "Apply changes to": "Aplicar alterações a",
   "Only this month": "Apenas este mês",
   "This month and all following months": "Este mês e todos os seguintes",
+  "Saving will replace all later monthly plans, including any manual adjustments.":
+    "Ao guardar, serão substituídos todos os planos dos meses seguintes, incluindo os ajustes manuais.",
   "Save monthly plan": "Guardar plano mensal",
   "Monthly plan saved": "Plano mensal guardado",
   "Choose a month, adjust its budgets and decide whether to apply the plan to following months.":

@@ -113,6 +113,14 @@ export default function App() {
   const [group, setGroup] = useState("all");
   const [pendingDelete, setPendingDelete] = useState<Transaction | null>(null),
     [removed, setRemoved] = useState<Transaction | null>(null);
+  const [planMonth, setPlanMonth] = useState(() => currentPeriod(data).month);
+  const [planScope, setPlanScope] = useState<"month" | "following">("month");
+  const selectedPlanMonth =
+    planMonth < data.settings.start
+      ? data.settings.start
+      : planMonth > data.settings.end
+        ? data.settings.end
+        : planMonth;
   const [settingsSection, setSettingsSection] = useState("plan");
   const isSettings = tab === "Budget & settings" || tab === "Budget";
   const [editor, setEditor] = useState<Transaction | "new" | null>(null),
@@ -726,7 +734,11 @@ export default function App() {
                     </div>
                   </div>
                   <BudgetForm
-                    key={JSON.stringify(data.plans)}
+                    key={selectedPlanMonth + JSON.stringify(data.plans)}
+                    month={selectedPlanMonth}
+                    setMonth={setPlanMonth}
+                    scope={planScope}
+                    setScope={setPlanScope}
                     data={data}
                     save={(d) => commit(d, "Monthly plan saved")}
                   />

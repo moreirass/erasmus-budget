@@ -492,3 +492,15 @@ it("edits one month without leaking into the next and replaces future overrides 
     101,
   );
 });
+
+it("editing only the final month does not create an out-of-period plan", () => {
+  const d = actualFreshData();
+  const originalKeys = Object.keys(d.plans);
+  const changed = resizePlan(planFor(d, d.settings.end), 70001);
+  const result = applyMonthlyPlan(d, d.settings.end, changed, "month");
+  assert.deepEqual(planFor(result, d.settings.end), changed);
+  assert.deepEqual(
+    Object.keys(result.plans).sort(),
+    [...new Set([...originalKeys, d.settings.end])].sort(),
+  );
+});

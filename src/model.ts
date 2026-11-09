@@ -508,7 +508,7 @@ export function applyMonthlyPlan(
 ): Data {
   const plans = structuredClone(d.plans);
   const next = nextMonth(month);
-  if (scope === "month" && !plans[next])
+  if (scope === "month" && next <= d.settings.end && !plans[next])
     plans[next] = structuredClone(planFor(d, next));
   if (scope === "following") {
     for (const key of Object.keys(plans)) if (key > month) delete plans[key];
