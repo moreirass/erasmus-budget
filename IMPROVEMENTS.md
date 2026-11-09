@@ -38,3 +38,12 @@ Após publicar, aceitar a atualização no PC e no telemóvel. Exportar uma cóp
 Validação desta atualização: 48 testes automáticos, build e format:check. Percurso Chrome com dados isolados e taxas simuladas: atalho, moeda/categoria memorizadas, regra automática, favorito com Anular, alerta e lembrete, sem erros de página ou overflow a 320/390/768/1440 px. Verificação do servidor SQL por inspeção do contrato e testes da decisão de sincronização; não equivale a um ensaio com dois dispositivos ligados ao Supabase real.
 
 Limites: recorrências só são processadas com a app aberta/retomada; taxas em cache podem ser antigas e não são taxas históricas. Anular lançamentos que sustentam lavagens posteriores pode falhar a validação do cartão. Favoritos sem taxa exigem atualização das taxas ou taxa manual nas definições. JSON completo inclui regras/favoritos, CSV inclui apenas movimentos. Exportações são texto simples; o registo indica o pedido de download, não confirma a conservação do ficheiro. Lembretes, preferências e avisos são locais ao dispositivo. A sincronização é manual e substitui documentos completos após escolha em caso de conflito, sem combinação automática. Atualizar ambos os dispositivos antes de sincronizar.
+
+## Reestruturação — 9 de novembro de 2026
+
+- Estado e ações do App separados por responsabilidade em hooks: preferências, período, movimentos, notificações, importação/exportação, seleções das definições e estado da plataforma.
+- Definições extraídas para src/views/Settings.tsx. Navegação e estrutura visual, controlos do período e diálogos em componentes próprios.
+- Mês e âmbito do plano continuam montados ao navegar; ações pendentes continuam a ser limpas ao mudar de conta. Recorrências mantêm o processamento mesmo fora da Visão geral.
+- Mantidos o comportamento, o aspeto, as chaves de armazenamento, os formatos JSON/CSV, as regras de contabilidade e o protocolo Supabase. Sem classes ou bibliotecas adicionais.
+
+Validação da reestruturação: 48 testes, build e format:check; percursos Chrome com dados isolados para adicionar/editar/apagar/anular, pesquisa, navegação de períodos, persistência do mês/âmbito do plano, conteúdo das exportações e confirmação/cancelamento das importações, preferências após recarregar e funcionalidades recentes. Sem ensaio Supabase real nem confirmação de conclusão dos downloads em disco.

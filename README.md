@@ -15,6 +15,22 @@ npm run dev
 
 Checks: `npm test` and `npm run build`. Production PWA: `npm run preview`. Install from your browser on HTTPS or localhost. On Android choose Install app; on iOS choose Share → Add to Home Screen. Save open forms before accepting Reload & update.
 
+## Code organization
+
+The app uses function components and hooks, without a new state-management library. `App.tsx` composes the screens and coordinates navigation; `store.ts` remains responsible for persistence and cloud sync, and `model.ts` retains the accounting rules.
+
+- `src/hooks/useAppPrefs.ts`: language, theme and saved Month/Week view.
+- `src/hooks/usePeriod.ts`: reporting month/week, budget group, summaries and reset on resume/date changes.
+- `src/hooks/useLedger.ts`: transaction editor, search/filter, save/delete/undo and existing limit notifications.
+- `src/hooks/useToast.ts`: notification state and timeout.
+- `src/hooks/useDataTransfer.ts`: import preview/confirmation, JSON/CSV exports and conflict exports.
+- `src/hooks/useSettings.ts`: settings section and monthly plan selection/scope, kept mounted across page changes.
+- `src/hooks/useAppPlatform.ts`: connectivity and PWA update availability.
+- `src/views/Settings.tsx`: settings screen, alongside Overview and Transactions.
+- `src/components/AppLayout.tsx`, `PeriodControls.tsx`, `LedgerDialogs.tsx` and `DataDialogs.tsx`: navigation/layout, calendar controls and dialogs.
+
+This separation preserves the existing interface, storage keys, backup format, sync protocol and accounting behavior. Extracting hooks organizes responsibilities; it does not by itself prevent the parent component from rendering again.
+
 ## Interface and navigation
 
 English is the default language. Open **Settings → Language** and choose **Português (Portugal)** to switch immediately. The device remembers the choice across reloads and shares it between open tabs. Navigation, forms, categories, app messages, currency names, dates and amounts follow the selected language. Personal notes, financial values and JSON/CSV field names remain unchanged. Translations live in `src/locales/pt.ts`, with English source messages as keys.

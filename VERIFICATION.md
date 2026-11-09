@@ -38,3 +38,11 @@ No incompatible forced downgrade or unverified transitive override was applied. 
 - Full PT/EN localization and language selection remain optional unfinished work. The primary interface language is English, declared consistently in HTML and the manifest, with some Portuguese design labels.
 
 Repeat local checks with `npm test`, `npm run build`, `npm run format:check`, `npm audit` and `npm audit --omit=dev`.
+
+## App responsibility refactor — 9 November 2026
+
+- App.tsx reduced from 1,335 to 227 lines. Preferences, reporting periods, ledger actions, notifications, data transfer, settings selections and platform status now have dedicated hooks. Settings, layout, period controls and dialogs are separate components. Persistence/cloud sync remain in store.ts and accounting remains in model.ts.
+- Production build and formatting check pass; all 48 existing automated tests pass. No dependency, database schema, storage key or backup-format changes.
+- Headless Chrome regression checks with isolated data and mocked FX cover adding/editing/deleting/undoing transactions, searching, month/week navigation, period reset on focus, plan month/scope preservation after saving and navigation, JSON/CSV payloads, import preview/cancellation/confirmation, duplicate-free CSV merge, and theme/language/view persistence after reload. No uncaught page errors. Export payloads were inspected at Blob creation; disk download completion was not verified.
+- The existing feature smoke check also passes: PWA add shortcut, remembered currency/category, automatic recurring processing while settings are open, favorite creation/use/undo, budget alert, backup reminder and no horizontal overflow at 320/390/768/1440px. Service workers were blocked in these browser checks.
+- Live Supabase authentication and two-device sync were not exercised. Existing sync tests pass; sync implementation and conflict behavior are unchanged. Extracting hooks groups responsibilities and does not on its own eliminate parent re-renders.
