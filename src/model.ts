@@ -72,6 +72,7 @@ export type Data = {
   layoutVersion?: 2;
   legacy?: { plans: unknown; openingTravel: number; openingEmergency: number };
   settings: {
+    limitAlerts?: boolean;
     firstDay?: number;
     start: string;
     end: string;
@@ -284,6 +285,8 @@ export function validateData(value: unknown): Data {
   )
     fail("This is not a Pocket v1 backup.");
   const s = d.settings;
+  if (s.limitAlerts !== undefined && typeof s.limitAlerts !== "boolean")
+    throw new Error("Invalid alert setting.");
   validateRecurring(d);
   if (
     !monthValid(s.start) ||
@@ -705,4 +708,42 @@ export function generateRecurring(d: Data, quotes: Quotes, through = today()) {
     }
   }
   return { data, added, pending: dueOccurrences(data, through) };
+}
+
+export function limitLevels(d: Data, month: string) {
+  const stats = summary(d, month),
+    plan = planFor(d, month);
+  return categories.flatMap((c) => {
+    const cap = plan.limits[c.id] + stats.received[c.id],
+      spent = stats.spent[c.id];
+    const percent = cap > 0 ? (spent / cap) * 100 : spent > 0 ? 100 : 0;
+    return percent >= 80
+      ? [{ category: c.id, threshold: percent >= 100 ? 100 : 80, percent }]
+      : [];
+  });
+}
+export function crossedLimits(
+  before: Data,
+  after: Data,
+  month: string,
+  seen: string[],
+) {
+  if (after.settings.limitAlerts === false) return [];
+  const old = summary(before, month),
+    plan = planFor(after, month),
+    stats = summary(after, month);
+  return categories.flatMap((c) =>
+    [80, 100].flatMap((threshold) => {
+      const key = month + ":" + c.id + ":" + threshold;
+      const cap = plan.limits[c.id] + stats.received[c.id];
+      const oldCap = planFor(before, month).limits[c.id] + old.received[c.id];
+      const reached = (spent: number, limit: number) =>
+        spent > 0 && (limit === 0 || spent * 100 >= limit * threshold);
+      return !seen.includes(key) &&
+        reached(stats.spent[c.id], cap) &&
+        !reached(old.spent[c.id], oldCap)
+        ? [{ key, category: c.id, threshold }]
+        : [];
+    }),
+  );
 }

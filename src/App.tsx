@@ -1,3 +1,4 @@
+import { crossedLimits } from "./model";
 import { RecurringManager, RecurringOverview } from "./components/Recurring";
 import {
   ArrowLeftRight,
@@ -220,7 +221,52 @@ export default function App() {
   function commit(d: Data, message = "Saved") {
     try {
       update(d);
-      setToast(message);
+      let notice = "";
+      if (
+        d.transactions.some(
+          (t) =>
+            t.kind === "expense" &&
+            !data.transactions.some(
+              (old) =>
+                old.id === t.id &&
+                old.eur === t.eur &&
+                old.category === t.category &&
+                old.date === t.date,
+            ),
+        )
+      ) {
+        const key = "pocket-limit-alerts:" + (store.user?.id ?? "guest");
+        try {
+          const raw = JSON.parse(localStorage.getItem(key) ?? "[]");
+          const seen: string[] = Array.isArray(raw)
+            ? raw.filter((x) => typeof x === "string")
+            : [];
+          const alerts = [
+            ...new Set(
+              d.transactions
+                .filter((t) => t.kind === "expense")
+                .map((t) => t.date.slice(0, 7)),
+            ),
+          ].flatMap((m) => crossedLimits(data, d, m, seen));
+          if (alerts.length) {
+            localStorage.setItem(
+              key,
+              JSON.stringify([...seen, ...alerts.map((a) => a.key)]),
+            );
+            notice = alerts
+              .map((a) =>
+                tr("{0}: {1}% of monthly limit reached", [
+                  tr(categories.find((c) => c.id === a.category)!.name),
+                  a.threshold,
+                ]),
+              )
+              .join(" · ");
+          }
+        } catch {
+          /* Saving the entry takes priority over notification storage. */
+        }
+      }
+      setToast(notice || message);
       return true;
     } catch (e) {
       setToast((e as Error).message);
@@ -674,6 +720,24 @@ export default function App() {
           {tab === "Transactions" && <TransactionsView {...viewProps} />}
           {isSettings && (
             <>
+              <section className="panel">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={data.settings.limitAlerts !== false}
+                    onChange={(e) =>
+                      commit({
+                        ...data,
+                        settings: {
+                          ...data.settings,
+                          limitAlerts: e.target.checked,
+                        },
+                      })
+                    }
+                  />
+                  {tr("Enable monthly limit alerts")}
+                </label>
+              </section>
               <RecurringManager
                 key={store.user?.id ?? "guest"}
                 data={data}

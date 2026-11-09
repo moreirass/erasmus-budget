@@ -1,3 +1,4 @@
+import { limitLevels } from "../model";
 import {
   ArrowUpRight,
   Check,
@@ -48,6 +49,8 @@ export function OverviewView({
   setFilter,
   setGroup,
 }: ViewProps) {
+  const alerts =
+    data.settings.limitAlerts === false ? [] : limitLevels(data, month);
   return (
     <>
       <section className="welcome-card">
@@ -235,7 +238,17 @@ export function OverviewView({
                     </div>
                     <div className="category-main">
                       <div className="category-label">
-                        <strong>{tr(c.name)}</strong>
+                        <strong>
+                          {tr(c.name)}
+                          {alerts.some((a) => a.category === c.id) && (
+                            <small role="status">
+                              {tr("Monthly limit: {0}% reached", [
+                                alerts.find((a) => a.category === c.id)!
+                                  .threshold,
+                              ])}
+                            </small>
+                          )}
+                        </strong>
                         <span>
                           <b>{money(spent)}</b>{" "}
                           <span className="muted">/ {money(cap)}</span>

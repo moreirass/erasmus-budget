@@ -495,4 +495,8 @@ export const portuguese = {
   "Occurrence ignored": "Ocorrência ignorada",
   "Invalid recurring rules.": "Regras recorrentes inválidas.",
   Edit: "Editar",
+  "Enable monthly limit alerts": "Ativar alertas de limite mensal",
+  "Monthly limit: {0}% reached": "Limite mensal: {0}% atingido",
+  "{0}: {1}% of monthly limit reached": "{0}: {1}% do limite mensal atingido",
+  "Invalid alert setting.": "Definição de alertas inválida.",
 } as const;

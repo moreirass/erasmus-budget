@@ -748,6 +748,7 @@ export function SettingsForm({
               {
                 ...data,
                 settings: {
+                  ...s,
                   firstDay: Number(f.get("firstDay")),
                   start: String(f.get("start")),
                   end: String(f.get("end")),
