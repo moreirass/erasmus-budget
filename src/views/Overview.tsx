@@ -189,93 +189,117 @@ export function OverviewView({
         </span>
       </div>
       <section className="dashboard-grid">
-        <div className="panel category-panel">
-          <div className="section-heading">
-            <div>
-              <h2>{tr("Where it’s going")}</h2>
-              <p>
-                {tr(
-                  view === "week"
-                    ? "Your prorated weekly category guide"
-                    : "Your monthly category guide",
-                )}
-              </p>
+        <div className="overview-primary">
+          <div className="panel category-panel">
+            <div className="section-heading">
+              <div>
+                <h2>{tr("Where it’s going")}</h2>
+                <p>
+                  {tr(
+                    view === "week"
+                      ? "Your prorated weekly category guide"
+                      : "Your monthly category guide",
+                  )}
+                </p>
+              </div>
+              <button
+                className="text-button"
+                onClick={() => {
+                  setTab("Budget & settings");
+                  setSettingsSection("plan");
+                }}
+              >
+                {tr("Edit limits")} <ArrowUpRight size={15} />
+              </button>
             </div>
-            <button
-              className="text-button"
-              onClick={() => {
-                setTab("Budget & settings");
-                setSettingsSection("plan");
-              }}
-            >
-              {tr("Edit limits")} <ArrowUpRight size={15} />
-            </button>
-          </div>
-          <div className="category-list">
-            {categories
-              .filter(
-                (c) =>
-                  group === "all" ||
-                  (group === "travel" ? c.id === "travel" : c.id !== "travel"),
-              )
-              .map((c) => {
-                const cap =
-                    Math.round(
-                      plan.limits[c.id] *
-                        (range ? range.days / periodDays(data, month) : 1),
-                    ) + stats.received[c.id],
-                  spent = stats.spent[c.id];
-                return (
-                  <div className="category-row" key={c.id}>
-                    <div className={`category-emoji cat-${c.id}`}>
-                      <CategoryIcon category={c.id} />
-                    </div>
-                    <div className="category-main">
-                      <div className="category-label">
-                        <strong>
-                          {tr(c.name)}
-                          {alerts.some((a) => a.category === c.id) && (
-                            <small className="limit-alert" role="status">
-                              <AlertTriangle size={16} aria-hidden="true" />
-                              {tr("Monthly limit: {0}% reached", [
-                                alerts.find((a) => a.category === c.id)!
-                                  .threshold,
-                              ])}
-                            </small>
-                          )}
-                        </strong>
-                        <span>
-                          <b>{money(spent)}</b>{" "}
-                          <span className="muted">/ {money(cap)}</span>
-                        </span>
+            <div className="category-list">
+              {categories
+                .filter(
+                  (c) =>
+                    group === "all" ||
+                    (group === "travel"
+                      ? c.id === "travel"
+                      : c.id !== "travel"),
+                )
+                .map((c) => {
+                  const cap =
+                      Math.round(
+                        plan.limits[c.id] *
+                          (range ? range.days / periodDays(data, month) : 1),
+                      ) + stats.received[c.id],
+                    spent = stats.spent[c.id];
+                  return (
+                    <div className="category-row" key={c.id}>
+                      <div className={`category-emoji cat-${c.id}`}>
+                        <CategoryIcon category={c.id} />
                       </div>
-                      <div className="track">
-                        <span
-                          style={{
-                            width: `${Math.min(100, (spent / Math.max(1, cap)) * 100)}%`,
-                            background:
-                              spent > cap
-                                ? "var(--error)"
-                                : `var(--category-${c.id})`,
-                          }}
-                        />
+                      <div className="category-main">
+                        <div className="category-label">
+                          <strong>
+                            {tr(c.name)}
+                            {alerts.some((a) => a.category === c.id) && (
+                              <small className="limit-alert" role="status">
+                                <AlertTriangle size={16} aria-hidden="true" />
+                                {tr("Monthly limit: {0}% reached", [
+                                  alerts.find((a) => a.category === c.id)!
+                                    .threshold,
+                                ])}
+                              </small>
+                            )}
+                          </strong>
+                          <span>
+                            <b>{money(spent)}</b>{" "}
+                            <span className="muted">/ {money(cap)}</span>
+                          </span>
+                        </div>
+                        <div className="track">
+                          <span
+                            style={{
+                              width: `${Math.min(100, (spent / Math.max(1, cap)) * 100)}%`,
+                              background:
+                                spent > cap
+                                  ? "var(--error)"
+                                  : `var(--category-${c.id})`,
+                            }}
+                          />
+                        </div>
+                        <small>
+                          {c.id === "laundry"
+                            ? tr("Top-ups only · washes use card credit")
+                            : spent > cap
+                              ? tr("{0} above this period’s guide", [
+                                  money(spent - cap),
+                                ])
+                              : tr("{0} left in this period · no rollover", [
+                                  money(cap - spent),
+                                ])}
+                        </small>
                       </div>
-                      <small>
-                        {c.id === "laundry"
-                          ? tr("Top-ups only · washes use card credit")
-                          : spent > cap
-                            ? tr("{0} above this period’s guide", [
-                                money(spent - cap),
-                              ])
-                            : tr("{0} left in this period · no rollover", [
-                                money(cap - spent),
-                              ])}
-                      </small>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+            </div>
           </div>
+          <section className="panel">
+            <div className="section-heading">
+              <div>
+                <h2>{tr("Recent activity")}</h2>
+                <p>{tr("Small moments, clearly recorded.")}</p>
+              </div>
+              <button
+                className="text-button"
+                onClick={() => setTab("Transactions")}
+              >
+                {tr("View all")} <ArrowUpRight size={15} />
+              </button>
+            </div>
+            <TransactionList
+              rows={rows.slice(0, 5)}
+              edit={setEditor}
+              remove={setPendingDelete}
+              add={() => openNew()}
+            />
+          </section>
         </div>
         <div className="right-stack">
           {group !== "daily" && <TravelBreakdown rows={stats.rows} />}
@@ -363,26 +387,6 @@ export function OverviewView({
             </div>
           </div>
         </div>
-      </section>
-      <section className="panel">
-        <div className="section-heading">
-          <div>
-            <h2>{tr("Recent activity")}</h2>
-            <p>{tr("Small moments, clearly recorded.")}</p>
-          </div>
-          <button
-            className="text-button"
-            onClick={() => setTab("Transactions")}
-          >
-            {tr("View all")} <ArrowUpRight size={15} />
-          </button>
-        </div>
-        <TransactionList
-          rows={rows.slice(0, 5)}
-          edit={setEditor}
-          remove={setPendingDelete}
-          add={() => openNew()}
-        />
       </section>
     </>
   );

@@ -4522,3 +4522,60 @@ button {
     display: block;
   }
 }
+
+/* Final review fixes: usable density and stable palette switching. */
+.overview-primary {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.overview-primary > .panel + .panel {
+  margin: 0;
+}
+.group-options button {
+  font-size: 1rem;
+  background: var(--low);
+  border: 1px solid var(--border);
+}
+.group-options button.selected {
+  background: var(--active);
+  border-color: var(--primary);
+}
+.category-chips {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.category-chips button {
+  padding: 12px 6px;
+  background: var(--low);
+  border: 1px solid var(--border);
+  min-height: 80px;
+}
+.category-chips button span {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  font-size: 0.875rem;
+}
+.category-chips button.selected {
+  background: var(--active);
+  border-color: var(--primary);
+}
+button {
+  transition: box-shadow 0.15s;
+}
+.danger {
+  color: var(--error);
+  border-color: var(--error);
+  background: var(--error-bg);
+}
+.notice.warning {
+  background: var(--gold-bg);
+  color: var(--gold);
+}
+.sidebar {
+  padding-top: max(32px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}

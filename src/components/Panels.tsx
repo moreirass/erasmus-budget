@@ -406,7 +406,9 @@ export function TransactionList({
             </dd>
             <dt>{tr("Original amount")}</dt>
             <dd>{money(detail.amount, detail.currency)}</dd>
-            <dt>{tr("Bank outflow")}</dt>
+            <dt>
+              {tr(detail.kind === "income" ? "Money received" : "Bank outflow")}
+            </dt>
             <dd>
               {detail.kind === "wash"
                 ? money(0)
@@ -414,7 +416,10 @@ export function TransactionList({
             </dd>
             <dt>{tr("Saved exchange rate")}</dt>
             <dd>
-              1 EUR = {detail.rate} {detail.currency}
+              1 EUR = {detail.rate}{" "}
+              {detail.kind === "topup" || detail.kind === "wash"
+                ? "CZK"
+                : detail.currency}
             </dd>
             <dt>{tr("Note")}</dt>
             <dd>{detail.note || "—"}</dd>
