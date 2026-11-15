@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   ArrowLeftRight,
   ChartPie,
   Check,
@@ -128,6 +129,7 @@ export function ExchangePanel({
       </p>
       {fx.error && (
         <p className="form-error" role="alert">
+          <AlertTriangle size={18} aria-hidden="true" />
           {tr(fx.error)}
         </p>
       )}
@@ -730,6 +732,7 @@ export function BudgetForm({
         </div>
         {!balanced && (
           <p className="form-error" role="status">
+            <AlertTriangle size={18} aria-hidden="true" />
             {tr("Adjust day-to-day allocations by {0} to match this budget.", [
               money(Math.round(budget * 100) - total),
             ])}
@@ -879,6 +882,7 @@ export function SettingsForm({
       </Field>
       {error && (
         <p role="alert" className="form-error">
+          <AlertTriangle size={18} aria-hidden="true" />
           {tr(error)}
         </p>
       )}

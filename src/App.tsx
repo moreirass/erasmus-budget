@@ -139,7 +139,8 @@ export default function App() {
         </p>
       )}
       {store.corrupt && (
-        <div className="notice error">
+        <div className="notice error" role="alert">
+          <AlertCircle size={20} aria-hidden="true" />
           {tr("Saved data needs recovery.")}{" "}
           <button
             onClick={() =>
@@ -164,7 +165,8 @@ export default function App() {
         </div>
       )}
       {needRefresh && (
-        <div className="notice">
+        <div className="notice" role="status">
+          <Info size={20} aria-hidden="true" />
           {tr("An app update is ready. Save any open form first.")}{" "}
           <button onClick={() => updateServiceWorker(true)}>
             {tr("Reload & update")}{" "}

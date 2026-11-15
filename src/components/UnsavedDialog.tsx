@@ -30,7 +30,16 @@ export function UnsavedDialog({
   return (
     <>
       <Modal title={title} close={() => (dirty ? setDiscard(true) : close())}>
-        <div onChangeCapture={() => markDirty(true)}>{children(markDirty)}</div>
+        <div
+          onChangeCapture={(event) => {
+            if (
+              (event.target as HTMLElement).getAttribute("role") !== "combobox"
+            )
+              markDirty(true);
+          }}
+        >
+          {children(markDirty)}
+        </div>
       </Modal>
       {discard && (
         <Modal

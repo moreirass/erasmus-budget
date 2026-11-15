@@ -1,4 +1,38 @@
-# Verification — 3 November 2026
+# Verification
+
+## Interface redesign — 15 November 2026
+
+Branch `codex/calm-pocket-redesign`, based on `240efd2`. Implementation follows the ordered checkpoints in [docs/COVERAGE.md](docs/COVERAGE.md); design rules and the short audit are in [docs/DESIGN.md](docs/DESIGN.md).
+
+### Changes and automated checks
+
+- Semantic tokens cover both themes; type, controls, navigation, overview, ledger, editor, settings sections, recurring/favourites, laundry, exchange rates, data and account states were revised. All new interface strings use English source keys with Portuguese (Portugal) translations.
+- **All 48 existing tests pass.** Every implementation checkpoint ran the tests and TypeScript/Vite/PWA production build before committing. Formatting passes. No new runtime or development dependencies were added.
+- Accounting (`model.ts`), persistence (`store.ts`), all hooks, sync protocol, exchange-rate retrieval, JSON/CSV transfer, schema and dependency files are unchanged from the base commit. No user data was read, migrated or populated by the redesign.
+- Original-currency presentation uses a UI formatter respecting currency minor units, including three-decimal currencies. This does not change stored amounts or conversions. Transaction details resolve their selected ID from current rows rather than retaining a stale object.
+- Transaction, favourite, recurring-rule and pending-occurrence dialogs share an unsaved-change guard. Successful saves close directly; cancellation offers Keep editing or Discard. Browser navigation warnings are registered only after edits.
+- Production output at the final code checkpoint: main JavaScript approximately **387.19 KB / 118.31 KB gzip**, Supabase **227.08 KB / 58.97 KB gzip**, CSS **67.19 KB / 12.56 KB gzip**. No JavaScript chunk exceeds the default 500 KB warning. The Supabase chunk remains separate; this does not assert lazy loading.
+
+### Browser and interaction evidence
+
+- The broad Chrome pass covered **209 layout/state samples and 20 workflow groups** across 320, 390, 768 and 1440px, dark/light themes and English/Portuguese layouts. There were no uncaught errors, horizontal document overflows or clipped amount findings. Font and control sampling found no text below 14px or non-checkbox controls below 44px in the sampled visible states.
+- Computed text-contrast sampling was checked against AA thresholds. Initial measurements taken during theme transitions were repeated after settling, with no remaining sampled contrast failures. Follow-up checks after the final layout changes covered mobile Overview/editor and desktop light Overview/editor.
+- Exercised entry creation for all four kinds, immutable conversion snapshots, details, edit/delete/Undo, currency keyboard navigation/manual rates, insufficient laundry credit, unsaved draft choices, favourites/use/Undo/missing rate, recurring rule and occurrence actions, monthly plan changes, JSON/CSV payloads and import validation/preview/merge, backup reminders and persistent appearance/language choices.
+- Dialog focus restoration was explicitly checked after detail → Edit → Close and nested Discard. Tests use real components and browser events, not duplicate implementations of accounting rules.
+- Focused follow-up checks passed for all four editor guards and successful-save bypass, KWD three-decimal details/delete/template amounts, EUR laundry quote labels, income labels, and detail updates/removal after simulated cross-tab storage events. Invalid plan distribution disables Save, following-month replacement feedback renders, and invalid tracking changes are rejected. Held/failed rate responses exercise refreshing, missing quote and error feedback.
+- The final focused pass covered **13 workflow groups and 8 additional rendered-state samples**, with no sampled contrast, size, overflow or clipped-amount findings. It also verified blocked deletion of a consumed card top-up, retention of cached rates after a failed refresh, and the actual App's update-ready/open-form warning with a mocked PWA hook and reload callback. This verifies the UI, not a real service-worker update.
+- Account fixtures rendered email-link request/success, pending changes, syncing, synced, offline, error, conflict and sign-out confirmation. Export-both and both conflict-resolution callbacks were exercised. These substitute store/network callbacks; they do not prove live Supabase authentication or sync.
+
+### What was not checked
+
+- No physical Android/iOS install, physical safe-area/landscape test or full assistive-technology audit.
+- Service workers were blocked in browser checks. Offline notices and cached-rate UI are separate from actual offline navigation and the service-worker update lifecycle.
+- No live Supabase email delivery, session, cross-account access check or two-device conflict. No live Frankfurter request was used for visual tests; all financial records and quotes were isolated test fixtures, not application defaults.
+- Export payloads were inspected at Blob creation; completion of files saved to disk and Android's system file picker were not verified.
+- No new dependency audit was run for this UI-only update. The dated audit below is historical, not a current claim.
+- Local browser data and exports remain unencrypted. No deployment or push was performed.
+
+## Historical checks — 3 November 2026
 
 ## Current checks
 
@@ -35,7 +69,7 @@ No incompatible forced downgrade or unverified transitive override was applied. 
 - FX cache remains browser localStorage. Offline use relies on previously fetched quotes or manual rates, not new live requests. Financial transactions keep their original conversion snapshots.
 - Supabase SQL and data-envelope version are unchanged. Existing budgets retain their period; only new workspaces use the current month. The legacy October start-day rule remains exclusively for old documents lacking `firstDay`.
 - JSON/CSV exports and browser storage are unencrypted. CSP reduces script-execution exposure; it does not encrypt data or replace Supabase RLS.
-- Full PT/EN localization and language selection remain optional unfinished work. The primary interface language is English, declared consistently in HTML and the manifest, with some Portuguese design labels.
+- At the time of this historical check, full PT/EN localization and language selection were unfinished. They are now available through the existing translation mechanism and were exercised in the November 15 redesign checks.
 
 Repeat local checks with `npm test`, `npm run build`, `npm run format:check`, `npm audit` and `npm audit --omit=dev`.
 
