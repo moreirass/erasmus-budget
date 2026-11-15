@@ -1,3 +1,4 @@
+import { displayDate } from "../i18n";
 import { AlertCircle, Repeat2, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -303,7 +304,7 @@ export function RecurringOverview({ data, save, fx, enabled = true }: Props) {
           {pending.map((o) => (
             <div className="allocation-total template-row" key={o.id}>
               <span>
-                {o.date} · {o.rule.note} ·{" "}
+                {displayDate(o.date)} · {o.rule.note} ·{" "}
                 {formatAmount(o.rule.amount, o.rule.currency)}
                 {!occurrenceTransaction(o, data, fx.cache?.rates ?? {}) && (
                   <small>{tr("No cached rate")}</small>

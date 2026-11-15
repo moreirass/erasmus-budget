@@ -4863,3 +4863,23 @@ body:has(.screen-settings) .quick-add {
 .plan-panel .primary {
   min-height: 56px;
 }
+
+.template-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+.template-row > span {
+  flex: 1 1 200px;
+}
+.plan-automation .panel {
+  background: transparent;
+  border: 0;
+  padding-inline: 0;
+}
+.favorites-panel button {
+  white-space: normal;
+  text-wrap: pretty;
+}
