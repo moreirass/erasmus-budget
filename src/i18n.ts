@@ -83,7 +83,15 @@ export function tr(
   if (!values.length) {
     for (const { key, pattern } of dynamicMessages) {
       const match = message.match(pattern);
-      if (match) return interpolate(messages[key], match.slice(1));
+      if (match)
+        return interpolate(
+          messages[key],
+          match
+            .slice(1)
+            .map((value) =>
+              /^\d{4}-\d{2}-\d{2}$/.test(value) ? displayDate(value) : value,
+            ),
+        );
     }
   }
   return message;

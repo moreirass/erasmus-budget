@@ -30,7 +30,7 @@ Done means implemented and rendered; mock account/PWA states are distinguished f
 
 ## Twenty UI rules
 
-The brief's related typography and state bullets are grouped into20 review rows.
+The brief's related typography and state bullets are grouped into 20 review rows.
 
 | Rule                                               | Where applied                                                            | Status                                                                       |
 | -------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
@@ -67,7 +67,7 @@ P3 compatibility/rollback is documented in PROPOSALS.md. Amounts,exchange conver
 
 ## Step record
 
-Every implementation commit passed tests and production build. Initial language work increased48tests to50; time/ordering coverage increased50to52. Commit history contains the ordered screen refinements and separate proposal commits. Review source with git diff ae629f2..HEAD. Screenshot fixtures are explicitly QA-only; compare docs/previews with the current files referenced in VERIFICATION.md.
+Every implementation commit passed tests and production build. Initial language work increased 48 tests to 50; time/ordering coverage increased 50 to 52. Commit history contains the ordered screen refinements and separate proposal commits. Review source with git diff ae629f2..HEAD. Screenshot fixtures are explicitly QA-only; compare docs/previews with the current files referenced in VERIFICATION.md.
 
 ## Remaining verification
 

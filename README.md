@@ -92,7 +92,7 @@ The app opens at the current Ostrava month and week. It remembers Month/Week vie
 
 ## Laundry accounting
 
-Top-ups count once as bank outflows and increase CZK card credit. Washes consume credit without another bank outflow. Opening credit and leftover card credit carry forward independently of monthly budgets. Negative historical card credit is blocked, even when deleting/editing a top-up. Same-day top-ups precede washes for credit validation because entries store dates, not times. Laundry support is bank money: record a separate top-up when you load the card.
+Top-ups count once as bank outflows and increase CZK card credit. Washes consume credit without another bank outflow. Opening credit and leftover card credit carry forward independently of monthly budgets. Negative historical card credit is blocked, even when deleting/editing a top-up. Same-day top-ups precede washes for credit validation for credit validation; recorded times are display metadata and do not change that rule. Laundry support is bank money: record a separate top-up when you load the card.
 
 ## Currencies, history and backups
 

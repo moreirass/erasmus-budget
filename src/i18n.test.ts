@@ -83,7 +83,7 @@ it("defaults to English and switches copy, dates, money and currency names toget
     tr(
       "Laundry credit would be negative on 2026-11-04. Add the missing top-up or opening credit first.",
     ),
-    "O crédito da lavandaria ficaria negativo em 2026-11-04. Adiciona primeiro o carregamento em falta ou o crédito inicial.",
+    "O crédito da lavandaria ficaria negativo em 04/11/2026. Adiciona primeiro o carregamento em falta ou o crédito inicial.",
   );
 });
 
