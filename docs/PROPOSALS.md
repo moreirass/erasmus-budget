@@ -31,11 +31,11 @@ Risk: medium (changes interpretation of the headline figures). Effort: S.
 Alternatives: do nothing; retain global values and explicitly label them as totals for both budgets.
 Recommendation: approve separately; for now retain values and clarify the global scope in copy. Status: IMPLEMENTED (P2). Summary figures use existing selected-budget values, including week proration.
 
-Only reply with IDs to approve these, e.g. approve P1; reject P2. Visual styling and the expressly requested language support continue independently. No HIGH IMPACT proposal is needed.
+The user approved P1 and P2 by ID. The initial visual/language audit required no HIGH IMPACT changes; the later explicit time-and-order request is recorded as P3 below.
 
 ## P3 — Newest entries within each day and recorded time — HIGH IMPACT
 
 Approved by the user's explicit follow-up request. Days remain descending; insertion sequence within a day becomes descending (editing never changes order). Optional time metadata stores HH:mm in Europe/Prague; new manual entries default to current time and permit editing. Legacy and scheduled entries with unknown time say Time not recorded. Favourite quick entries record current time.
 Affects model transaction metadata/validation/comparator, optional JSON property, appended CSV time column, bilingual editor/list/detail, tests. No amount, conversion, allocation, credit-validation rules, storage keys, sync protocol or SQL schema changes. Risk medium; effort M. Alternative do nothing rejected by the direct request.
-Migration: no invented times; old10/12/13/15-column CSVs remain readable; new exports16columns. Older CSV merging preserves an existing recorded time. JSON version unchanged. Update both devices before editing; old clients may drop time metadata when editing. Rollback: export a complete JSON first, return to previous client; original financial fields remain compatible, but older clients cannot import the new CSV header. Retain the JSON for time recovery.
-Status: IMPLEMENTED after tests pass.
+Migration: no invented times; old 10/12/13/15-column CSVs remain readable; new exports have 16 columns. Older CSV merging preserves an existing recorded time. JSON version unchanged. Update both devices before editing; old clients may drop time metadata when editing. Rollback: export a complete JSON first, return to the previous client; original financial fields remain compatible, but older clients cannot import the new CSV header. Retain the JSON for time recovery.
+Status: IMPLEMENTED; tests and production build pass.

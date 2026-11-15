@@ -5003,6 +5003,7 @@ body:has(.screen-settings) .quick-add {
   .period-right > select:first-child {
     flex-basis: 100%;
     width: 100%;
+    max-width: none;
   }
 }
 
