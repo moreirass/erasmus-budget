@@ -4819,3 +4819,23 @@ body:has(.screen-settings) .quick-add {
 .detail-list dd {
   font-variant-numeric: tabular-nums;
 }
+
+.transaction-editor .amount-hero {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--low);
+}
+.transaction-editor .group-options {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.category-chips button {
+  background: transparent;
+}
+.editor-actions {
+  padding-block: var(--space-4);
+}
+.editor-actions .primary {
+  min-height: 56px;
+}

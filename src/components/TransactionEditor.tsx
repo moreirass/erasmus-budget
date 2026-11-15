@@ -312,11 +312,11 @@ export function TransactionForm({
                     "No cached rate for this currency. Refresh online or choose a manual bank rate.",
                   )
               : rateMode === "saved"
-                ? tr("This entry keeps its saved rate{0}.", [
-                    initial?.rateDate
-                      ? tr(" from {0}", [displayDate(initial.rateDate)])
-                      : "",
-                  ])
+                ? initial?.rateDate
+                  ? tr("This entry keeps its saved rate from {0}.", [
+                      displayDate(initial.rateDate),
+                    ])
+                  : tr("This entry keeps its saved rate.")
                 : tr(
                     "Enter your effective bank rate. It may differ from the reference rate.",
                   )}
