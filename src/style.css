@@ -4978,3 +4978,10 @@ body:has(.screen-settings) .quick-add {
   transform-origin: left center;
   transition: transform var(--duration) var(--ease);
 }
+
+.transaction-time {
+  display: block;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}

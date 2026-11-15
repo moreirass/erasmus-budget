@@ -1,3 +1,4 @@
+import { currentTime } from "../time";
 import { errorMessage } from "../i18n";
 import { AlertCircle, Repeat2, Star } from "lucide-react";
 import { useState } from "react";
@@ -185,6 +186,7 @@ export function FavoriteButtons({ data, fx, save }: Props) {
                   );
                   return;
                 }
+                t.time = currentTime();
                 if (
                   save(
                     { ...data, transactions: [...data.transactions, t] },

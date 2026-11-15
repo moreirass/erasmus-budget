@@ -609,4 +609,7 @@ export const portuguese = {
     "Introduz um valor dentro do intervalo permitido.",
   "Use the required format.": "Usa o formato pedido.",
   "you@example.com": "nome@exemplo.pt",
+  "Time not recorded": "Hora não registada",
+  "Time (Ostrava)": "Hora (Ostrava)",
+  "Invalid transaction time.": "Hora do movimento inválida.",
 } as const;

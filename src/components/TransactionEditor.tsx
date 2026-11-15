@@ -1,3 +1,4 @@
+import { currentTime } from "../time";
 import { errorMessage } from "../i18n";
 import { lastEntry } from "../quickEntry";
 import {
@@ -153,6 +154,7 @@ export function TransactionForm({
           Math.max(0, ...data.transactions.map((t) => t.addedOrder ?? 0)) + 1,
         id: initial?.id ?? crypto.randomUUID(),
         date: String(f.get("date")),
+        ...(f.get("time") ? { time: String(f.get("time")) } : {}),
         kind,
         category,
         amount: Math.round(Number(amount) * currencyFactor(currency)),
@@ -443,6 +445,16 @@ export function TransactionForm({
           />
         </Field>
       </div>
+      {!ruleMode && (
+        <Field label={tr("Time (Ostrava)")}>
+          <input
+            type="time"
+            name="time"
+            required={!initial}
+            defaultValue={initial ? (initial.time ?? "") : currentTime()}
+          />
+        </Field>
+      )}
       <Field label={tr("Note (optional)")}>
         <input
           name="note"

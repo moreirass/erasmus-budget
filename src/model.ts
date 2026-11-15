@@ -52,6 +52,8 @@ export type Plan = { budget: number; limits: Record<Category, number> };
 export type Transaction = {
   id: string;
   date: string;
+  /** Wall-clock time in Europe/Prague. Missing on legacy or scheduled records. */
+  time?: string;
   kind: "expense" | "topup" | "wash" | "income";
   category: Category;
   amount: number;
@@ -350,6 +352,11 @@ export function validateData(value: unknown): Data {
       fail("Transactions need unique IDs.");
     ids.add(t.id);
     if (
+      t.time !== undefined &&
+      (typeof t.time !== "string" || !/^([01]\d|2[0-3]):[0-5]\d$/.test(t.time))
+    )
+      fail("Invalid transaction time.");
+    if (
       typeof t.date !== "string" ||
       !/^20\d{2}-\d{2}-\d{2}$/.test(t.date) ||
       !monthValid(t.date.slice(0, 7)) ||
@@ -511,7 +518,7 @@ export function currentPeriod(d: Data, date = today()) {
 }
 
 export const transactionOrder = (a: Transaction, b: Transaction) =>
-  b.date.localeCompare(a.date) || (a.addedOrder ?? 0) - (b.addedOrder ?? 0);
+  b.date.localeCompare(a.date) || (b.addedOrder ?? 0) - (a.addedOrder ?? 0);
 
 export function applyMonthlyPlan(
   d: Data,

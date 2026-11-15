@@ -1,3 +1,4 @@
+import { displayTime } from "../time";
 import { Skeleton } from "./Feedback";
 import { formatNumber, formatPercent } from "../i18n";
 import { errorMessage } from "../i18n";
@@ -417,6 +418,8 @@ export function TransactionList({
           <dl className="detail-list">
             <dt>{tr("Date")}</dt>
             <dd>{displayDate(detail.date)}</dd>
+            <dt>{tr("Time (Ostrava)")}</dt>
+            <dd>{displayTime(detail.time)}</dd>
             <dt>{tr("Category")}</dt>
             <dd>
               {tr(categories.find((c) => c.id === detail.category)!.name)}
@@ -487,6 +490,12 @@ export function TransactionList({
                     <CategoryIcon category={c.id} travelType={t.travelType} />
                   </span>
                   <div className="transaction-description">
+                    <time
+                      className="transaction-time"
+                      dateTime={t.time ? `${t.date}T${t.time}` : t.date}
+                    >
+                      {displayTime(t.time)}
+                    </time>
                     <button
                       className="transaction-title"
                       onClick={() => setDetailId(t.id)}

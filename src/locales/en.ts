@@ -584,4 +584,7 @@ export const english = {
     "Enter a value within the allowed range.",
   "Use the required format.": "Use the required format.",
   "you@example.com": "you@example.com",
+  "Time not recorded": "Time not recorded",
+  "Time (Ostrava)": "Time (Ostrava)",
+  "Invalid transaction time.": "Invalid transaction time.",
 } as const;
