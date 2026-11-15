@@ -1,3 +1,4 @@
+import { formatPercent } from "../i18n";
 import { Metric } from "../components/Primitives";
 import { limitLevels } from "../model";
 import {
@@ -193,7 +194,7 @@ export function OverviewView({
           <div className="panel category-panel">
             <div className="section-heading">
               <div>
-                <h2>{tr("Where it’s going")}</h2>
+                <h2>{tr("Category spending")}</h2>
                 <p>
                   {tr(
                     view === "week"
@@ -240,9 +241,11 @@ export function OverviewView({
                             {alerts.some((a) => a.category === c.id) && (
                               <small className="limit-alert" role="status">
                                 <AlertTriangle size={16} aria-hidden="true" />
-                                {tr("Monthly limit: {0}% reached", [
-                                  alerts.find((a) => a.category === c.id)!
-                                    .threshold,
+                                {tr("{0} of the monthly limit reached", [
+                                  formatPercent(
+                                    alerts.find((a) => a.category === c.id)!
+                                      .threshold / 100,
+                                  ),
                                 ])}
                               </small>
                             )}

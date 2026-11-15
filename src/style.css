@@ -4783,3 +4783,21 @@ body:has(.screen-settings) .quick-add {
   color: var(--text);
   border: 1px solid var(--border);
 }
+
+.metrics {
+  gap: var(--space-4);
+}
+.metrics .metric:last-child dd {
+  font-size: var(--text-heading);
+  color: var(--primary);
+}
+.category-panel,
+.overview-primary > .panel {
+  border-color: transparent;
+}
+.category-row {
+  padding-block: var(--space-4);
+}
+.balance-footer {
+  gap: var(--space-3);
+}
