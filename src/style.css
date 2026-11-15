@@ -4883,3 +4883,23 @@ body:has(.screen-settings) .quick-add {
   white-space: normal;
   text-wrap: pretty;
 }
+
+.laundry-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.laundry-value {
+  color: var(--gold);
+  font-size: clamp(var(--text-heading), 8vw, var(--text-display));
+}
+.laundry-history {
+  border: 0;
+}
+.privacy-note {
+  border: 0;
+  background: transparent;
+  padding: var(--space-4) 0;
+}
+.laundry-title {
+  color: var(--gold);
+}
