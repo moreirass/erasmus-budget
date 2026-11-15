@@ -1667,7 +1667,7 @@ dialog::backdrop {
     border-radius: 50%;
     background: var(--primary);
     color: var(--on-cta);
-    box-shadow: 0 0 24px var(--border);
+    box-shadow: none;
   }
   .topbar {
     height: 80px;
