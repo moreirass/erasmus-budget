@@ -1,5 +1,59 @@
 // English source messages are the canonical keys. Keep placeholders unchanged.
 export const portuguese = {
+  Ledger: "Registos",
+  "No card credit. Add a top-up before recording a wash.":
+    "Sem crédito no cartão. Adiciona um carregamento antes de registares uma lavagem.",
+  "No recurring rules yet. Create one for a regular expense or support.":
+    "Ainda não há regras recorrentes. Cria uma para uma despesa ou apoio regular.",
+  "Save frequent expenses here for quicker entry.":
+    "Guarda aqui as despesas frequentes para as registares mais depressa.",
+  "Signing out…": "A terminar sessão…",
+  "Your saved account data stays on this device after signing out.":
+    "Os dados guardados da conta ficam neste dispositivo depois de terminares sessão.",
+  "Sign out?": "Terminar sessão?",
+  "Show a reminder at 80% and 100% of a monthly category limit.":
+    "Mostrar um aviso aos 80% e 100% do limite mensal de uma categoria.",
+  Light: "Claro",
+  Dark: "Escuro",
+  Appearance: "Aspeto",
+  "App preferences": "Preferências da app",
+  "Sending sign-in link…": "A enviar ligação de acesso…",
+  "Signed-in account": "Conta com sessão iniciada",
+  "Offline changes stay on this device until you sync online.":
+    "As alterações sem ligação ficam neste dispositivo até sincronizares com ligação à internet.",
+  "Your devices, one budget": "Os teus dispositivos, um orçamento",
+  "Backup reminders": "Lembretes de cópia de segurança",
+  "Review the file before making changes":
+    "Revê o ficheiro antes de aplicar alterações",
+  "Transaction history for a spreadsheet":
+    "Histórico de movimentos para uma folha de cálculo",
+  "Plans, transactions, rules and favorites":
+    "Planos, movimentos, regras e favoritos",
+  "Keep a copy. Bring it with you.": "Guarda uma cópia e leva-a contigo.",
+  "Budget and settings sections": "Secções de orçamento e definições",
+  "Cloud version": "Versão na nuvem",
+  "Discard changes": "Descartar alterações",
+  "Keep editing": "Continuar a editar",
+  "This transaction has not been saved. Keep editing or discard your changes.":
+    "Este movimento ainda não foi guardado. Continua a editar ou descarta as alterações.",
+  "Discard unsaved changes?": "Descartar alterações por guardar?",
+  "Amount and currency": "Montante e moeda",
+  Category: "Categoria",
+  Note: "Nota",
+  "Try another search or clear your filters.":
+    "Experimenta outra pesquisa ou limpa os filtros.",
+  "Clear filters": "Limpar filtros",
+  "No matching transactions": "Nenhum movimento encontrado",
+  "Saved exchange rate": "Taxa de câmbio guardada",
+  "Original amount": "Montante original",
+  "Transaction details": "Detalhes do movimento",
+  "Period summary": "Resumo do período",
+  "Planned remainder": "Saldo planeado",
+  "Your plan is ready. Add a transaction when you have one to record.":
+    "O teu plano está pronto. Adiciona um movimento quando tiveres algo para registar.",
+  "Main navigation": "Navegação principal",
+  "Offline · changes are saved on this device. Sync when connected.":
+    "Sem ligação · as alterações ficam guardadas neste dispositivo. Sincroniza quando tiveres ligação.",
   "{0} transaction": "{0} movimento",
   "{0} transaction this period · {1} money out":
     "{0} movimento neste período · {1} em saídas",
@@ -520,4 +574,6 @@ export const portuguese = {
   "Not synced yet": "Ainda sem sincronização",
   "Invalid backup interval.": "Intervalo de backup inválido.",
   "Invalid cloud revision.": "Revisão da cloud inválida.",
+  "Your changes have not been saved. Keep editing or discard them.":
+    "As alterações ainda não foram guardadas. Continua a editar ou descarta-as.",
 } as const;

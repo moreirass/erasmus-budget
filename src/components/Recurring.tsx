@@ -1,3 +1,4 @@
+import { AlertCircle, Repeat2, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   dueOccurrences,
@@ -5,7 +6,6 @@ import {
   occurrenceTransaction,
   settleOccurrence,
   makeTransaction,
-  money,
   today,
   type Data,
   type Transaction,
@@ -13,9 +13,11 @@ import {
   type Occurrence,
 } from "../model";
 import { tr } from "../i18n";
+import { formatAmount } from "../formatAmount";
+import { UnsavedDialog } from "./UnsavedDialog";
 import type { useExchangeRates } from "../useExchangeRates";
 import { TransactionForm } from "./TransactionEditor";
-import { Field, Modal } from "./Primitives";
+import { Field } from "./Primitives";
 type Props = {
   enabled?: boolean;
   data: Data;
@@ -25,18 +27,28 @@ type Props = {
 export function RecurringManager({ data, save, fx }: Props) {
   const [editing, setEditing] = useState<RecurringRule | "new" | null>(null);
   return (
-    <section className="panel">
-      <h2>{tr("Recurring transactions")}</h2>
+    <section className="panel recurring-panel">
+      <h2>
+        <Repeat2 size={20} aria-hidden="true" />
+        {tr("Recurring transactions")}
+      </h2>
       <p className="help">
         {tr(
           "Rules run when you open or resume the app. Missing exchange rates require confirmation.",
         )}
       </p>
+      {!data.recurring?.length && (
+        <p className="help">
+          {tr(
+            "No recurring rules yet. Create one for a regular expense or support.",
+          )}
+        </p>
+      )}
       {(data.recurring ?? []).map((r) => (
-        <div className="allocation-total" key={r.id}>
+        <div className="allocation-total template-row" key={r.id}>
           <span>
             {r.note || tr("Recurring transactions")} ·{" "}
-            {money(r.amount, r.currency)} ·{" "}
+            {formatAmount(r.amount, r.currency)} ·{" "}
             {tr(r.frequency === "monthly" ? "Monthly" : "Weekly")}
           </span>
           <div className="button-pair">
@@ -98,117 +110,120 @@ function RuleEditor({
       })
     : undefined;
   return (
-    <Modal title={tr("Recurring transactions")} close={close}>
-      <TransactionForm
-        data={data}
-        month={today().slice(0, 7)}
-        initial={initial}
-        initialKind="expense"
-        fx={fx}
-        ruleMode
-        extraFields={
-          <fieldset>
-            <legend>{tr("Schedule")}</legend>
-            <Field label={tr("Frequency")}>
-              <select
-                value={frequency}
-                onChange={(e) => {
-                  setFrequency(e.target.value as typeof frequency);
-                  setDay(1);
-                }}
+    <UnsavedDialog title={tr("Recurring transactions")} close={close}>
+      {(markDirty) => (
+        <TransactionForm
+          onDirtyChange={markDirty}
+          data={data}
+          month={today().slice(0, 7)}
+          initial={initial}
+          initialKind="expense"
+          fx={fx}
+          ruleMode
+          extraFields={
+            <fieldset>
+              <legend>{tr("Schedule")}</legend>
+              <Field label={tr("Frequency")}>
+                <select
+                  value={frequency}
+                  onChange={(e) => {
+                    setFrequency(e.target.value as typeof frequency);
+                    setDay(1);
+                  }}
+                >
+                  <option value="monthly">{tr("Monthly")}</option>
+                  <option value="weekly">{tr("Weekly")}</option>
+                </select>
+              </Field>
+              <Field
+                label={tr(
+                  frequency === "monthly"
+                    ? "Day of month"
+                    : "Day of week (0 Sunday, 6 Saturday)",
+                )}
               >
-                <option value="monthly">{tr("Monthly")}</option>
-                <option value="weekly">{tr("Weekly")}</option>
-              </select>
-            </Field>
-            <Field
-              label={tr(
-                frequency === "monthly"
-                  ? "Day of month"
-                  : "Day of week (0 Sunday, 6 Saturday)",
-              )}
-            >
-              <input
-                type="number"
-                required
-                min={frequency === "monthly" ? 1 : 0}
-                max={frequency === "monthly" ? 31 : 6}
-                value={day}
-                onChange={(e) => setDay(Number(e.target.value))}
-              />
-            </Field>
-            <p className="help">
-              {tr(
-                "The transaction date is the rule start date. Day 31 uses the last day in shorter months.",
-              )}
-            </p>
-            <Field label={tr("End date (optional)")}>
-              <input
-                type="date"
-                value={end}
-                onChange={(e) => setEnd(e.target.value)}
-              />
-            </Field>
-            <Field label={tr("Generation mode")}>
-              <select
-                value={mode}
-                onChange={(e) => setMode(e.target.value as typeof mode)}
-              >
-                <option value="confirm">{tr("Ask for confirmation")}</option>
-                <option value="auto">{tr("Add automatically")}</option>
-              </select>
-            </Field>
-            <Field label={tr("Fixed manual rate (optional)")}>
-              <input
-                type="number"
-                min="0.000000000001"
-                max="1000000000000"
-                step="any"
-                value={manual}
-                onChange={(e) => setManual(e.target.value)}
-              />
-            </Field>
-            <p className="help">
-              {tr(
-                "Leave empty to use cached rates or the manual CZK fallback at generation time.",
-              )}
-            </p>
-          </fieldset>
-        }
-        save={(t) => {
-          const r: RecurringRule = {
-            id: rule?.id ?? crypto.randomUUID(),
-            kind: t.kind as RecurringRule["kind"],
-            category: t.category,
-            amount: t.amount,
-            currency: t.currency,
-            note: t.note,
-            travelType: t.travelType,
-            start: t.date,
-            ...(end ? { end } : {}),
-            frequency,
-            day,
-            mode,
-            ...(manual ? { manualRate: Number(manual) } : {}),
-            generated: rule?.generated ?? [],
-            ignored: rule?.ignored ?? [],
-          };
-          if (
-            save(
-              {
-                ...data,
-                recurring: [
-                  ...(data.recurring ?? []).filter((x) => x.id !== r.id),
-                  r,
-                ],
-              },
-              "Recurring rule saved",
+                <input
+                  type="number"
+                  required
+                  min={frequency === "monthly" ? 1 : 0}
+                  max={frequency === "monthly" ? 31 : 6}
+                  value={day}
+                  onChange={(e) => setDay(Number(e.target.value))}
+                />
+              </Field>
+              <p className="help">
+                {tr(
+                  "The transaction date is the rule start date. Day 31 uses the last day in shorter months.",
+                )}
+              </p>
+              <Field label={tr("End date (optional)")}>
+                <input
+                  type="date"
+                  value={end}
+                  onChange={(e) => setEnd(e.target.value)}
+                />
+              </Field>
+              <Field label={tr("Generation mode")}>
+                <select
+                  value={mode}
+                  onChange={(e) => setMode(e.target.value as typeof mode)}
+                >
+                  <option value="confirm">{tr("Ask for confirmation")}</option>
+                  <option value="auto">{tr("Add automatically")}</option>
+                </select>
+              </Field>
+              <Field label={tr("Fixed manual rate (optional)")}>
+                <input
+                  type="number"
+                  min="0.000000000001"
+                  max="1000000000000"
+                  step="any"
+                  value={manual}
+                  onChange={(e) => setManual(e.target.value)}
+                />
+              </Field>
+              <p className="help">
+                {tr(
+                  "Leave empty to use cached rates or the manual CZK fallback at generation time.",
+                )}
+              </p>
+            </fieldset>
+          }
+          save={(t) => {
+            const r: RecurringRule = {
+              id: rule?.id ?? crypto.randomUUID(),
+              kind: t.kind as RecurringRule["kind"],
+              category: t.category,
+              amount: t.amount,
+              currency: t.currency,
+              note: t.note,
+              travelType: t.travelType,
+              start: t.date,
+              ...(end ? { end } : {}),
+              frequency,
+              day,
+              mode,
+              ...(manual ? { manualRate: Number(manual) } : {}),
+              generated: rule?.generated ?? [],
+              ignored: rule?.ignored ?? [],
+            };
+            if (
+              save(
+                {
+                  ...data,
+                  recurring: [
+                    ...(data.recurring ?? []).filter((x) => x.id !== r.id),
+                    r,
+                  ],
+                },
+                "Recurring rule saved",
+              )
             )
-          )
-            close();
-        }}
-      />
-    </Modal>
+              close();
+          }}
+        />
+      )}
+    </UnsavedDialog>
   );
 }
 export function RecurringOverview({ data, save, fx, enabled = true }: Props) {
@@ -283,13 +298,13 @@ export function RecurringOverview({ data, save, fx, enabled = true }: Props) {
         </div>
       )}
       {!!pending.length && (
-        <section className="panel">
+        <section className="panel recurring-panel">
           <h2>{tr("Pending recurring transactions")}</h2>
           {pending.map((o) => (
-            <div className="allocation-total" key={o.id}>
+            <div className="allocation-total template-row" key={o.id}>
               <span>
                 {o.date} · {o.rule.note} ·{" "}
-                {money(o.rule.amount, o.rule.currency)}
+                {formatAmount(o.rule.amount, o.rule.currency)}
                 {!occurrenceTransaction(o, data, fx.cache?.rates ?? {}) && (
                   <small>{tr("No cached rate")}</small>
                 )}
@@ -311,19 +326,28 @@ export function RecurringOverview({ data, save, fx, enabled = true }: Props) {
         </section>
       )}
       {editing && draft && (
-        <Modal title={tr("Confirm / edit")} close={() => setEditing(null)}>
-          <TransactionForm
-            data={data}
-            month={editing.date.slice(0, 7)}
-            initial={draft}
-            initialKind={draft.kind}
-            fx={fx}
-            save={(t) => {
-              if (save(settleOccurrence(data, editing, t), "Transaction saved"))
-                setEditing(null);
-            }}
-          />
-        </Modal>
+        <UnsavedDialog
+          key={editing.id}
+          title={tr("Confirm / edit")}
+          close={() => setEditing(null)}
+        >
+          {(markDirty) => (
+            <TransactionForm
+              onDirtyChange={markDirty}
+              data={data}
+              month={editing.date.slice(0, 7)}
+              initial={draft}
+              initialKind={draft.kind}
+              fx={fx}
+              save={(t) => {
+                if (
+                  save(settleOccurrence(data, editing, t), "Transaction saved")
+                )
+                  setEditing(null);
+              }}
+            />
+          )}
+        </UnsavedDialog>
       )}
     </>
   );

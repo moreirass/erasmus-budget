@@ -1,5 +1,6 @@
 import { lastEntry } from "../quickEntry";
 import {
+  AlertTriangle,
   ArrowDownLeft,
   Check,
   Plane,
@@ -8,7 +9,13 @@ import {
   Wallet,
   WashingMachine,
 } from "lucide-react";
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { CurrencyPicker } from "../CurrencyPicker";
 import { currencyDigits, currencyFactor } from "../fx";
 import { appLocale, displayDate, tr } from "../i18n";
@@ -38,6 +45,7 @@ export function TransactionForm({
   extraFields,
   ruleMode = false,
   expenseOnly = false,
+  onDirtyChange,
 }: {
   data: Data;
   month: string;
@@ -48,6 +56,7 @@ export function TransactionForm({
   extraFields?: ReactNode;
   ruleMode?: boolean;
   expenseOnly?: boolean;
+  onDirtyChange?: (dirty: boolean) => void;
 }) {
   const remembered = lastEntry(fx.currencies.map((c) => c.code));
   const [kind, setKind] = useState(initial?.kind ?? initialKind),
@@ -92,12 +101,18 @@ export function TransactionForm({
     if (rateMode === "auto")
       setRate(needsRate && quote ? String(quote.rate) : needsRate ? "" : "1");
   }, [currency, rateMode, quote?.rate, needsRate]);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
   const chooseCurrency = (code: string) => {
+    onDirtyChange?.(true);
     setCurrency(code);
     setRateMode("auto");
     setRate("");
   };
   const chooseKind = (k: Transaction["kind"]) => {
+    onDirtyChange?.(true);
     setKind(k);
     if (k === "expense" && category === "laundry") setCategory("groceries");
     if (
@@ -166,7 +181,14 @@ export function TransactionForm({
     }
   }
   return (
-    <form onSubmit={submit}>
+    <form
+      className="transaction-editor"
+      onSubmit={submit}
+      onChangeCapture={(e) => {
+        if ((e.target as HTMLElement).getAttribute("role") !== "combobox")
+          onDirtyChange?.(true);
+      }}
+    >
       <div className="segmented full transaction-kinds">
         {(["expense", "income", "topup", "wash"] as const)
           .filter((k) =>
@@ -177,6 +199,7 @@ export function TransactionForm({
               type="button"
               key={k}
               className={kind === k ? "selected" : ""}
+              aria-pressed={kind === k}
               onClick={() => chooseKind(k)}
             >
               {k === "expense" ? (
@@ -192,7 +215,7 @@ export function TransactionForm({
                 {
                   {
                     expense: tr("Expense"),
-                    income: tr("Support"),
+                    income: tr("Money received"),
                     topup: tr("Top up"),
                     wash: tr("Wash"),
                   }[k]
@@ -201,60 +224,40 @@ export function TransactionForm({
             </button>
           ))}
       </div>
-      {(kind === "expense" || kind === "income") && (
-        <div className="form-section">
-          <div className="field-label">{tr("BUDGET GROUP")}</div>
-          <div className="group-options">
-            <button
-              type="button"
-              className={group === "daily" ? "selected" : ""}
-              onClick={() => setGroup("daily")}
-            >
-              <Wallet size={19} />
-              <b>{tr("Day to day")}</b>
-              <small>{tr("Everyday expenses")}</small>
-            </button>
-            <button
-              type="button"
-              className={group === "travel" ? "selected" : ""}
-              onClick={() => setGroup("travel")}
-            >
-              <Plane size={19} />
-              <b>{tr("Travel & tourism")}</b>
-              <small>{tr("An independent limit")}</small>
-            </button>
-          </div>
+      <section className="editor-money" aria-label={tr("Amount and currency")}>
+        <CurrencyPicker
+          value={currency}
+          onChange={chooseCurrency}
+          currencies={
+            laundry
+              ? fx.currencies.filter((c) =>
+                  (initial ? ["EUR", "CZK"] : ["CZK"]).includes(c.code),
+                )
+              : fx.currencies
+          }
+        />
+        <div className="amount-hero">
+          <Field label={tr("Amount ({0})", [currency])}>
+            <input
+              autoFocus
+              type="number"
+              inputMode="decimal"
+              min={1 / factor}
+              max={100000000 / factor}
+              step={1 / factor}
+              required
+              placeholder={(0).toFixed(digits)}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </Field>
         </div>
-      )}
-      <CurrencyPicker
-        value={currency}
-        onChange={chooseCurrency}
-        currencies={
-          laundry
-            ? fx.currencies.filter((c) =>
-                (initial ? ["EUR", "CZK"] : ["CZK"]).includes(c.code),
-              )
-            : fx.currencies
-        }
-      />
-      <div className="amount-hero">
-        <Field label={tr("Amount ({0})", [currency])}>
-          <input
-            autoFocus
-            type="number"
-            inputMode="decimal"
-            min={1 / factor}
-            max={100000000 / factor}
-            step={1 / factor}
-            required
-            placeholder={(0).toFixed(digits)}
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-        </Field>
-      </div>
+      </section>
       {needsRate && !ruleMode && (
-        <>
+        <section
+          className="editor-rate"
+          aria-label={tr("Exchange rate source")}
+        >
           <Field label={tr("Exchange rate source")}>
             <select
               value={rateMode}
@@ -327,10 +330,11 @@ export function TransactionForm({
           </button>
           {fx.error && (
             <p className="form-error" role="status">
+              <AlertTriangle size={18} aria-hidden="true" />
               {tr(fx.error)}
             </p>
           )}
-        </>
+        </section>
       )}
       {amount && Number(rate) > 0 && !ruleMode && (
         <p className="conversion">
@@ -350,7 +354,40 @@ export function TransactionForm({
             : ""}
         </p>
       )}
-      <div className="form-grid">
+      {(kind === "expense" || kind === "income") && (
+        <div className="form-section">
+          <div className="field-label">{tr("BUDGET GROUP")}</div>
+          <div className="group-options">
+            <button
+              type="button"
+              className={group === "daily" ? "selected" : ""}
+              aria-pressed={group === "daily"}
+              onClick={() => {
+                setGroup("daily");
+                onDirtyChange?.(true);
+              }}
+            >
+              <Wallet size={19} />
+              <b>{tr("Day to day")}</b>
+              <small>{tr("Everyday expenses")}</small>
+            </button>
+            <button
+              type="button"
+              className={group === "travel" ? "selected" : ""}
+              aria-pressed={group === "travel"}
+              onClick={() => {
+                setGroup("travel");
+                onDirtyChange?.(true);
+              }}
+            >
+              <Plane size={19} />
+              <b>{tr("Travel & tourism")}</b>
+              <small>{tr("An independent limit")}</small>
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="form-grid editor-details">
         {(kind === "expense" || kind === "income") &&
           (group === "travel" ? (
             <Field label={tr("Travel category")}>
@@ -381,7 +418,11 @@ export function TransactionForm({
                       type="button"
                       key={c.id}
                       className={category === c.id ? "selected" : ""}
-                      onClick={() => setCategory(c.id)}
+                      aria-pressed={category === c.id}
+                      onClick={() => {
+                        setCategory(c.id);
+                        onDirtyChange?.(true);
+                      }}
                     >
                       <CategoryIcon category={c.id} />
                       <span>{tr(c.name)}</span>
@@ -430,21 +471,24 @@ export function TransactionForm({
       </p>
       {extraFields}
       {error && (
-        <p className="form-error" role="alert">
+        <p ref={errorRef} tabIndex={-1} className="form-error" role="alert">
+          <AlertTriangle size={18} aria-hidden="true" />
           {tr(error)}
         </p>
       )}
-      <button className="primary full" type="submit">
-        <Check size={18} />{" "}
-        {tr(
-          {
-            expense: "Save expense",
-            income: "Save money received",
-            topup: "Save top-up",
-            wash: "Save wash",
-          }[kind],
-        )}
-      </button>
+      <div className="editor-actions">
+        <button className="primary full" type="submit">
+          <Check size={18} />{" "}
+          {tr(
+            {
+              expense: "Save expense",
+              income: "Save money received",
+              topup: "Save top-up",
+              wash: "Save wash",
+            }[kind],
+          )}
+        </button>
+      </div>
     </form>
   );
 }

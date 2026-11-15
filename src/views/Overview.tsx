@@ -1,5 +1,7 @@
+import { Metric } from "../components/Primitives";
 import { limitLevels } from "../model";
 import {
+  AlertTriangle,
   ArrowUpRight,
   Check,
   Plane,
@@ -53,29 +55,21 @@ export function OverviewView({
     data.settings.limitAlerts === false ? [] : limitLevels(data, month);
   return (
     <>
-      <section className="welcome-card">
-        <div>
-          <span className="tiny">
-            OSTRAVA · {monthLabel(month).toUpperCase()}
-          </span>
-          <h2>
-            {stats.rows.length
-              ? tr("Your Erasmus, in balance.")
-              : tr("A blank page for new adventures.")}
-          </h2>
-          <p>
-            {stats.rows.length
-              ? trCount("{0} transactions this period · {1} money out", [
-                  stats.rows.length,
-                  money(stats.cash),
-                ])
-              : tr(
-                  "No transactions this period. Record your first purchase when you’re ready.",
-                )}
-          </p>
-        </div>
-        <Wallet size={24} />
-      </section>
+      <dl className="metrics" aria-label={tr("Period summary")}>
+        <Metric label={tr("Money out")} value={money(stats.cash)} />
+        <Metric label={tr("Money received")} value={money(stats.income)} />
+        <Metric
+          label={tr("Planned remainder")}
+          value={money(stats.budget + stats.income - stats.cash)}
+        />
+      </dl>
+      {!stats.rows.length && (
+        <p className="first-use-note">
+          {tr(
+            "Your plan is ready. Add a transaction when you have one to record.",
+          )}
+        </p>
+      )}
       <section className="hero-grid two-budgets">
         <div
           className={`balance-card budget-card ${group === "daily" ? "budget-selected" : ""}`}
@@ -195,89 +189,117 @@ export function OverviewView({
         </span>
       </div>
       <section className="dashboard-grid">
-        <div className="panel category-panel">
-          <div className="section-heading">
-            <div>
-              <h2>{tr("Where it’s going")}</h2>
-              <p>
-                {tr(
-                  view === "week"
-                    ? "Your prorated weekly category guide"
-                    : "Your monthly category guide",
-                )}
-              </p>
+        <div className="overview-primary">
+          <div className="panel category-panel">
+            <div className="section-heading">
+              <div>
+                <h2>{tr("Where it’s going")}</h2>
+                <p>
+                  {tr(
+                    view === "week"
+                      ? "Your prorated weekly category guide"
+                      : "Your monthly category guide",
+                  )}
+                </p>
+              </div>
+              <button
+                className="text-button"
+                onClick={() => {
+                  setTab("Budget & settings");
+                  setSettingsSection("plan");
+                }}
+              >
+                {tr("Edit limits")} <ArrowUpRight size={15} />
+              </button>
             </div>
-            <button
-              className="text-button"
-              onClick={() => {
-                setTab("Budget & settings");
-                setSettingsSection("plan");
-              }}
-            >
-              {tr("Edit limits")} <ArrowUpRight size={15} />
-            </button>
-          </div>
-          <div className="category-list">
-            {categories
-              .filter(
-                (c) =>
-                  group === "all" ||
-                  (group === "travel" ? c.id === "travel" : c.id !== "travel"),
-              )
-              .map((c) => {
-                const cap =
-                    Math.round(
-                      plan.limits[c.id] *
-                        (range ? range.days / periodDays(data, month) : 1),
-                    ) + stats.received[c.id],
-                  spent = stats.spent[c.id];
-                return (
-                  <div className="category-row" key={c.id}>
-                    <div className={`category-emoji cat-${c.id}`}>
-                      <CategoryIcon category={c.id} />
-                    </div>
-                    <div className="category-main">
-                      <div className="category-label">
-                        <strong>
-                          {tr(c.name)}
-                          {alerts.some((a) => a.category === c.id) && (
-                            <small role="status">
-                              {tr("Monthly limit: {0}% reached", [
-                                alerts.find((a) => a.category === c.id)!
-                                  .threshold,
-                              ])}
-                            </small>
-                          )}
-                        </strong>
-                        <span>
-                          <b>{money(spent)}</b>{" "}
-                          <span className="muted">/ {money(cap)}</span>
-                        </span>
+            <div className="category-list">
+              {categories
+                .filter(
+                  (c) =>
+                    group === "all" ||
+                    (group === "travel"
+                      ? c.id === "travel"
+                      : c.id !== "travel"),
+                )
+                .map((c) => {
+                  const cap =
+                      Math.round(
+                        plan.limits[c.id] *
+                          (range ? range.days / periodDays(data, month) : 1),
+                      ) + stats.received[c.id],
+                    spent = stats.spent[c.id];
+                  return (
+                    <div className="category-row" key={c.id}>
+                      <div className={`category-emoji cat-${c.id}`}>
+                        <CategoryIcon category={c.id} />
                       </div>
-                      <div className="track">
-                        <span
-                          style={{
-                            width: `${Math.min(100, (spent / Math.max(1, cap)) * 100)}%`,
-                            background: spent > cap ? "#b86148" : c.color,
-                          }}
-                        />
+                      <div className="category-main">
+                        <div className="category-label">
+                          <strong>
+                            {tr(c.name)}
+                            {alerts.some((a) => a.category === c.id) && (
+                              <small className="limit-alert" role="status">
+                                <AlertTriangle size={16} aria-hidden="true" />
+                                {tr("Monthly limit: {0}% reached", [
+                                  alerts.find((a) => a.category === c.id)!
+                                    .threshold,
+                                ])}
+                              </small>
+                            )}
+                          </strong>
+                          <span>
+                            <b>{money(spent)}</b>{" "}
+                            <span className="muted">/ {money(cap)}</span>
+                          </span>
+                        </div>
+                        <div className="track">
+                          <span
+                            style={{
+                              width: `${Math.min(100, (spent / Math.max(1, cap)) * 100)}%`,
+                              background:
+                                spent > cap
+                                  ? "var(--error)"
+                                  : `var(--category-${c.id})`,
+                            }}
+                          />
+                        </div>
+                        <small>
+                          {c.id === "laundry"
+                            ? tr("Top-ups only · washes use card credit")
+                            : spent > cap
+                              ? tr("{0} above this period’s guide", [
+                                  money(spent - cap),
+                                ])
+                              : tr("{0} left in this period · no rollover", [
+                                  money(cap - spent),
+                                ])}
+                        </small>
                       </div>
-                      <small>
-                        {c.id === "laundry"
-                          ? tr("Top-ups only · washes use card credit")
-                          : spent > cap
-                            ? tr("{0} above this period’s guide", [
-                                money(spent - cap),
-                              ])
-                            : tr("{0} left in this period · no rollover", [
-                                money(cap - spent),
-                              ])}
-                      </small>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+            </div>
           </div>
+          <section className="panel">
+            <div className="section-heading">
+              <div>
+                <h2>{tr("Recent activity")}</h2>
+                <p>{tr("Small moments, clearly recorded.")}</p>
+              </div>
+              <button
+                className="text-button"
+                onClick={() => setTab("Transactions")}
+              >
+                {tr("View all")} <ArrowUpRight size={15} />
+              </button>
+            </div>
+            <TransactionList
+              rows={rows.slice(0, 5)}
+              edit={setEditor}
+              remove={setPendingDelete}
+              add={() => openNew()}
+            />
+          </section>
         </div>
         <div className="right-stack">
           {group !== "daily" && <TravelBreakdown rows={stats.rows} />}
@@ -353,7 +375,7 @@ export function OverviewView({
                     <span>{money(groupCash(s))}</span>
                     <div className="bar-slot">
                       <div
-                        style={{ height: `${(groupCash(s) / max) * 100}%` }}
+                        style={{ width: `${(groupCash(s) / max) * 100}%` }}
                       />
                     </div>
                     <small>
@@ -365,26 +387,6 @@ export function OverviewView({
             </div>
           </div>
         </div>
-      </section>
-      <section className="panel">
-        <div className="section-heading">
-          <div>
-            <h2>{tr("Recent activity")}</h2>
-            <p>{tr("Small moments, clearly recorded.")}</p>
-          </div>
-          <button
-            className="text-button"
-            onClick={() => setTab("Transactions")}
-          >
-            {tr("View all")} <ArrowUpRight size={15} />
-          </button>
-        </div>
-        <TransactionList
-          rows={rows.slice(0, 5)}
-          edit={setEditor}
-          remove={setPendingDelete}
-          add={() => openNew()}
-        />
       </section>
     </>
   );

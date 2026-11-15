@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { Info, AlertCircle, X } from "lucide-react";
 import { BackupReminder } from "./components/BackupReminder";
 import { FavoriteButtons } from "./components/Favorites";
 import { RecurringOverview } from "./components/Recurring";
@@ -115,6 +115,7 @@ export default function App() {
           <DataDialogs {...transfer} store={store} />
           {toast && (
             <div className="toast" role="status">
+              <Info size={20} aria-hidden="true" />
               {tr(toast)}
               <button
                 onClick={() => setToast("")}
@@ -138,7 +139,8 @@ export default function App() {
         </p>
       )}
       {store.corrupt && (
-        <div className="notice error">
+        <div className="notice error" role="alert">
+          <AlertCircle size={20} aria-hidden="true" />
           {tr("Saved data needs recovery.")}{" "}
           <button
             onClick={() =>
@@ -152,6 +154,7 @@ export default function App() {
       )}
       {store.error && (
         <div role="alert" className="notice error">
+          <AlertCircle size={20} aria-hidden="true" />
           {tr(store.error)}
           <button
             onClick={() => store.setError("")}
@@ -162,7 +165,8 @@ export default function App() {
         </div>
       )}
       {needRefresh && (
-        <div className="notice">
+        <div className="notice" role="status">
+          <Info size={20} aria-hidden="true" />
           {tr("An app update is ready. Save any open form first.")}{" "}
           <button onClick={() => updateServiceWorker(true)}>
             {tr("Reload & update")}{" "}
@@ -217,6 +221,8 @@ export default function App() {
           commit={commit}
           monthList={monthList}
           online={online}
+          dark={dark}
+          setDark={setDark}
           language={prefs.language}
           setLanguage={prefs.setLanguage}
           setToast={setToast}

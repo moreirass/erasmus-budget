@@ -1,3 +1,4 @@
+import { EmptyState } from "../components/Primitives";
 import { Download, RefreshCw, Search } from "lucide-react";
 import {
   LaundryPanel,
@@ -88,12 +89,30 @@ export function TransactionsView({
             <span>{tr("TRANSACTION HISTORY")}</span>
             <span>{trCount("{0} transactions", [rows.length])}</span>
           </div>
-          <TransactionList
-            rows={rows}
-            edit={setEditor}
-            remove={setPendingDelete}
-            add={() => openNew()}
-          />
+          {!rows.length && (search || filter !== "all") ? (
+            <EmptyState
+              title={tr("No matching transactions")}
+              action={
+                <button
+                  onClick={() => {
+                    setSearch("");
+                    setFilter("all");
+                  }}
+                >
+                  {tr("Clear filters")}
+                </button>
+              }
+            >
+              {tr("Try another search or clear your filters.")}
+            </EmptyState>
+          ) : (
+            <TransactionList
+              rows={rows}
+              edit={setEditor}
+              remove={setPendingDelete}
+              add={() => openNew()}
+            />
+          )}
         </div>
         <aside className="ledger-aside">
           <LaundryPanel stats={stats} openNew={openNew} />

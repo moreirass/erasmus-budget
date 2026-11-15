@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   ArrowLeftRight,
   ChartPie,
   Check,
@@ -10,8 +11,9 @@ import {
   Trash2,
   WashingMachine,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { currencyDigits, currencyName, searchCurrencies } from "../fx";
+import { formatAmount } from "../formatAmount";
 import { appLocale, displayDate, kindLabel, tr, trCount } from "../i18n";
 import {
   applyGlobalPlan,
@@ -35,7 +37,7 @@ import {
 } from "../model";
 import { CategoryIcon, categoryInfo } from "../ui";
 import { useExchangeRates } from "../useExchangeRates";
-import { Field } from "./Primitives";
+import { Field, Modal } from "./Primitives";
 const toCents = (s: FormDataEntryValue | null) => Math.round(Number(s) * 100);
 export function ExchangePanel({
   fx,
@@ -125,7 +127,12 @@ export function ExchangePanel({
           "Each transaction keeps its rate. This reference may differ from your bank rate. Cached rates are available offline.",
         )}{" "}
       </p>
-      {fx.error && <p className="form-error">{tr(fx.error)}</p>}
+      {fx.error && (
+        <p className="form-error" role="alert">
+          <AlertTriangle size={18} aria-hidden="true" />
+          {tr(fx.error)}
+        </p>
+      )}
       <label className="search">
         <Search size={19} />
         <input
@@ -135,6 +142,11 @@ export function ExchangePanel({
           onChange={(e) => setQuery(e.target.value)}
         />
       </label>
+      {!searchCurrencies(fx.currencies, query).length && (
+        <p className="empty-caption" role="status">
+          {tr("No currencies found.")}
+        </p>
+      )}
       <div className="exchange-list">
         {searchCurrencies(fx.currencies, query).map((c) => (
           <button
@@ -262,6 +274,11 @@ export function LaundryPanel({
         </span>
       </div>
       <div className="laundry-value">{money(stats.card, "CZK")}</div>
+      {stats.card === 0 && (
+        <p className="card-empty-note">
+          {tr("No card credit. Add a top-up before recording a wash.")}
+        </p>
+      )}
       <p>
         {tr("Accumulated card credit. Washes use the balance already loaded.")}
       </p>
@@ -297,7 +314,7 @@ export function SpendingChart({ spent }: { spent: Record<Category, number> }) {
             cy="80"
             r="61"
             fill="none"
-            stroke="#edf0e9"
+            stroke="var(--lowest)"
             strokeWidth="17"
           />
           {categories
@@ -311,7 +328,7 @@ export function SpendingChart({ spent }: { spent: Record<Category, number> }) {
                   cy="80"
                   r="61"
                   fill="none"
-                  stroke={c.color}
+                  stroke={`var(--category-${c.id})`}
                   strokeWidth="17"
                   strokeDasharray={`${length} ${383.274 - length}`}
                   strokeDashoffset={-offset}
@@ -333,9 +350,12 @@ export function SpendingChart({ spent }: { spent: Record<Category, number> }) {
             .filter((c) => spent[c.id] > 0)
             .map((c) => (
               <div key={c.id}>
-                <span style={{ background: c.color }} />
+                <span style={{ background: `var(--category-${c.id})` }} />
                 {tr(c.name)}
-                <b>{Math.round((spent[c.id] / total) * 100)}%</b>
+                <b>
+                  {money(spent[c.id])}
+                  <small>{Math.round((spent[c.id] / total) * 100)}%</small>
+                </b>
               </div>
             ))}
         </div>
@@ -360,6 +380,11 @@ export function TransactionList({
   remove: (t: Transaction) => void;
   add: () => void;
 }) {
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detail = rows.find((transaction) => transaction.id === detailId);
+  useEffect(() => {
+    if (detailId && !detail) setDetailId(null);
+  }, [detailId, detail]);
   if (!rows.length)
     return (
       <div className="empty-state">
@@ -377,6 +402,50 @@ export function TransactionList({
     days = [...new Set(ordered.map((t) => t.date))];
   return (
     <div className="transactions">
+      {detail && (
+        <Modal
+          title={tr("Transaction details")}
+          close={() => setDetailId(null)}
+        >
+          <dl className="detail-list">
+            <dt>{tr("Date")}</dt>
+            <dd>{displayDate(detail.date)}</dd>
+            <dt>{tr("Category")}</dt>
+            <dd>
+              {tr(categories.find((c) => c.id === detail.category)!.name)}
+            </dd>
+            <dt>{tr("Original amount")}</dt>
+            <dd>{formatAmount(detail.amount, detail.currency)}</dd>
+            <dt>
+              {tr(detail.kind === "income" ? "Money received" : "Bank outflow")}
+            </dt>
+            <dd>
+              {detail.kind === "wash"
+                ? money(0)
+                : `${detail.kind === "income" ? "+" : "−"} ${money(detail.eur)}`}
+            </dd>
+            <dt>{tr("Saved exchange rate")}</dt>
+            <dd>
+              1 EUR = {detail.rate}{" "}
+              {detail.kind === "topup" || detail.kind === "wash"
+                ? "CZK"
+                : detail.currency}
+            </dd>
+            <dt>{tr("Note")}</dt>
+            <dd>{detail.note || "—"}</dd>
+          </dl>
+          <button
+            className="primary full"
+            onClick={() => {
+              edit(detail);
+              setDetailId(null);
+            }}
+          >
+            <Pencil size={18} />
+            {tr("Edit")}
+          </button>
+        </Modal>
+      )}
       {days.map((day) => (
         <section className="transaction-day" key={day}>
           <h3>
@@ -411,7 +480,10 @@ export function TransactionList({
                     <CategoryIcon category={c.id} travelType={t.travelType} />
                   </span>
                   <div className="transaction-description">
-                    <strong>
+                    <button
+                      className="transaction-title"
+                      onClick={() => setDetailId(t.id)}
+                    >
                       {t.note ||
                         (t.kind === "income"
                           ? tr("Money received")
@@ -420,7 +492,7 @@ export function TransactionList({
                             : t.kind === "wash"
                               ? tr("Laundry wash")
                               : tr(c.name))}
-                    </strong>
+                    </button>
                     <small>
                       {tr(c.name)}
                       {t.category === "travel"
@@ -447,7 +519,7 @@ export function TransactionList({
                       {t.kind === "wash"
                         ? tr("{0} bank outflow", [money(0)])
                         : t.currency !== "EUR"
-                          ? money(t.amount, t.currency)
+                          ? formatAmount(t.amount, t.currency)
                           : t.kind === "income"
                             ? tr("Support received")
                             : tr("Bank outflow")}
@@ -660,6 +732,7 @@ export function BudgetForm({
         </div>
         {!balanced && (
           <p className="form-error" role="status">
+            <AlertTriangle size={18} aria-hidden="true" />
             {tr("Adjust day-to-day allocations by {0} to match this budget.", [
               money(Math.round(budget * 100) - total),
             ])}
@@ -809,6 +882,7 @@ export function SettingsForm({
       </Field>
       {error && (
         <p role="alert" className="form-error">
+          <AlertTriangle size={18} aria-hidden="true" />
           {tr(error)}
         </p>
       )}

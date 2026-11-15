@@ -1,9 +1,14 @@
+import { AlertTriangle, CheckCircle2, Trash2, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Modal } from "./Primitives";
+import { UnsavedDialog } from "./UnsavedDialog";
 import { TransactionForm } from "./TransactionEditor";
-import { kindLabel, tr } from "../i18n";
-import { money, type Data } from "../model";
+import { displayDate, kindLabel, tr } from "../i18n";
+import { validateData, type Data, type Transaction } from "../model";
+import { formatAmount } from "../formatAmount";
 import type { useExchangeRates } from "../useExchangeRates";
 import type { useLedger } from "../hooks/useLedger";
+
 type LedgerDialogsProps = Pick<
   ReturnType<typeof useLedger>,
   | "editor"
@@ -17,6 +22,44 @@ type LedgerDialogsProps = Pick<
   | "deleteTransaction"
   | "undoDelete"
 > & { data: Data; month: string; fx: ReturnType<typeof useExchangeRates> };
+
+function EditorDialog({
+  data,
+  month,
+  fx,
+  initial,
+  initialKind,
+  close,
+  save,
+}: {
+  data: Data;
+  month: string;
+  fx: ReturnType<typeof useExchangeRates>;
+  initial?: Transaction;
+  initialKind: Transaction["kind"];
+  close: () => void;
+  save: (transaction: Transaction) => void;
+}) {
+  return (
+    <UnsavedDialog
+      title={tr(initial ? "Edit transaction" : "New transaction")}
+      close={close}
+    >
+      {(markDirty) => (
+        <TransactionForm
+          data={data}
+          month={month}
+          initial={initial}
+          initialKind={initialKind}
+          fx={fx}
+          save={save}
+          onDirtyChange={markDirty}
+        />
+      )}
+    </UnsavedDialog>
+  );
+}
+
 export function LedgerDialogs({
   data,
   month,
@@ -32,58 +75,91 @@ export function LedgerDialogs({
   deleteTransaction,
   undoDelete,
 }: LedgerDialogsProps) {
+  const [deleteError, setDeleteError] = useState("");
+  useEffect(() => setDeleteError(""), [pendingDelete?.id]);
+  const confirmDelete = () => {
+    if (!pendingDelete) return;
+    try {
+      validateData({
+        ...data,
+        transactions: data.transactions.filter(
+          (t) => t.id !== pendingDelete.id,
+        ),
+      });
+      deleteTransaction();
+    } catch (error) {
+      setDeleteError((error as Error).message);
+    }
+  };
   return (
     <>
       {editor && (
-        <Modal
-          title={
-            editor === "new" ? tr("New transaction") : tr("Edit transaction")
-          }
+        <EditorDialog
+          key={editor === "new" ? `new-${editorKind}` : editor.id}
+          data={data}
+          month={month}
+          fx={fx}
+          initial={editor === "new" ? undefined : editor}
+          initialKind={editorKind}
           close={() => setEditor(null)}
-        >
-          <TransactionForm
-            data={data}
-            month={month}
-            initial={editor === "new" ? undefined : editor}
-            initialKind={editorKind}
-            fx={fx}
-            save={saveTransaction}
-          />
-        </Modal>
+          save={saveTransaction}
+        />
       )}
       {pendingDelete && (
         <Modal
           title={tr("Delete transaction?")}
           close={() => setPendingDelete(null)}
         >
-          <p>
-            {pendingDelete.note || kindLabel(pendingDelete.kind)} ·{" "}
-            {pendingDelete.date} · {money(pendingDelete.eur)}
-          </p>
+          <div className="record-summary">
+            <span className="record-summary-icon">
+              <Trash2 size={22} aria-hidden="true" />
+            </span>
+            <div>
+              <strong>
+                {pendingDelete.note || kindLabel(pendingDelete.kind)}
+              </strong>
+              <p>
+                {displayDate(pendingDelete.date)} ·{" "}
+                {kindLabel(pendingDelete.kind)}
+              </p>
+            </div>
+            <strong>
+              {formatAmount(pendingDelete.amount, pendingDelete.currency)}
+            </strong>
+          </div>
           <p className="help">
             {tr(
               "You can undo deletion on this device. Card balance validation still applies.",
-            )}{" "}
+            )}
           </p>
-          <div className="button-pair">
+          {deleteError && (
+            <div role="alert" className="notice error">
+              <AlertTriangle size={20} aria-hidden="true" />
+              <p>{tr(deleteError)}</p>
+            </div>
+          )}
+          <div className="button-pair dialog-actions">
             <button onClick={() => setPendingDelete(null)}>
               {tr("Cancel")}
             </button>
-            <button className="primary" onClick={deleteTransaction}>
-              {tr("Delete")}{" "}
+            <button className="danger" onClick={confirmDelete}>
+              <Trash2 size={18} aria-hidden="true" />
+              {tr("Delete")}
             </button>
           </div>
         </Modal>
       )}
       {removed && (
         <div className="undo-notice" role="status">
-          {tr("Transaction deleted.")}{" "}
-          <button onClick={undoDelete}>{tr("Undo")} </button>
+          <CheckCircle2 size={20} aria-hidden="true" />
+          <span>{tr("Transaction deleted.")}</span>
+          <button onClick={undoDelete}>{tr("Undo")}</button>
           <button
+            className="icon-button"
             aria-label={tr("Dismiss undo option")}
             onClick={() => setRemoved(null)}
           >
-            ×
+            <X size={18} />
           </button>
         </div>
       )}
