@@ -4985,3 +4985,9 @@ body:has(.screen-settings) .quick-add {
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
+.metrics .metric:last-child dd {
+  font-size: var(--text-lg);
+}
+.metrics .metric {
+  min-width: 0;
+}
