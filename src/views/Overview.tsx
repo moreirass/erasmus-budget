@@ -112,7 +112,8 @@ export function OverviewView({
           <div className="track">
             <span
               style={{
-                width: `${Math.max(0, Math.min(100, ((stats.cash - stats.spent.travel) / Math.max(1, Math.round((plan.budget - plan.limits.travel) * (range ? range.days / periodDays(data, month) : 1)))) * 100))}%`,
+                width: "100%",
+                transform: `scaleX(${Math.max(0, Math.min(100, ((stats.cash - stats.spent.travel) / Math.max(1, Math.round((plan.budget - plan.limits.travel) * (range ? range.days / periodDays(data, month) : 1)))) * 100)) / 100})`,
               }}
             />
           </div>
@@ -167,7 +168,8 @@ export function OverviewView({
           <div className="track">
             <span
               style={{
-                width: `${Math.max(0, Math.min(100, (stats.spent.travel / Math.max(1, Math.round(plan.limits.travel * (range ? range.days / periodDays(data, month) : 1)))) * 100))}%`,
+                width: "100%",
+                transform: `scaleX(${Math.max(0, Math.min(100, (stats.spent.travel / Math.max(1, Math.round(plan.limits.travel * (range ? range.days / periodDays(data, month) : 1)))) * 100)) / 100})`,
               }}
             />
           </div>
@@ -274,7 +276,8 @@ export function OverviewView({
                         <div className="track">
                           <span
                             style={{
-                              width: `${Math.min(100, (spent / Math.max(1, cap)) * 100)}%`,
+                              width: "100%",
+                              transform: `scaleX(${Math.min(100, (spent / Math.max(1, cap)) * 100) / 100})`,
                               background:
                                 spent > cap
                                   ? "var(--error)"
@@ -394,7 +397,10 @@ export function OverviewView({
                     <span>{money(groupCash(s))}</span>
                     <div className="bar-slot">
                       <div
-                        style={{ width: `${(groupCash(s) / max) * 100}%` }}
+                        style={{
+                          width: "100%",
+                          transform: `scaleX(${((groupCash(s) / max) * 100) / 100})`,
+                        }}
                       />
                     </div>
                     <small>

@@ -4991,3 +4991,17 @@ body:has(.screen-settings) .quick-add {
 .metrics .metric {
   min-width: 0;
 }
+
+.bar-slot > div {
+  transform-origin: left center;
+  transition: transform var(--duration) var(--ease);
+}
+@media (max-width: 767px) {
+  .period-right {
+    flex-wrap: wrap;
+  }
+  .period-right > select:first-child {
+    flex-basis: 100%;
+    width: 100%;
+  }
+}

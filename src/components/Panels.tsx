@@ -227,7 +227,8 @@ export function PeriodSummary({
       <div className="track">
         <span
           style={{
-            width: `${Math.min(100, used)}%`,
+            width: "100%",
+            transform: `scaleX(${Math.min(100, used) / 100})`,
             background: used > 100 ? "var(--error)" : "var(--primary)",
           }}
         />
