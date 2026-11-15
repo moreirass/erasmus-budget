@@ -4839,3 +4839,27 @@ body:has(.screen-settings) .quick-add {
 .editor-actions .primary {
   min-height: 56px;
 }
+
+.plan-panel fieldset {
+  padding: var(--space-4) 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+}
+.plan-row {
+  padding: var(--space-3) 0;
+  border-radius: 0;
+}
+.semester-plan {
+  border: 0;
+  background: transparent;
+}
+.semester-plan > div > span {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.plan-panel .primary {
+  min-height: 56px;
+}
