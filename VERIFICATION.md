@@ -1,5 +1,11 @@
 # Verification
 
+## Budget-card hover fix — 15 November 2026
+
+- Removed the opaque hover background from the full-card click target, which sits above the card content. The target stays transparent; selection highlighting and keyboard focus remain unchanged.
+- Reproduced the opaque overlay before the fix and checked eight hover states afterward: both budget cards, both themes, selected and unselected. Click toggling, keyboard activation and visible keyboard focus passed. Built assets ran in isolated Chrome with no personal data or live services.
+- All 52 tests and the production build pass. This correction changes CSS only; accounting, records and sync are unaffected. No push or deployment performed.
+
 ## Bilingual UI refinement and transaction time
 
 Base ae629f2; branch codex/pocket-ui-language. See docs/COVERAGE.md for all screens, 20 UI rules and proposals; docs/PROPOSALS.md records approval/impact/rollback. The language selector already existed and was completed, not invented anew.
