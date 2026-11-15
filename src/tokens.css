@@ -1,0 +1,83 @@
+:root {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color-scheme: light;
+  --canvas: #f3f6f2;
+  --surface: #ffffff;
+  --low: #edf2ec;
+  --lowest: #e6eee7;
+  --elevated: #e0eee5;
+  --active: #d9f1e3;
+  --text: #17382b;
+  --muted: #52685b;
+  --primary: #176c4b;
+  --cta: #176c4b;
+  --on-cta: #ffffff;
+  --border: #c4d2c8;
+  --gold: #805900;
+  --gold-bg: #fbf2d8;
+  --error: #ac342e;
+  --error-bg: #fff0ed;
+  --shadow: 0 8px 32px #17382b0d;
+  --overlay: #051c16aa;
+  --category-groceries: #287951;
+  --category-snacks: #7b5c27;
+  --category-restaurants: #9b6527;
+  --category-laundry: #33777d;
+  --category-nightlife: #805e9a;
+  --category-other: #926557;
+  --category-travel: #366fab;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 20px;
+  background: var(--canvas);
+  color: var(--text);
+  font-synthesis: none;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #0b1c17;
+  --surface: #122a21;
+  --low: #10231c;
+  --lowest: #091a13;
+  --elevated: #1d3b2d;
+  --active: #214c39;
+  --text: #eef6ef;
+  --muted: #afc5b6;
+  --primary: #8ce3b6;
+  --cta: #8ce3b6;
+  --on-cta: #0c3021;
+  --border: #3d5c4b;
+  --gold: #f0cd79;
+  --gold-bg: #332d1b;
+  --error: #ffb4ab;
+  --error-bg: #3b2523;
+  --shadow: 0 8px 32px #00000024;
+  --category-groceries: #8ce3b6;
+  --category-snacks: #d8b77b;
+  --category-restaurants: #e4b277;
+  --category-laundry: #86cbd0;
+  --category-nightlife: #c4ace3;
+  --category-other: #d7b0a1;
+  --category-travel: #a0c9ef;
+}
+
+:root {
+  --legacy-0: #34d39908;
+  --legacy-1: #0007;
+  --legacy-2: #00120ab3;
+  --legacy-3: #0004;
+  --legacy-4: #00170f;
+  --legacy-5: #002116;
+  --legacy-6: #10b98150;
+  --legacy-7: #0006;
+  --legacy-8: #e3e8df;
+}
