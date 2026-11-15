@@ -1,5 +1,9 @@
 // English source messages are the canonical keys. Keep placeholders unchanged.
 export const portuguese = {
+  "Period summary": "Resumo do período",
+  "Planned remainder": "Saldo planeado",
+  "Your plan is ready. Add a transaction when you have one to record.":
+    "O teu plano está pronto. Adiciona um movimento quando tiveres algo para registar.",
   "Main navigation": "Navegação principal",
   "Offline · changes are saved on this device. Sync when connected.":
     "Sem ligação · as alterações ficam guardadas neste dispositivo. Sincroniza quando tiveres ligação.",

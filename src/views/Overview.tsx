@@ -1,5 +1,7 @@
+import { Metric } from "../components/Primitives";
 import { limitLevels } from "../model";
 import {
+  AlertTriangle,
   ArrowUpRight,
   Check,
   Plane,
@@ -53,29 +55,21 @@ export function OverviewView({
     data.settings.limitAlerts === false ? [] : limitLevels(data, month);
   return (
     <>
-      <section className="welcome-card">
-        <div>
-          <span className="tiny">
-            OSTRAVA · {monthLabel(month).toUpperCase()}
-          </span>
-          <h2>
-            {stats.rows.length
-              ? tr("Your Erasmus, in balance.")
-              : tr("A blank page for new adventures.")}
-          </h2>
-          <p>
-            {stats.rows.length
-              ? trCount("{0} transactions this period · {1} money out", [
-                  stats.rows.length,
-                  money(stats.cash),
-                ])
-              : tr(
-                  "No transactions this period. Record your first purchase when you’re ready.",
-                )}
-          </p>
-        </div>
-        <Wallet size={24} />
-      </section>
+      <dl className="metrics" aria-label={tr("Period summary")}>
+        <Metric label={tr("Money out")} value={money(stats.cash)} />
+        <Metric label={tr("Money received")} value={money(stats.income)} />
+        <Metric
+          label={tr("Planned remainder")}
+          value={money(stats.budget + stats.income - stats.cash)}
+        />
+      </dl>
+      {!stats.rows.length && (
+        <p className="first-use-note">
+          {tr(
+            "Your plan is ready. Add a transaction when you have one to record.",
+          )}
+        </p>
+      )}
       <section className="hero-grid two-budgets">
         <div
           className={`balance-card budget-card ${group === "daily" ? "budget-selected" : ""}`}
@@ -258,7 +252,10 @@ export function OverviewView({
                         <span
                           style={{
                             width: `${Math.min(100, (spent / Math.max(1, cap)) * 100)}%`,
-                            background: spent > cap ? "#b86148" : c.color,
+                            background:
+                              spent > cap
+                                ? "var(--error)"
+                                : `var(--category-${c.id})`,
                           }}
                         />
                       </div>

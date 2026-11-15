@@ -297,7 +297,7 @@ export function SpendingChart({ spent }: { spent: Record<Category, number> }) {
             cy="80"
             r="61"
             fill="none"
-            stroke="#edf0e9"
+            stroke="var(--lowest)"
             strokeWidth="17"
           />
           {categories
@@ -311,7 +311,7 @@ export function SpendingChart({ spent }: { spent: Record<Category, number> }) {
                   cy="80"
                   r="61"
                   fill="none"
-                  stroke={c.color}
+                  stroke={`var(--category-${c.id})`}
                   strokeWidth="17"
                   strokeDasharray={`${length} ${383.274 - length}`}
                   strokeDashoffset={-offset}
@@ -333,9 +333,12 @@ export function SpendingChart({ spent }: { spent: Record<Category, number> }) {
             .filter((c) => spent[c.id] > 0)
             .map((c) => (
               <div key={c.id}>
-                <span style={{ background: c.color }} />
+                <span style={{ background: `var(--category-${c.id})` }} />
                 {tr(c.name)}
-                <b>{Math.round((spent[c.id] / total) * 100)}%</b>
+                <b>
+                  {money(spent[c.id])}
+                  <small>{Math.round((spent[c.id] / total) * 100)}%</small>
+                </b>
               </div>
             ))}
         </div>
