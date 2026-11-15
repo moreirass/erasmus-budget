@@ -57,7 +57,7 @@ select {
   color: var(--text);
   border: 1px solid transparent;
   border-radius: 9px;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 input:focus,
 select:focus {
@@ -90,24 +90,24 @@ h3,
   letter-spacing: -0.035em;
 }
 h1 {
-  font-size: 40px;
+  font-size: var(--text-display);
   font-weight: 700;
   line-height: 1.2;
 }
 h2 {
-  font-size: 19px;
+  font-size: var(--text-lg);
   font-weight: 600;
   line-height: 1.3;
 }
 h3 {
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 p {
   line-height: 1.65;
   color: var(--muted);
 }
 small {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 b,
 strong {
@@ -120,7 +120,7 @@ strong {
 .tiny,
 .eyebrow,
 .field-label {
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
   letter-spacing: 0.065em;
   color: var(--muted);
@@ -145,7 +145,7 @@ strong {
   gap: 10px;
   align-items: center;
   font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-  font-size: 21px;
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 .brand-icon {
@@ -163,7 +163,7 @@ strong {
   left: 24px;
   top: 75px;
   font-family: Inter, sans-serif;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 400;
   color: var(--muted);
 }
@@ -179,12 +179,12 @@ strong {
 }
 .active-term span {
   display: block;
-  font-size: 14px;
+  font-size: var(--text-sm);
   letter-spacing: 0.04em;
 }
 .active-term strong {
   display: block;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--text);
 }
@@ -195,7 +195,7 @@ strong {
 }
 .sidebar nav button {
   justify-content: flex-start;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 400;
   background: none;
   padding: 13px 14px;
@@ -219,13 +219,13 @@ strong {
 .sidebar-laundry > span {
   flex: 1;
   text-align: left;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .sidebar-laundry strong {
   display: block;
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .storage-badge {
   display: flex;
@@ -233,7 +233,7 @@ strong {
   gap: 6px;
   flex-wrap: wrap;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin-top: 18px;
 }
 .storage-badge .status-dot {
@@ -241,7 +241,7 @@ strong {
 }
 .storage-badge small {
   flex-basis: 100%;
-  font-size: 14px;
+  font-size: var(--text-sm);
   overflow-wrap: anywhere;
 }
 .status-dot,
@@ -275,7 +275,7 @@ main {
 .breadcrumb {
   min-width: 0;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .desktop-crumb {
   display: flex;
@@ -298,7 +298,7 @@ main {
   border-radius: 30px;
   background: var(--low);
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
   white-space: nowrap;
   padding: 4px 9px;
 }
@@ -307,7 +307,7 @@ main {
 }
 .fx-pill strong {
   color: var(--gold);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .sync-pill {
   min-height: 28px;
@@ -315,7 +315,7 @@ main {
   padding: 3px 10px;
   background: var(--surface);
   color: var(--primary);
-  font-size: 14px;
+  font-size: var(--text-sm);
   max-width: 160px;
   overflow: hidden;
   white-space: nowrap;
@@ -323,7 +323,7 @@ main {
 .primary {
   background: var(--cta);
   color: var(--on-cta);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 .primary:hover {
@@ -376,7 +376,7 @@ main {
 }
 .page-heading p {
   margin-top: 8px;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .page-heading > .primary {
   white-space: nowrap;
@@ -409,7 +409,7 @@ main {
 .period-right > select {
   width: auto;
   max-width: 190px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   background: var(--surface);
 }
 .segmented {
@@ -426,7 +426,7 @@ main {
   padding: 5px 17px;
   background: none;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
   border-radius: 30px;
 }
 .segmented button.selected {
@@ -441,7 +441,7 @@ main {
   border-radius: 30px;
   background: var(--elevated);
   color: var(--primary);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -472,18 +472,18 @@ main {
   align-items: center;
   justify-content: space-between;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
   letter-spacing: 0.09em;
 }
 .balance-number {
-  font-size: 48px;
+  font-size: var(--text-display);
   font-weight: 700;
   line-height: 1.25;
   margin: 20px 0 10px;
 }
 .balance-card p,
 .mini-card p {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .balance-footer {
   display: flex;
@@ -491,12 +491,12 @@ main {
   justify-content: space-between;
   margin-top: 28px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .balance-footer strong {
   display: block;
   color: var(--text);
-  font-size: 17px;
+  font-size: var(--text-base);
   margin-top: 6px;
 }
 .mini-icon {
@@ -513,21 +513,21 @@ main {
   display: block;
 }
 .mini-card h2 {
-  font-size: 38px;
+  font-size: var(--text-heading);
   margin: 10px 0 6px;
 }
 .mini-footer {
   margin: 20px 0 12px;
   border-top: 1px solid var(--border);
   padding-top: 15px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .travel-totals {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .budget-card-button {
   position: absolute;
@@ -558,7 +558,7 @@ main {
   gap: 15px;
   margin: 17px 0 25px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .under-hero > span:first-child {
   display: flex;
@@ -586,7 +586,7 @@ main {
   margin-bottom: 24px;
 }
 .section-heading p {
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin-top: 5px;
 }
 .text-button {
@@ -595,7 +595,7 @@ main {
   color: var(--primary);
   background: none;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .text-button:hover {
   background: none;
@@ -634,14 +634,14 @@ main {
   justify-content: space-between;
   gap: 10px;
   align-items: center;
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin-bottom: 9px;
 }
 .category-label strong {
   font-weight: 500;
 }
 .category-label > span {
-  font-size: 14px;
+  font-size: var(--text-sm);
   white-space: nowrap;
 }
 .track {
@@ -659,7 +659,7 @@ main {
 .category-main small {
   display: block;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin-top: 6px;
 }
 .spending-chart {
@@ -693,11 +693,11 @@ main {
   pointer-events: none;
 }
 .donut-label strong {
-  font-size: 22px;
+  font-size: var(--text-xl);
   color: var(--text);
 }
 .donut-label span {
-  font-size: 14px;
+  font-size: var(--text-sm);
   letter-spacing: 0.05em;
   color: var(--muted);
   margin-top: 6px;
@@ -713,7 +713,7 @@ main {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .legend > div > span {
@@ -727,14 +727,14 @@ main {
   color: var(--text);
 }
 .empty-caption {
-  font-size: 14px;
+  font-size: var(--text-sm);
   max-width: 155px;
 }
 .laundry-title {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--gold);
 }
@@ -744,26 +744,26 @@ main {
 .laundry-card .pill {
   background: var(--gold-bg);
   color: var(--gold);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .laundry-value {
-  font-size: 30px;
+  font-size: var(--text-heading);
   font-weight: 600;
   margin: 5px 0 8px;
 }
 .laundry-card p {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .laundry-meta {
   display: flex;
   gap: 30px;
   margin: 18px 0;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .laundry-meta b {
   display: block;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--text);
   margin-top: 5px;
 }
@@ -774,13 +774,13 @@ main {
 }
 .button-pair > button {
   flex: 1;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .laundry-card button {
   background: var(--low);
 }
 .weekly-panel .muted {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .bar-chart {
   display: flex;
@@ -798,7 +798,7 @@ main {
 }
 .bar-column > span,
 .bar-column small {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .bar-slot {
@@ -831,10 +831,10 @@ main {
   margin: 0 auto 16px;
 }
 .empty-state h3 {
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 .empty-state p {
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin: 10px 0;
 }
 .transactions-layout {
@@ -871,7 +871,7 @@ main {
   background: none;
   padding-left: 8px;
   border: 0;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .search input:focus {
   outline: none;
@@ -881,16 +881,16 @@ main {
 }
 .transaction-tools select {
   max-width: 170px;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .export-csv {
-  font-size: 14px;
+  font-size: var(--text-sm);
   white-space: nowrap;
 }
 .ledger-heading {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: var(--text-sm);
   letter-spacing: 0.065em;
   font-weight: 600;
   color: var(--muted);
@@ -901,7 +901,7 @@ main {
   align-items: center;
   gap: 9px;
   font-family: Inter, sans-serif;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--muted);
@@ -913,7 +913,7 @@ main {
 }
 .day-total {
   margin-left: auto;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
 .transaction {
@@ -939,12 +939,12 @@ main {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
 }
 .transaction-description small {
   display: block;
-  font-size: 14px;
+  font-size: var(--text-sm);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -956,11 +956,11 @@ main {
   text-align: right;
 }
 .transaction-amount strong {
-  font-size: 15px;
+  font-size: var(--text-base);
 }
 .transaction-amount small {
   display: block;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--gold);
   margin-top: 5px;
 }
@@ -1000,21 +1000,21 @@ main {
   justify-content: space-between;
   gap: 12px;
   margin: 8px 0 16px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .summary-values strong {
-  font-size: 30px;
+  font-size: var(--text-heading);
   color: var(--text);
 }
 .summary-values > div > span {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .summary-foot {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin: 10px 0 17px;
 }
@@ -1031,7 +1031,7 @@ main {
   border-radius: 25px;
   padding: 6px 14px;
   min-height: 32px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
   white-space: nowrap;
 }
@@ -1040,13 +1040,13 @@ main {
   color: var(--on-cta);
 }
 .budget-pills small {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .fx-detail h2 {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 .fx-detail > strong {
   display: block;
@@ -1057,7 +1057,7 @@ main {
   margin: 17px 0;
 }
 .fx-detail p {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .settings-grid {
   display: grid;
@@ -1092,13 +1092,13 @@ main {
   gap: 10px;
 }
 .settings-grid .panel > p {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .field {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin: 18px 0;
   min-width: 0;
@@ -1115,7 +1115,7 @@ main {
   margin: 12px 0;
 }
 .help {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin: 13px 0;
   line-height: 1.65;
@@ -1125,7 +1125,7 @@ main {
   align-items: center;
   gap: 10px;
   color: var(--primary);
-  font-size: 14px;
+  font-size: var(--text-sm);
   letter-spacing: 0.05em;
   background: var(--low);
   padding: 15px 17px;
@@ -1133,7 +1133,7 @@ main {
   margin-top: 25px;
 }
 .plan-panel form > .field input {
-  font-size: 34px;
+  font-size: var(--text-heading);
   font-family: "Plus Jakarta Sans", sans-serif;
   font-weight: 700;
   color: var(--primary);
@@ -1159,12 +1159,12 @@ main {
   min-width: 0;
 }
 .limit-description b {
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
 }
 .limit-description small {
   display: block;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin-top: 4px;
   line-height: 1.4;
@@ -1179,14 +1179,14 @@ main {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
   flex-shrink: 0;
 }
 .limit-input input {
   width: 86px;
   text-align: right;
-  font-size: 14px;
+  font-size: var(--text-sm);
   background: var(--lowest);
   border-radius: 5px;
   padding: 7px;
@@ -1198,13 +1198,13 @@ main {
   gap: 10px;
   margin: 18px 0;
   color: var(--primary);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .budget-rule {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   padding: 17px;
   background: var(--low);
   border-radius: 10px;
@@ -1229,7 +1229,7 @@ main {
   margin: 18px 0;
 }
 .export-buttons button {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .data-panel .export-buttons > button:last-child {
   width: 100%;
@@ -1238,7 +1238,7 @@ main {
   flex-direction: column;
 }
 .sync-status {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--primary);
 }
 .rates-panel > button {
@@ -1253,11 +1253,11 @@ main {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin-bottom: 20px;
 }
 .notice button {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .notice.error,
 .form-error {
@@ -1266,7 +1266,7 @@ main {
   border-color: color-mix(in srgb, var(--error) 30%, transparent);
 }
 .form-error {
-  font-size: 14px;
+  font-size: var(--text-sm);
   padding: 12px;
   border-radius: 8px;
   margin: 12px 0;
@@ -1276,7 +1276,7 @@ footer {
   justify-content: space-between;
   gap: 15px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
   padding: 25px 0 5px;
 }
 footer .muted {
@@ -1292,7 +1292,7 @@ footer .muted {
   border-bottom: 1px solid var(--border);
 }
 .modal-head h2 {
-  font-size: 24px;
+  font-size: var(--text-xl);
 }
 dialog {
   background: var(--surface);
@@ -1325,7 +1325,7 @@ dialog::backdrop {
   flex: 1;
   padding: 13px 4px;
   min-height: 75px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .transaction-kinds > button.selected {
@@ -1341,7 +1341,7 @@ dialog::backdrop {
   justify-content: space-between;
   text-align: left;
   background: var(--low);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .field-label {
   display: block;
@@ -1369,7 +1369,7 @@ dialog::backdrop {
   border: 0;
   background: none;
   text-align: left;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .currency-results button[aria-selected="true"] {
   background: var(--active);
@@ -1390,7 +1390,7 @@ dialog::backdrop {
   margin: 0;
 }
 .amount-hero input {
-  font-size: 43px;
+  font-size: var(--text-display);
   font-family: "Plus Jakarta Sans", sans-serif;
   font-weight: 600;
   border: 0;
@@ -1403,7 +1403,7 @@ dialog::backdrop {
   padding: 17px;
   background: var(--elevated);
   color: var(--primary);
-  font-size: 14px;
+  font-size: var(--text-sm);
   border-radius: 11px;
   margin: 16px 0;
 }
@@ -1433,11 +1433,11 @@ dialog::backdrop {
   color: var(--text);
 }
 .group-options b {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .group-options small {
   flex-basis: 100%;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .category-picker {
@@ -1455,7 +1455,7 @@ dialog::backdrop {
   min-height: 82px;
   background: var(--lowest);
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
   gap: 9px;
 }
 .category-chips button.selected {
@@ -1480,7 +1480,7 @@ dialog::backdrop {
   background: var(--primary);
   color: var(--on-cta);
   box-shadow: 0 10px 35px var(--overlay);
-  font-size: 14px;
+  font-size: var(--text-sm);
   padding: 14px 18px;
   border-radius: 12px;
 }
@@ -1536,7 +1536,7 @@ dialog::backdrop {
     gap: 9px;
   }
   .limit-description small {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .transaction > .icon-button {
     padding: 2px;
@@ -1547,14 +1547,14 @@ dialog::backdrop {
     width: 205px;
   }
   .sidebar nav button {
-    font-size: 14px;
+    font-size: var(--text-sm);
     padding: 13px 10px;
   }
   main {
     margin-left: 205px;
   }
   .desktop-crumb {
-    font-size: 14px;
+    font-size: var(--text-sm);
     gap: 7px;
   }
   .top-add {
@@ -1582,17 +1582,17 @@ dialog::backdrop {
     padding: 23px;
   }
   .balance-number {
-    font-size: 38px;
+    font-size: var(--text-heading);
   }
   .mini-card h2 {
-    font-size: 32px;
+    font-size: var(--text-heading);
   }
   .balance-footer {
     gap: 12px;
     flex-wrap: wrap;
   }
   .page-heading h1 {
-    font-size: 34px;
+    font-size: var(--text-heading);
   }
   .category-list {
     display: grid;
@@ -1653,7 +1653,7 @@ dialog::backdrop {
     color: var(--muted);
     border-radius: 0;
     min-height: 54px;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .mobile-nav > button.active {
     color: var(--primary);
@@ -1682,7 +1682,7 @@ dialog::backdrop {
     display: flex;
     gap: 9px;
     align-items: center;
-    font-size: 18px;
+    font-size: var(--text-lg);
     font-family: "Plus Jakarta Sans", sans-serif;
     font-weight: 600;
   }
@@ -1695,7 +1695,7 @@ dialog::backdrop {
   .mobile-brand em {
     display: inline-block;
     font-family: Inter, sans-serif;
-    font-size: 14px;
+    font-size: var(--text-sm);
     font-style: normal;
     padding: 2px 5px;
     border-radius: 20px;
@@ -1705,7 +1705,7 @@ dialog::backdrop {
   .mobile-brand small {
     display: block;
     font-family: Inter, sans-serif;
-    font-size: 14px;
+    font-size: var(--text-sm);
     letter-spacing: 0.05em;
     color: var(--muted);
     margin-top: 3px;
@@ -1715,7 +1715,7 @@ dialog::backdrop {
   }
   .fx-pill {
     padding: 6px 8px;
-    font-size: 14px;
+    font-size: var(--text-sm);
     background: var(--gold-bg);
     color: var(--gold);
   }
@@ -1723,7 +1723,7 @@ dialog::backdrop {
     display: none;
   }
   .fx-pill strong {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .fx-pill svg {
     color: var(--gold);
@@ -1753,15 +1753,15 @@ dialog::backdrop {
     background: none;
     padding: 0;
     letter-spacing: 0.07em;
-    font-size: 14px;
+    font-size: var(--text-sm);
     margin-bottom: 6px;
   }
   .page-heading h1 {
-    font-size: 29px;
+    font-size: var(--text-heading);
     line-height: 1.25;
   }
   .page-heading p {
-    font-size: 14px;
+    font-size: var(--text-sm);
     margin-top: 8px;
   }
   .page-heading > .primary {
@@ -1781,7 +1781,7 @@ dialog::backdrop {
   .month-picker select {
     max-width: 210px;
     background: var(--surface);
-    font-size: 14px;
+    font-size: var(--text-sm);
     padding: 9px 12px;
     min-height: 40px;
   }
@@ -1793,7 +1793,7 @@ dialog::backdrop {
     flex-wrap: wrap;
   }
   .period-right > select {
-    font-size: 14px;
+    font-size: var(--text-sm);
     max-width: 160px;
     padding: 9px 10px;
   }
@@ -1801,7 +1801,7 @@ dialog::backdrop {
     margin-left: auto;
   }
   .segmented button {
-    font-size: 14px;
+    font-size: var(--text-sm);
     min-height: 34px;
     padding: 6px 17px;
   }
@@ -1825,7 +1825,7 @@ dialog::backdrop {
     border-radius: 16px;
   }
   .balance-number {
-    font-size: 43px;
+    font-size: var(--text-display);
     margin-top: 16px;
   }
   .balance-footer {
@@ -1833,31 +1833,31 @@ dialog::backdrop {
     gap: 12px;
   }
   .balance-footer strong {
-    font-size: 16px;
+    font-size: var(--text-base);
   }
   .balance-footer span {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .mini-card h2 {
-    font-size: 35px;
+    font-size: var(--text-heading);
   }
   .mini-card .tiny {
-    font-size: 14px;
+    font-size: var(--text-sm);
     letter-spacing: 0.06em;
   }
   .card-kicker {
-    font-size: 14px;
+    font-size: var(--text-sm);
     letter-spacing: 0.065em;
   }
   .mini-card p,
   .balance-card p {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .under-hero {
     flex-direction: column;
     align-items: flex-start;
     gap: 7px;
-    font-size: 14px;
+    font-size: var(--text-sm);
     margin: 15px 0 23px;
   }
   .dashboard-grid {
@@ -1879,23 +1879,23 @@ dialog::backdrop {
   .category-label {
     flex-wrap: nowrap;
     align-items: center;
-    font-size: 14px;
+    font-size: var(--text-sm);
     gap: 6px;
   }
   .category-label > span {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .category-main small {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .section-heading h2 {
-    font-size: 17px;
+    font-size: var(--text-base);
   }
   .section-heading p {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .text-button {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .category-emoji {
     width: 39px;
@@ -1913,10 +1913,10 @@ dialog::backdrop {
     min-width: 100px;
   }
   .legend > div {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .empty-caption {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .bar-chart {
     height: 130px;
@@ -1924,7 +1924,7 @@ dialog::backdrop {
   }
   .bar-column > span,
   .bar-column small {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .transactions-layout {
     display: block;
@@ -1943,17 +1943,17 @@ dialog::backdrop {
     border-radius: 13px;
   }
   .search input {
-    font-size: 16px;
+    font-size: var(--text-base);
     padding-top: 14px;
     padding-bottom: 14px;
   }
   .transaction-tools select {
     max-width: 190px;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .export-csv {
     margin-left: auto;
-    font-size: 14px;
+    font-size: var(--text-sm);
     min-height: 36px;
     padding: 7px 10px;
   }
@@ -1966,20 +1966,20 @@ dialog::backdrop {
     margin: 7px 0 14px;
   }
   .summary-values strong {
-    font-size: 29px;
+    font-size: var(--text-heading);
   }
   .summary-values > div > span {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .summary-values > span {
-    font-size: 14px;
+    font-size: var(--text-sm);
     text-align: right;
   }
   .summary-top .pill {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .summary-foot {
-    font-size: 14px;
+    font-size: var(--text-sm);
     gap: 10px;
   }
   .budget-pills {
@@ -1987,22 +1987,22 @@ dialog::backdrop {
     margin-top: 18px;
   }
   .budget-pills button {
-    font-size: 14px;
+    font-size: var(--text-sm);
     padding: 6px 12px;
   }
   .budget-pills small {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .ledger-heading {
-    font-size: 14px;
+    font-size: var(--text-sm);
     margin: 22px 4px 7px;
   }
   .transaction-day h3 {
-    font-size: 14px;
+    font-size: var(--text-sm);
     margin: 23px 4px 13px;
   }
   .day-total {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .transaction {
     padding: 16px 13px;
@@ -2017,19 +2017,19 @@ dialog::backdrop {
     min-width: 110px;
   }
   .transaction-description strong {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .transaction-description small {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .transaction-amount {
     margin-left: auto;
   }
   .transaction-amount strong {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .transaction-amount small {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .transaction .category-emoji {
     width: 38px;
@@ -2060,7 +2060,7 @@ dialog::backdrop {
     flex-direction: column;
     background: none;
     color: var(--muted);
-    font-size: 14px;
+    font-size: var(--text-sm);
     padding: 10px 5px;
     min-width: 55px;
     gap: 6px;
@@ -2096,14 +2096,14 @@ dialog::backdrop {
     margin-bottom: 10px;
   }
   .settings-grid .plan-panel > .section-heading p {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .plan-total-label {
     padding: 13px;
     margin-top: 20px;
   }
   .plan-panel form > .field input {
-    font-size: 36px;
+    font-size: var(--text-heading);
   }
   .limit-input {
     padding: 15px 11px;
@@ -2119,34 +2119,34 @@ dialog::backdrop {
     width: 19px;
   }
   .limit-description b {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .limit-description small {
-    font-size: 14px;
+    font-size: var(--text-sm);
     line-height: 1.4;
   }
   .limit-input input {
     width: 72px;
-    font-size: 15px;
+    font-size: var(--text-base);
     padding: 8px 6px;
   }
   .allocation-total {
-    font-size: 14px;
+    font-size: var(--text-sm);
     flex-wrap: wrap;
   }
   .budget-rule {
-    font-size: 14px;
+    font-size: var(--text-sm);
     padding: 15px;
   }
   .field input,
   .field select {
-    font-size: 16px;
+    font-size: var(--text-base);
   }
   .form-grid {
     grid-template-columns: 1fr;
   }
   .help {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .button-pair {
     flex-wrap: wrap;
@@ -2156,25 +2156,25 @@ dialog::backdrop {
   }
   .notice {
     align-items: flex-start;
-    font-size: 14px;
+    font-size: var(--text-sm);
     padding: 13px;
   }
   .notice button {
-    font-size: 14px;
+    font-size: var(--text-sm);
     padding: 7px;
   }
   .export-buttons button {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .toast {
     bottom: 100px;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   footer {
     flex-direction: column;
     text-align: center;
     align-items: center;
-    font-size: 14px;
+    font-size: var(--text-sm);
     padding-top: 27px;
     gap: 7px;
   }
@@ -2197,14 +2197,14 @@ dialog::backdrop {
     padding-bottom: 16px;
   }
   .modal-head h2 {
-    font-size: 23px;
+    font-size: var(--text-xl);
   }
   .transaction-kinds {
     margin-bottom: 20px;
     gap: 2px;
   }
   .transaction-kinds > button {
-    font-size: 14px;
+    font-size: var(--text-sm);
     padding: 12px 3px;
     min-height: 75px;
   }
@@ -2212,10 +2212,10 @@ dialog::backdrop {
     padding: 23px;
   }
   .amount-hero input {
-    font-size: 43px;
+    font-size: var(--text-display);
   }
   .currency-picker > button {
-    font-size: 14px;
+    font-size: var(--text-sm);
     min-height: 45px;
   }
   .currency-results button {
@@ -2231,21 +2231,21 @@ dialog::backdrop {
     padding: 17px 12px;
   }
   .group-options b {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .category-chips {
     gap: 8px;
   }
   .category-chips button {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .conversion {
-    font-size: 14px;
+    font-size: var(--text-sm);
     line-height: 1.5;
   }
   .full.primary {
     min-height: 54px;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .form-grid .field {
     margin-top: 16px;
@@ -2256,7 +2256,7 @@ dialog::backdrop {
     padding: 0 13px;
   }
   .mobile-brand {
-    font-size: 16px;
+    font-size: var(--text-base);
     gap: 7px;
   }
   .mobile-brand .brand-icon {
@@ -2267,7 +2267,7 @@ dialog::backdrop {
     display: none;
   }
   .fx-pill strong {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .header-actions {
     gap: 2px;
@@ -2287,10 +2287,10 @@ dialog::backdrop {
   }
   .transaction-description strong,
   .transaction-amount strong {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .balance-footer strong {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -2312,11 +2312,11 @@ dialog::backdrop {
   margin-bottom: 22px;
 }
 .welcome-card h2 {
-  font-size: 21px;
+  font-size: var(--text-lg);
   margin: 6px 0;
 }
 .welcome-card p {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .welcome-card > svg {
   color: var(--primary);
@@ -2336,7 +2336,7 @@ dialog::backdrop {
 .rate-hero > strong {
   display: block;
   font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-  font-size: 27px;
+  font-size: var(--text-xl);
   line-height: 1.5;
   margin: 12px 0;
 }
@@ -2344,7 +2344,7 @@ dialog::backdrop {
   color: var(--gold);
 }
 .rate-hero p {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .rate-hero button {
   margin: 20px 0 12px;
@@ -2352,7 +2352,7 @@ dialog::backdrop {
 .rate-hero > small {
   display: block;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
   text-align: center;
 }
 .rate-calculator {
@@ -2365,7 +2365,7 @@ dialog::backdrop {
   background: var(--low);
   padding: 12px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: var(--text-base);
   color: var(--gold);
   overflow-wrap: anywhere;
 }
@@ -2397,13 +2397,13 @@ dialog::backdrop {
 }
 .exchange-list small {
   display: block;
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin-top: 3px;
   overflow-wrap: anywhere;
 }
 .exchange-list > button > strong {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .currency-symbol {
   width: 35px;
@@ -2413,7 +2413,7 @@ dialog::backdrop {
   background: var(--lowest);
   border-radius: 50%;
   color: var(--primary);
-  font-size: 21px;
+  font-size: var(--text-lg);
   flex-shrink: 0;
 }
 .laundry-history {
@@ -2423,7 +2423,7 @@ dialog::backdrop {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 .tracking-panel > .laundry-card {
   background: var(--low);
@@ -2443,10 +2443,10 @@ dialog::backdrop {
   min-width: 100px;
 }
 .laundry-history .transaction-amount strong {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .laundry-history .transaction-description strong {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .laundry-history .category-emoji {
   width: 30px;
@@ -2472,7 +2472,7 @@ dialog::backdrop {
   color: var(--gold);
 }
 .conflict-banner p {
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin-top: 8px;
 }
 .conflict-banner ~ .button-pair {
@@ -2484,7 +2484,7 @@ dialog::backdrop {
 }
 .conflict-banner ~ .button-pair small {
   flex-basis: 100%;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .rate-hero .tiny {
   color: var(--muted);
@@ -2500,22 +2500,22 @@ dialog::backdrop {
     margin-bottom: 17px;
   }
   .welcome-card h2 {
-    font-size: 19px;
+    font-size: var(--text-lg);
   }
   .welcome-card p {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .rate-hero {
     padding: 20px;
   }
   .rate-hero > strong {
-    font-size: 25px;
+    font-size: var(--text-xl);
   }
   .exchange-list {
     max-height: 600px;
   }
   .rate-calculator .field input {
-    font-size: 16px;
+    font-size: var(--text-base);
   }
   .settings-tabs {
     position: sticky;
@@ -2536,7 +2536,7 @@ dialog::backdrop {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .semester-plan > div {
   display: grid;
@@ -2553,11 +2553,11 @@ dialog::backdrop {
 .semester-plan small {
   display: block;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin-bottom: 5px;
 }
 .semester-plan b {
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .semester-plan .current {
   background: var(--active);
@@ -2567,7 +2567,7 @@ dialog::backdrop {
   padding: 20px 8px;
 }
 .rates-panel > .help {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--muted);
   background: none;
   padding: 0;
@@ -2612,7 +2612,7 @@ dialog::backdrop {
 }
 @media (max-width: 380px) {
   .mobile-brand small {
-    font-size: 14px;
+    font-size: var(--text-sm);
     max-width: 70px;
     overflow: hidden;
     white-space: nowrap;
@@ -2687,7 +2687,7 @@ dialog::backdrop {
 }
 .plan-budget-group legend {
   padding: 0 8px;
-  font-size: 1.05rem;
+  font-size: var(--text-base);
   font-weight: 700;
 }
 .plan-budget-group .help {
@@ -2708,7 +2708,7 @@ input,
 select,
 textarea,
 button {
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 small,
 .tiny,
@@ -2716,7 +2716,7 @@ small,
 .field-label,
 .help,
 .pill {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 button,
 .icon-button,
@@ -2737,7 +2737,7 @@ button svg {
   background: var(--cta);
   color: var(--on-cta);
   border-color: transparent;
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .primary:hover {
   background: var(--cta);
@@ -2766,11 +2766,11 @@ h1 {
   font-size: clamp(1.75rem, 2.5vw, 2.25rem);
 }
 h2 {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   line-height: 1.35;
 }
 h3 {
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .help,
 .empty-caption {
@@ -2799,7 +2799,7 @@ h3 {
 }
 .field > span,
 .field-label {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
   font-weight: 600;
   letter-spacing: 0;
@@ -2828,7 +2828,7 @@ h3 {
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   border-radius: var(--radius);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .notice {
   gap: var(--space-4);
@@ -2845,7 +2845,7 @@ h3 {
   padding: 12px;
   background: var(--error-bg);
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .toast,
 .undo-notice {
@@ -2882,16 +2882,16 @@ h3 {
 }
 .empty-mark {
   color: var(--primary);
-  font-size: 28px;
+  font-size: var(--text-heading);
   margin-bottom: 12px;
 }
 .empty-state p {
-  font-size: 1rem;
+  font-size: var(--text-base);
   margin: 8px auto 20px;
   max-width: 38ch;
 }
 .empty-state h3 {
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
 }
 .empty-state > span {
   background: var(--surface);
@@ -2909,7 +2909,7 @@ h3 {
   min-width: 0;
 }
 .metric dt {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .metric dd {
@@ -2938,7 +2938,7 @@ dialog::backdrop {
   gap: 12px;
 }
 .modal-head h2 {
-  font-size: 1.375rem;
+  font-size: var(--text-xl);
 }
 .modal-head .icon-button {
   min-width: 44px;
@@ -2962,7 +2962,7 @@ dialog::backdrop {
   color: var(--muted);
   background: transparent;
   border: 1px solid transparent;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   min-height: 44px;
 }
 .segmented button.selected {
@@ -2978,7 +2978,7 @@ dialog::backdrop {
   border-radius: var(--radius-sm);
 }
 .search input {
-  font-size: 1rem;
+  font-size: var(--text-base);
   background: transparent;
   border: 0;
 }
@@ -3011,12 +3011,12 @@ dialog::backdrop {
 .brand small {
   position: static;
   display: block;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   margin-top: 5px;
 }
 .brand {
   align-items: flex-start;
-  font-size: 23px;
+  font-size: var(--text-xl);
 }
 .brand-icon {
   width: 40px;
@@ -3034,11 +3034,11 @@ dialog::backdrop {
 .storage-badge small,
 .sidebar-laundry > span,
 .sidebar-laundry strong {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .sidebar nav button {
   min-height: 48px;
-  font-size: 1rem;
+  font-size: var(--text-base);
   border: 1px solid transparent;
 }
 .sidebar nav button.active {
@@ -3066,14 +3066,14 @@ main {
   justify-content: flex-end;
 }
 .desktop-crumb {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   gap: 8px;
 }
 .fx-pill,
 .fx-pill strong,
 .sync-pill,
 .sync-pill small {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .sync-pill {
   white-space: normal;
@@ -3100,11 +3100,11 @@ main {
 }
 .page-heading .eyebrow {
   letter-spacing: 0.06em;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   margin-bottom: 10px;
 }
 .page-heading p {
-  font-size: 1rem;
+  font-size: var(--text-base);
   margin-top: 10px;
   max-width: 65ch;
 }
@@ -3121,7 +3121,7 @@ main {
   gap: 4px;
 }
 .month-picker select {
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 600;
   width: auto;
   flex: 1;
@@ -3151,7 +3151,7 @@ footer {
   padding-top: 20px;
   gap: 16px;
   flex-wrap: wrap;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 @media (min-width: 768px) and (max-width: 1100px) {
   .sidebar {
@@ -3204,7 +3204,7 @@ footer {
     display: none;
   }
   .mobile-brand {
-    font-size: 18px;
+    font-size: var(--text-lg);
   }
   .topbar .fx-pill,
   .topbar .sync-pill,
@@ -3227,10 +3227,10 @@ footer {
     display: none;
   }
   .page-heading h1 {
-    font-size: 28px;
+    font-size: var(--text-heading);
   }
   .page-heading p {
-    font-size: 1rem;
+    font-size: var(--text-base);
   }
   .period-bar .month-picker {
     width: 100%;
@@ -3265,11 +3265,11 @@ footer {
     border: 1px solid transparent;
     border-radius: 10px;
     gap: 5px;
-    font-size: 14px;
+    font-size: var(--text-sm);
     color: var(--muted);
   }
   .mobile-nav button span {
-    font-size: 14px;
+    font-size: var(--text-sm);
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
@@ -3329,7 +3329,7 @@ footer {
 .budget-card .card-kicker,
 .budget-card > .tiny {
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   line-height: 1.5;
   letter-spacing: 0.035em;
 }
@@ -3344,7 +3344,7 @@ footer {
 }
 .budget-card p {
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   line-height: 1.5;
   margin: 16px 0;
 }
@@ -3360,11 +3360,11 @@ footer {
 .mini-footer,
 .travel-totals {
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .balance-footer strong {
   color: var(--text);
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .mini-card .mini-icon {
   float: right;
@@ -3382,7 +3382,7 @@ footer {
   flex-wrap: wrap;
   margin: 16px 0 24px;
   gap: 8px;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .dashboard-grid {
@@ -3420,10 +3420,10 @@ footer {
 }
 .category-top strong,
 .category-top span {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .category-row small {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   line-height: 1.5;
 }
 .category-row .track {
@@ -3439,11 +3439,11 @@ footer {
   gap: 24px;
 }
 .donut-label strong {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   overflow-wrap: anywhere;
 }
 .donut-label span {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .legend > div {
@@ -3451,12 +3451,12 @@ footer {
   grid-template-columns: 8px minmax(0, 1fr) auto;
   align-items: start;
   gap: 10px;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   padding: 8px 0;
 }
 .legend b {
   text-align: right;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .legend b small {
   display: block;
@@ -3474,7 +3474,7 @@ footer {
 .laundry-card p,
 .laundry-meta,
 .laundry-title {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .laundry-value {
@@ -3492,7 +3492,7 @@ footer {
 }
 .bar-column > span,
 .bar-column small {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .bar-slot {
   background: var(--low);
@@ -3516,7 +3516,7 @@ footer {
   }
   .balance-number,
   .mini-card.budget-card > h2 {
-    font-size: 2.25rem;
+    font-size: var(--text-heading);
     margin: 16px 0;
   }
   .balance-footer {
@@ -3533,7 +3533,7 @@ footer {
     gap: 8px;
   }
   .bar-column > span {
-    font-size: 14px;
+    font-size: var(--text-sm);
     writing-mode: horizontal-tb;
     overflow-wrap: anywhere;
   }
@@ -3560,17 +3560,17 @@ footer {
   flex: 1 1 160px;
 }
 .transaction-tools .export-csv {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .ledger-heading {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   letter-spacing: 0.04em;
   margin: 24px 0 12px;
   gap: 8px;
   flex-wrap: wrap;
 }
 .transaction-day > h3 {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
   display: flex;
   flex-wrap: wrap;
@@ -3580,7 +3580,7 @@ footer {
 .day-total {
   margin-left: auto;
   color: var(--text);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .transaction {
   display: grid;
@@ -3613,7 +3613,7 @@ footer {
   display: block;
   text-align: left;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: var(--text-base);
   background: transparent;
   border: 0;
   padding: 0;
@@ -3623,7 +3623,7 @@ footer {
   overflow-wrap: anywhere;
 }
 .transaction-description small {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   white-space: normal;
   color: var(--muted);
   overflow: visible;
@@ -3634,13 +3634,13 @@ footer {
   text-align: right;
 }
 .transaction-amount strong {
-  font-size: 1rem;
+  font-size: var(--text-base);
   color: var(--text);
   white-space: normal;
   overflow-wrap: anywhere;
 }
 .transaction-amount small {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
   white-space: normal;
 }
@@ -3658,7 +3658,7 @@ footer {
 }
 .detail-list dt {
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .detail-list dd {
   margin: 0;
@@ -3677,12 +3677,12 @@ footer {
   flex-wrap: wrap;
 }
 .summary-values strong {
-  font-size: 2rem;
+  font-size: var(--text-heading);
   overflow-wrap: anywhere;
 }
 .summary-values span,
 .summary-foot {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .summary-foot {
@@ -3696,7 +3696,7 @@ footer {
 }
 .budget-pills button {
   white-space: normal;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   min-height: 44px;
 }
 .budget-pills button.selected {
@@ -3758,12 +3758,12 @@ footer {
   gap: 16px;
 }
 .editor-money input[type="number"] {
-  font-size: 1.75rem;
+  font-size: var(--text-heading);
   font-weight: 600;
 }
 .transaction-editor .field-label,
 .transaction-editor .tiny {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .group-choice {
   gap: 12px;
@@ -3782,10 +3782,10 @@ footer {
 }
 .group-choice b,
 .group-choice strong {
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
 }
 .group-choice small {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .category-choices {
@@ -3795,7 +3795,7 @@ footer {
 }
 .category-choices button {
   min-height: 88px;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   padding: 12px 8px;
   background: var(--low);
   border: 1px solid var(--border);
@@ -3805,7 +3805,7 @@ footer {
 }
 .category-choices button span {
   white-space: normal;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   overflow: visible;
   text-overflow: clip;
 }
@@ -3852,7 +3852,7 @@ fieldset {
 }
 legend {
   padding: 0 8px;
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 600;
 }
 .currency-options {
@@ -3862,7 +3862,7 @@ legend {
 }
 .currency-results button {
   min-height: 52px;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .currency-results .keyboard-active {
   background: var(--active);
@@ -3908,7 +3908,7 @@ legend {
 .settings-tabs button {
   flex: 1 1 110px;
   min-height: 48px;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
   background: var(--surface);
   border: 1px solid var(--border);
@@ -3959,10 +3959,10 @@ legend {
   gap: 12px;
 }
 .limit-description b {
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .limit-description small {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   line-height: 1.5;
   color: var(--muted);
 }
@@ -3972,7 +3972,7 @@ legend {
 }
 .limit-input input {
   width: 100px;
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .allocation-total {
   display: flex;
@@ -3980,13 +3980,13 @@ legend {
   flex-wrap: wrap;
   align-items: center;
   padding: 16px 0;
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .allocation-total > b {
   margin-left: auto;
 }
 .budget-rule {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
   padding: 16px;
   background: var(--low);
@@ -4005,7 +4005,7 @@ legend {
 }
 .semester-plan small,
 .semester-plan b {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   white-space: normal;
 }
 .semester-plan .current {
@@ -4067,7 +4067,7 @@ legend {
 .favorites-panel .export-buttons button {
   background: var(--low);
   color: var(--text);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   white-space: normal;
   text-align: left;
 }
@@ -4148,7 +4148,7 @@ legend {
 }
 .rate-hero small {
   display: block;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin-top: 12px;
 }
@@ -4164,7 +4164,7 @@ legend {
   min-height: 48px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--gold);
   background: var(--low);
   overflow-wrap: anywhere;
@@ -4195,25 +4195,25 @@ legend {
 .exchange-list small,
 .exchange-list b,
 .exchange-list strong {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .exchange-list small {
   color: var(--muted);
   white-space: normal;
 }
 .currency-symbol {
-  font-size: 1rem;
+  font-size: var(--text-base);
   width: 36px;
   height: 36px;
   background: var(--low);
   color: var(--gold);
 }
 .fx-detail strong {
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   color: var(--gold);
 }
 .fx-detail p {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 @media (max-width: 767px) {
   .rate-hero {
@@ -4251,12 +4251,12 @@ legend {
 .data-action b,
 .data-action strong {
   display: block;
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .data-action small {
   display: block;
   font-weight: 400;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
   line-height: 1.5;
   margin-top: 4px;
@@ -4269,7 +4269,7 @@ legend {
   align-items: flex-start;
   gap: 10px;
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   padding: 16px;
   margin-top: 20px;
   background: var(--low);
@@ -4332,7 +4332,7 @@ legend {
 }
 .account-sync-state p,
 .account-sync-state small {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .preferences-panel h2 {
   margin-bottom: 24px;
@@ -4358,7 +4358,7 @@ legend {
   align-items: flex-start;
   gap: 12px;
   padding: 16px 0;
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .check-field input {
   margin-top: 2px;
@@ -4397,7 +4397,7 @@ button {
   line-height: 1.4;
 }
 .button-pair button {
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .category-list {
   gap: 0;
@@ -4413,21 +4413,21 @@ button {
   white-space: normal;
 }
 .category-label strong {
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 .category-label small.limit-alert {
   display: flex;
   align-items: flex-start;
   gap: 6px;
   color: var(--gold);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .category-label small.limit-alert svg {
   flex-shrink: 0;
   margin-top: 2px;
 }
 .category-main small {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .period-right {
   display: flex;
@@ -4458,7 +4458,7 @@ button {
   grid-column: 3;
   grid-row: 1;
   text-align: right;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   white-space: nowrap;
 }
 .bar-column .bar-slot {
@@ -4477,7 +4477,7 @@ button {
   grid-column: 1;
   grid-row: 1;
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .bar-column {
   min-width: 0;
@@ -4534,7 +4534,7 @@ button {
   margin: 0;
 }
 .group-options button {
-  font-size: 1rem;
+  font-size: var(--text-base);
   background: var(--low);
   border: 1px solid var(--border);
 }
@@ -4557,7 +4557,7 @@ button {
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .category-chips button.selected {
   background: var(--active);
@@ -4962,4 +4962,19 @@ body:has(.screen-settings) .quick-add {
 }
 .sync-status {
   min-height: 44px;
+}
+
+.balance-number,
+.mini-card h2,
+.laundry-value,
+.transaction-amount,
+.metric dd,
+.rate-hero strong,
+.donut-label strong {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+.track > span {
+  transform-origin: left center;
+  transition: transform var(--duration) var(--ease);
 }

@@ -603,4 +603,10 @@ export const portuguese = {
   "This entry keeps its saved rate from {0}.":
     "Este movimento mantém a taxa guardada de {0}.",
   "This entry keeps its saved rate.": "Este movimento mantém a taxa guardada.",
+  "Please complete this field.": "Preenche este campo.",
+  "Enter a valid value.": "Introduz um valor válido.",
+  "Enter a value within the allowed range.":
+    "Introduz um valor dentro do intervalo permitido.",
+  "Use the required format.": "Usa o formato pedido.",
+  "you@example.com": "nome@exemplo.pt",
 } as const;

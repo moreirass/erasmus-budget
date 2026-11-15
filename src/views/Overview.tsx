@@ -138,7 +138,7 @@ export function OverviewView({
             onClick={() => selectBudget("travel")}
           />
           <div className="mini-icon blue">
-            <Plane size={21} />
+            <Plane size={20} />
           </div>
           <span className="tiny">
             {tr(
@@ -175,7 +175,7 @@ export function OverviewView({
       </section>
       <div className="under-hero">
         <span>
-          <Check size={14} />{" "}
+          <Check size={16} />{" "}
           {group === "all"
             ? tr("Tap a budget card to filter · tap again for both")
             : group === "daily"
@@ -210,7 +210,7 @@ export function OverviewView({
                   setSettingsSection("plan");
                 }}
               >
-                {tr("Edit limits")} <ArrowUpRight size={15} />
+                {tr("Edit limits")} <ArrowUpRight size={16} />
               </button>
             </div>
             <div className="category-list">
@@ -293,7 +293,7 @@ export function OverviewView({
                 className="text-button"
                 onClick={() => setTab("Transactions")}
               >
-                {tr("View all")} <ArrowUpRight size={15} />
+                {tr("View all")} <ArrowUpRight size={16} />
               </button>
             </div>
             <TransactionList
@@ -334,7 +334,7 @@ export function OverviewView({
             <div className="laundry-card">
               <div className="section-heading">
                 <span className="laundry-title">
-                  <WashingMachine size={21} /> {tr("Laundry card")}{" "}
+                  <WashingMachine size={20} /> {tr("Laundry card")}{" "}
                 </span>
                 <span className="pill">{tr("CZK CREDIT")}</span>
               </div>

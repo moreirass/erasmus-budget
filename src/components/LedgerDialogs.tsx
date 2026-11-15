@@ -113,7 +113,7 @@ export function LedgerDialogs({
         >
           <div className="record-summary">
             <span className="record-summary-icon">
-              <Trash2 size={22} aria-hidden="true" />
+              <Trash2 size={24} aria-hidden="true" />
             </span>
             <div>
               <strong>
@@ -144,7 +144,7 @@ export function LedgerDialogs({
               {tr("Cancel")}
             </button>
             <button className="danger" onClick={confirmDelete}>
-              <Trash2 size={18} aria-hidden="true" />
+              <Trash2 size={20} aria-hidden="true" />
               {tr("Delete")}
             </button>
           </div>
@@ -160,7 +160,7 @@ export function LedgerDialogs({
             aria-label={tr("Dismiss undo option")}
             onClick={() => setRemoved(null)}
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
       )}

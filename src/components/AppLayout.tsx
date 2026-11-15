@@ -114,7 +114,7 @@ export function AppLayout({
           <ChevronRight size={16} />
         </button>
         <div className="storage-badge">
-          <MapPin size={14} />
+          <MapPin size={16} />
           <span>{tr("Ostrava, Czechia")}</span>
           <span className={online ? "status-dot" : "status-dot offline"} />
           <small>{store.user?.email ?? tr("Saved on this device")}</small>
@@ -125,7 +125,7 @@ export function AppLayout({
           className={tab === "Overview" ? "active" : ""}
           onClick={() => setTab("Overview")}
         >
-          <LayoutDashboard size={21} />
+          <LayoutDashboard size={20} />
           <span>{tr("Overview")}</span>
         </button>
         <button
@@ -133,7 +133,7 @@ export function AppLayout({
           className={tab === "Transactions" ? "active" : ""}
           onClick={() => setTab("Transactions")}
         >
-          <ArrowLeftRight size={21} />
+          <ArrowLeftRight size={20} />
           <span className="nav-full">{tr("Transactions")}</span>
           <span className="nav-short">{tr("Ledger")}</span>
         </button>
@@ -143,7 +143,7 @@ export function AppLayout({
           onClick={() => openNew()}
           disabled={!store.ready || store.corrupt}
         >
-          <Plus size={29} />
+          <Plus size={24} />
         </button>
         <button
           className={tab === "Budget" ? "active" : ""}
@@ -152,7 +152,7 @@ export function AppLayout({
             setSettingsSection("plan");
           }}
         >
-          <ChartPie size={21} />
+          <ChartPie size={20} />
           <span>{tr("Budget")}</span>
         </button>
         <button
@@ -162,7 +162,7 @@ export function AppLayout({
             setSettingsSection("sync");
           }}
         >
-          <Settings size={21} />
+          <Settings size={20} />
           <span>{tr("Settings")}</span>
         </button>
       </nav>
@@ -170,12 +170,12 @@ export function AppLayout({
         <header className="topbar">
           <div className="breadcrumb">
             <span className="desktop-crumb">
-              <LayoutDashboard size={15} /> {tr("/ Erasmus Hub /")}{" "}
+              <LayoutDashboard size={16} /> {tr("/ Erasmus Hub /")}{" "}
               <b>{tr(tab)}</b>
             </span>
             <span className="mobile-brand">
               <span className="brand-icon">
-                <Wallet size={22} />
+                <Wallet size={24} />
               </span>
               <span>Pocket</span>
             </span>
@@ -248,14 +248,14 @@ export function AppLayout({
               }
               onClick={() => setDark(!dark)}
             >
-              {dark ? <Sun size={19} /> : <Moon size={19} />}
+              {dark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             <button
               className="primary top-add"
               onClick={() => openNew()}
               disabled={!store.ready || store.corrupt}
             >
-              <Plus size={18} /> {tr("Add transaction")}{" "}
+              <Plus size={20} /> {tr("Add transaction")}{" "}
             </button>
             <button
               className="avatar"
@@ -265,7 +265,7 @@ export function AppLayout({
                 setSettingsSection("sync");
               }}
             >
-              <UserRound size={19} />
+              <UserRound size={20} />
             </button>
           </div>
         </header>

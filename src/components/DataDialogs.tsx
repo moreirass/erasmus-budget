@@ -37,7 +37,7 @@ export function DataDialogs({
           close={() => setPendingImport(null)}
         >
           <div className="record-summary import-summary">
-            <FileCheck2 size={28} aria-hidden="true" />
+            <FileCheck2 size={24} aria-hidden="true" />
             <p>
               {trCount("{0} transactions in the resulting workspace.", [
                 pendingImport.data.transactions.length,
@@ -114,7 +114,7 @@ export function DataDialogs({
           </div>
           <div className="button-pair">
             <button onClick={() => store.resolveConflict("remote")}>
-              <Cloud size={18} /> {tr("Use cloud version")}{" "}
+              <Cloud size={20} /> {tr("Use cloud version")}{" "}
               <small>
                 {trCount("{0} transactions", [
                   store.conflict.data.transactions.length,
@@ -125,7 +125,7 @@ export function DataDialogs({
               className="primary"
               onClick={() => store.resolveConflict("local")}
             >
-              <Wallet size={18} /> {tr("Keep local version")}{" "}
+              <Wallet size={20} /> {tr("Keep local version")}{" "}
               <small>
                 {trCount("{0} transactions · sync later", [
                   data.transactions.length,

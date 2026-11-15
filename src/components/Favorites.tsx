@@ -205,7 +205,7 @@ export function FavoriteButtons({ data, fx, save }: Props) {
       </div>
       {error && (
         <p className="form-error" role="alert">
-          <AlertCircle size={18} />
+          <AlertCircle size={20} />
           {errorMessage(error)}
         </p>
       )}

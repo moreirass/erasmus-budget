@@ -578,4 +578,10 @@ export const english = {
   "This entry keeps its saved rate from {0}.":
     "This entry keeps its saved rate from {0}.",
   "This entry keeps its saved rate.": "This entry keeps its saved rate.",
+  "Please complete this field.": "Please complete this field.",
+  "Enter a valid value.": "Enter a valid value.",
+  "Enter a value within the allowed range.":
+    "Enter a value within the allowed range.",
+  "Use the required format.": "Use the required format.",
+  "you@example.com": "you@example.com",
 } as const;

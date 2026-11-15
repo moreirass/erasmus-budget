@@ -43,7 +43,7 @@ export function PeriodControls({
           disabled={month === monthList[0]}
           onClick={() => changeMonth(monthList[monthList.indexOf(month) - 1])}
         >
-          <ChevronLeft size={18} />
+          <ChevronLeft size={20} />
         </button>
         <select
           aria-label={tr("Selected month")}
@@ -62,7 +62,7 @@ export function PeriodControls({
           disabled={month === monthList.at(-1)}
           onClick={() => changeMonth(monthList[monthList.indexOf(month) + 1])}
         >
-          <ChevronRight size={18} />
+          <ChevronRight size={20} />
         </button>
         {isFuture && <span className="pill">{tr("Plan preview")}</span>}
       </div>

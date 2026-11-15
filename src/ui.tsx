@@ -59,5 +59,5 @@ export function CategoryIcon({
           unclassified: MapPin,
         }[travelType ?? "unclassified"]
       : categoryInfo[category].icon;
-  return <Icon size={21} strokeWidth={1.8} />;
+  return <Icon size={20} strokeWidth={1.75} />;
 }

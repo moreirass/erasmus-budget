@@ -119,7 +119,7 @@ export function SettingsView({
             aria-controls={`settings-${id}`}
             onClick={() => setSettingsSection(id)}
           >
-            <Icon size={18} /> <span>{tr(label)}</span>
+            <Icon size={20} /> <span>{tr(label)}</span>
           </button>
         ))}
       </nav>
@@ -251,18 +251,18 @@ export function SettingsView({
               <h2>{tr("Backup files")}</h2>
               <p>{tr("Export or restore your records.")}</p>
             </div>
-            <Download size={22} />
+            <Download size={24} />
           </div>
           <div className="data-actions">
             <BusyButton className="data-action" onClick={exportJSON}>
-              <Download size={22} />
+              <Download size={24} />
               <span>
                 <strong>{tr("Full JSON backup")}</strong>
                 <small>{tr("Plans, transactions, rules and favorites")}</small>
               </span>
             </BusyButton>
             <BusyButton className="data-action" onClick={exportCSV}>
-              <Download size={22} />
+              <Download size={24} />
               <span>
                 <strong>{tr("Transactions CSV")}</strong>
                 <small>{tr("Transaction history for a spreadsheet")}</small>
@@ -274,7 +274,7 @@ export function SettingsView({
               aria-busy={reading}
               onClick={() => fileRef.current?.click()}
             >
-              <Upload size={22} />
+              <Upload size={24} />
               <span>
                 <strong>
                   {tr(reading ? "Reading file…" : "Import JSON / CSV")}
@@ -404,7 +404,7 @@ export function SettingsView({
                   onClick={() => store.sync()}
                   disabled={store.busy || !online}
                 >
-                  <RefreshCw size={18} className={store.busy ? "spin" : ""} />{" "}
+                  <RefreshCw size={20} className={store.busy ? "spin" : ""} />{" "}
                   {tr(store.busy ? "Syncing…" : "Sync now")}
                 </button>
                 <button
@@ -413,7 +413,7 @@ export function SettingsView({
                     setConfirmSignOut(true);
                   }}
                 >
-                  <LogOut size={18} /> {tr("Sign out")}
+                  <LogOut size={20} /> {tr("Sign out")}
                 </button>
               </div>
               <p className="help">
@@ -456,7 +456,7 @@ export function SettingsView({
                   name="email"
                   required
                   autoComplete="email"
-                  placeholder="you@example.com"
+                  placeholder={tr("you@example.com")}
                   disabled={sending}
                 />
               </Field>
@@ -465,7 +465,7 @@ export function SettingsView({
                 type="submit"
                 disabled={sending || !online}
               >
-                {sending && <RefreshCw size={18} className="spin" />}
+                {sending && <RefreshCw size={20} className="spin" />}
                 {tr(sending ? "Sending sign-in link…" : "Send sign-in link")}
               </button>
               {authMessage && (
@@ -499,7 +499,7 @@ export function SettingsView({
                 aria-pressed={dark}
                 onClick={() => setDark(true)}
               >
-                <Moon size={18} />
+                <Moon size={20} />
                 {tr("Dark")}
               </button>
               <button
@@ -508,7 +508,7 @@ export function SettingsView({
                 aria-pressed={!dark}
                 onClick={() => setDark(false)}
               >
-                <Sun size={18} />
+                <Sun size={20} />
                 {tr("Light")}
               </button>
             </div>

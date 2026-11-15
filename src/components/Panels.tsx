@@ -57,7 +57,7 @@ export function ExchangePanel({
       <div className="section-heading">
         <div>
           <h2>
-            <RefreshCw size={21} /> {tr("Exchange rates")}{" "}
+            <RefreshCw size={20} /> {tr("Exchange rates")}{" "}
           </h2>
           <p>{tr("Frankfurter reference rates · EUR base")}</p>
         </div>
@@ -67,7 +67,7 @@ export function ExchangePanel({
           disabled={fx.busy}
           aria-label={tr("Refresh rates")}
         >
-          <RefreshCw size={18} className={fx.busy ? "spin" : ""} />
+          <RefreshCw size={20} className={fx.busy ? "spin" : ""} />
         </button>
       </div>
       <div className="rate-hero">
@@ -98,7 +98,7 @@ export function ExchangePanel({
           disabled={fx.busy}
           onClick={() => fx.refresh(true)}
         >
-          <RefreshCw size={18} />
+          <RefreshCw size={20} />
           {fx.busy ? tr("Refreshing…") : tr("Refresh rates online")}
         </button>
         <small>
@@ -136,12 +136,12 @@ export function ExchangePanel({
       </p>
       {fx.error && (
         <p className="form-error" role="alert">
-          <AlertTriangle size={18} aria-hidden="true" />
+          <AlertTriangle size={20} aria-hidden="true" />
           {errorMessage(fx.error)}
         </p>
       )}
       <label className="search">
-        <Search size={19} />
+        <Search size={20} />
         <input
           aria-label={tr("Search exchange currencies")}
           placeholder={tr("Search currency, name or code…")}
@@ -277,7 +277,7 @@ export function LaundryPanel({
     <div className="laundry-card">
       <div className="section-heading">
         <span className="laundry-title">
-          <WashingMachine size={22} /> {tr("CZK CARD CREDIT")}{" "}
+          <WashingMachine size={24} /> {tr("CZK CARD CREDIT")}{" "}
         </span>
       </div>
       <div className="laundry-value">{money(stats.card, "CZK")}</div>
@@ -396,7 +396,7 @@ export function TransactionList({
     return (
       <div className="empty-state">
         <span>
-          <ArrowLeftRight size={26} />
+          <ArrowLeftRight size={24} />
         </span>
         <h3>{tr("Your first transaction starts here.")}</h3>
         <p>{tr("No transactions in this view.")}</p>
@@ -448,7 +448,7 @@ export function TransactionList({
               setDetailId(null);
             }}
           >
-            <Pencil size={18} />
+            <Pencil size={20} />
             {tr("Edit")}
           </button>
         </Modal>
@@ -739,7 +739,7 @@ export function BudgetForm({
         </div>
         {!balanced && (
           <p className="form-error" role="status">
-            <AlertTriangle size={18} aria-hidden="true" />
+            <AlertTriangle size={20} aria-hidden="true" />
             {tr("Adjust day-to-day allocations by {0} to match this budget.", [
               money(Math.round(budget * 100) - total),
             ])}
@@ -772,13 +772,13 @@ export function BudgetForm({
       </fieldset>
       <div className="allocation-total">
         <span className="plan-total-label">
-          <ChartPie size={22} />
+          <ChartPie size={24} />
           {tr("Combined monthly total")}
         </span>
         <b>{money(Math.round(budget * 100) + limits.travel)}</b>
       </div>
       <p className="budget-rule">
-        <CheckCircle2 size={18} />
+        <CheckCircle2 size={20} />
         {tr("Two independent budgets. Only laundry credit carries over.")}
       </p>
       <Field label={tr("Apply changes to")}>
@@ -801,7 +801,7 @@ export function BudgetForm({
           </p>
         )}
       <button className="primary full" disabled={!balanced}>
-        <Check size={18} />
+        <Check size={20} />
         {tr("Save monthly plan")}
       </button>
     </form>
@@ -889,7 +889,7 @@ export function SettingsForm({
       </Field>
       {error && (
         <p role="alert" className="form-error">
-          <AlertTriangle size={18} aria-hidden="true" />
+          <AlertTriangle size={20} aria-hidden="true" />
           {errorMessage(error)}
         </p>
       )}
