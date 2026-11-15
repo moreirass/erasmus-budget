@@ -217,6 +217,8 @@ export default function App() {
           commit={commit}
           monthList={monthList}
           online={online}
+          dark={dark}
+          setDark={setDark}
           language={prefs.language}
           setLanguage={prefs.setLanguage}
           setToast={setToast}

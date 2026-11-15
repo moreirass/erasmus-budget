@@ -3895,3 +3895,142 @@ legend {
     bottom: -20px;
   }
 }
+
+/* Focused settings sections, preserving mounted forms and their drafts. */
+.settings-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  position: static;
+  gap: 8px;
+  padding: 0 0 20px;
+  margin: 0 0 24px;
+  overflow: visible;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+}
+.settings-tabs button {
+  flex: 1 1 110px;
+  min-height: 48px;
+  font-size: 0.875rem;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.settings-tabs button.selected {
+  color: var(--primary);
+  background: var(--active);
+  border-color: var(--primary);
+}
+.settings-section {
+  min-width: 0;
+}
+.settings-plan-layout,
+.settings-card-layout,
+.settings-data-layout,
+.settings-account-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.settings-companion {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+.settings-companion > .panel + .panel {
+  margin-top: 0;
+}
+.settings-rates-layout {
+  max-width: 820px;
+  margin-inline: auto;
+}
+.plan-budget-group {
+  background: var(--low);
+  padding: 16px;
+}
+.limit-input {
+  gap: 12px;
+  padding: 16px 0;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.limit-description {
+  flex: 1 1 180px;
+  min-width: 0;
+  gap: 12px;
+}
+.limit-description b {
+  font-size: 1rem;
+}
+.limit-description small {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.limit-input > span:last-child {
+  flex: 0 0 125px;
+  min-width: 0;
+}
+.limit-input input {
+  width: 100px;
+  font-size: 1rem;
+}
+.allocation-total {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 16px 0;
+  font-size: 1rem;
+}
+.allocation-total > b {
+  margin-left: auto;
+}
+.budget-rule {
+  font-size: 0.875rem;
+  color: var(--muted);
+  padding: 16px;
+  background: var(--low);
+  border-radius: var(--radius);
+}
+.semester-plan > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.semester-plan > div > span {
+  padding: 16px;
+  background: var(--low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.semester-plan small,
+.semester-plan b {
+  font-size: 0.875rem;
+  white-space: normal;
+}
+.semester-plan .current {
+  background: var(--active);
+  border-color: var(--primary);
+}
+@media (max-width: 1100px) {
+  .settings-plan-layout,
+  .settings-card-layout,
+  .settings-data-layout,
+  .settings-account-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .settings-tabs {
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .settings-tabs button {
+    flex: 1 1 85px;
+    padding: 10px 8px;
+    flex-direction: row;
+  }
+}

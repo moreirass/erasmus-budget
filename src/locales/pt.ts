@@ -1,5 +1,29 @@
 // English source messages are the canonical keys. Keep placeholders unchanged.
 export const portuguese = {
+  "Signing out…": "A terminar sessão…",
+  "Your saved account data stays on this device after signing out.":
+    "Os dados guardados da conta ficam neste dispositivo depois de terminares sessão.",
+  "Sign out?": "Terminar sessão?",
+  "Show a reminder at 80% and 100% of a monthly category limit.":
+    "Mostrar um aviso aos 80% e 100% do limite mensal de uma categoria.",
+  Light: "Claro",
+  Dark: "Escuro",
+  Appearance: "Aspeto",
+  "App preferences": "Preferências da app",
+  "Sending sign-in link…": "A enviar ligação de acesso…",
+  "Signed-in account": "Conta com sessão iniciada",
+  "Offline changes stay on this device until you sync online.":
+    "As alterações sem ligação ficam neste dispositivo até sincronizares com ligação à internet.",
+  "Your devices, one budget": "Os teus dispositivos, um orçamento",
+  "Backup reminders": "Lembretes de cópia de segurança",
+  "Review the file before making changes":
+    "Revê o ficheiro antes de aplicar alterações",
+  "Transaction history for a spreadsheet":
+    "Histórico de movimentos para uma folha de cálculo",
+  "Plans, transactions, rules and favorites":
+    "Planos, movimentos, regras e favoritos",
+  "Keep a copy. Bring it with you.": "Guarda uma cópia e leva-a contigo.",
+  "Budget and settings sections": "Secções de orçamento e definições",
   "Cloud version": "Versão na nuvem",
   "Discard changes": "Descartar alterações",
   "Keep editing": "Continuar a editar",
