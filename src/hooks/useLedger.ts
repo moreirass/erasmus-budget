@@ -1,3 +1,4 @@
+import { visualFeedback } from "../visualFeedback";
 import { useEffect, useState } from "react";
 import { rememberEntry, consumeAddShortcut } from "../quickEntry";
 import { tr, kindLabel } from "../i18n";
@@ -121,7 +122,7 @@ export function useLedger(
       )
     ) {
       rememberEntry(t, editor === "new" ? "new" : "edit");
-      setEditor(null);
+      visualFeedback(() => setEditor(null));
     }
   }
   function deleteTransaction() {
@@ -152,7 +153,7 @@ export function useLedger(
         "Deletion undone",
       )
     )
-      setRemoved(null);
+      visualFeedback(() => setRemoved(null));
   }
   return {
     editor,

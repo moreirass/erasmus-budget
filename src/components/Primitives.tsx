@@ -1,3 +1,4 @@
+import { visualFeedback } from "../visualFeedback";
 import { AlertCircle, X } from "lucide-react";
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { tr } from "../i18n";
@@ -28,7 +29,7 @@ export function Modal({
       ref={ref}
       onCancel={(event) => {
         event.preventDefault();
-        close();
+        visualFeedback(close);
       }}
       aria-labelledby={titleId}
     >
@@ -36,7 +37,7 @@ export function Modal({
         <h2 id={titleId}>{title}</h2>
         <button
           className="icon-button"
-          onClick={close}
+          onClick={() => visualFeedback(close)}
           aria-label={tr("Close")}
         >
           <X size={20} />

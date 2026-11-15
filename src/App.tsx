@@ -1,3 +1,4 @@
+import { visualFeedback } from "./visualFeedback";
 import { errorMessage } from "./i18n";
 import { useEffect, useState } from "react";
 import { Info, AlertCircle, X } from "lucide-react";
@@ -119,7 +120,7 @@ export default function App() {
               <Info size={20} aria-hidden="true" />
               {errorMessage(toast)}
               <button
-                onClick={() => setToast("")}
+                onClick={() => visualFeedback(() => setToast(""))}
                 aria-label={tr("Dismiss notification")}
               >
                 <X size={16} />

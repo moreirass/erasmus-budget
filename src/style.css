@@ -5005,3 +5005,23 @@ body:has(.screen-settings) .quick-add {
     width: 100%;
   }
 }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration);
+  animation-timing-function: var(--ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+.panel .panel,
+.panel fieldset {
+  border-radius: max(0px, calc(var(--radius-lg) - var(--space-4)));
+}
+.mini-icon,
+.empty-mark {
+  display: none;
+}
