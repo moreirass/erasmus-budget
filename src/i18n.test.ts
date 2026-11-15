@@ -11,11 +11,51 @@ import {
   trCount,
 } from "./i18n.ts";
 import { portuguese } from "./locales/pt.ts";
+import { english } from "./locales/en.ts";
 import { freshData, money, monthLabel } from "./model.ts";
 import { currencyName, searchCurrencies } from "./fx.ts";
 import { toCSV } from "./transfer.ts";
 
 afterEach(() => setLanguage("en"));
+
+it("keeps both language catalogs in exact key parity", () => {
+  assert.deepEqual(Object.keys(english).sort(), Object.keys(portuguese).sort());
+});
+
+it("follows Portuguese device variants on first launch and preserves explicit choices", () => {
+  const nav = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+  const storage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  let saved: string | null = null;
+  try {
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: { getItem: () => saved },
+    });
+    for (const device of ["pt-PT", "pt-BR", "pt-AO"]) {
+      Object.defineProperty(globalThis, "navigator", {
+        configurable: true,
+        value: { language: device },
+      });
+      assert.equal(readLanguage(), "pt");
+    }
+    saved = "en";
+    assert.equal(readLanguage(), "en");
+    saved = null;
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: { language: "de-DE" },
+    });
+    assert.equal(
+      readLanguage(),
+      navigator.language.toLowerCase().startsWith("pt") ? "pt" : "en",
+    );
+  } finally {
+    if (nav) Object.defineProperty(globalThis, "navigator", nav);
+    else Reflect.deleteProperty(globalThis, "navigator");
+    if (storage) Object.defineProperty(globalThis, "localStorage", storage);
+    else Reflect.deleteProperty(globalThis, "localStorage");
+  }
+});
 
 it("defaults to English and switches copy, dates, money and currency names together", () => {
   assert.equal(getLanguage(), "en");
@@ -61,19 +101,28 @@ it("persists a supported language and tolerates unavailable storage", () => {
         setItem: (key: string, value: string) => saved.set(key, value),
       },
     });
-    assert.equal(readLanguage(), "en");
+    assert.equal(
+      readLanguage(),
+      navigator.language.toLowerCase().startsWith("pt") ? "pt" : "en",
+    );
     setLanguage("pt");
     assert.equal(saved.get("pocket-language"), "pt");
     assert.equal(readLanguage(), "pt");
     saved.set("pocket-language", "fr");
-    assert.equal(readLanguage(), "en");
+    assert.equal(
+      readLanguage(),
+      navigator.language.toLowerCase().startsWith("pt") ? "pt" : "en",
+    );
     Object.defineProperty(globalThis, "localStorage", {
       configurable: true,
       get() {
         throw new Error("Blocked");
       },
     });
-    assert.equal(readLanguage(), "en");
+    assert.equal(
+      readLanguage(),
+      navigator.language.toLowerCase().startsWith("pt") ? "pt" : "en",
+    );
     assert.doesNotThrow(() => setLanguage("pt"));
     assert.equal(getLanguage(), "pt");
   } finally {

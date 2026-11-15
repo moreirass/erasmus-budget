@@ -1,3 +1,4 @@
+import { errorMessage } from "../i18n";
 import { lastEntry } from "../quickEntry";
 import {
   AlertTriangle,
@@ -331,7 +332,7 @@ export function TransactionForm({
           {fx.error && (
             <p className="form-error" role="status">
               <AlertTriangle size={18} aria-hidden="true" />
-              {tr(fx.error)}
+              {errorMessage(fx.error)}
             </p>
           )}
         </section>
@@ -473,7 +474,7 @@ export function TransactionForm({
       {error && (
         <p ref={errorRef} tabIndex={-1} className="form-error" role="alert">
           <AlertTriangle size={18} aria-hidden="true" />
-          {tr(error)}
+          {errorMessage(error)}
         </p>
       )}
       <div className="editor-actions">

@@ -1,3 +1,4 @@
+import { errorMessage } from "./i18n";
 import { useEffect, useState } from "react";
 import { Info, AlertCircle, X } from "lucide-react";
 import { BackupReminder } from "./components/BackupReminder";
@@ -155,7 +156,7 @@ export default function App() {
       {store.error && (
         <div role="alert" className="notice error">
           <AlertCircle size={20} aria-hidden="true" />
-          {tr(store.error)}
+          {errorMessage(store.error)}
           <button
             onClick={() => store.setError("")}
             aria-label={tr("Dismiss error")}

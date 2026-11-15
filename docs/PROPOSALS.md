@@ -17,7 +17,7 @@ Benefit: navigation does not silently discard a draft.
 Affects: navigation/form behaviour and tests; bilingual discard/restore copy if required. No accounting, storage key, backup, sync or schema change.
 Risk: medium (stale drafts after external data updates). Effort: M.
 Alternatives: do nothing; warn before leaving instead.
-Recommendation: approve separately after the visual work. Status: PENDING. Not implemented.
+Recommendation: approve separately after the visual work. Status: APPROVED by the user. Implementation scheduled after visual polish.
 
 ## P2 — Scope the Overview summary to the selected budget
 Problem: Overview.tsx global spending/support/remainder metrics stay global while category charts filter to Day to day or Travel.
@@ -26,6 +26,6 @@ Benefit: the headline summary matches the selected context.
 Affects: presentation/grouping, UI tests and translated labels only; uses existing summary values. No model/accounting/storage/backup/sync/schema change.
 Risk: medium (changes interpretation of the headline figures). Effort: S.
 Alternatives: do nothing; retain global values and explicitly label them as totals for both budgets.
-Recommendation: approve separately; for now retain values and clarify the global scope in copy. Status: PENDING. Not implemented.
+Recommendation: approve separately; for now retain values and clarify the global scope in copy. Status: APPROVED by the user. Implementation scheduled after visual polish.
 
 Only reply with IDs to approve these, e.g. approve P1; reject P2. Visual styling and the expressly requested language support continue independently. No HIGH IMPACT proposal is needed.

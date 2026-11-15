@@ -1,3 +1,4 @@
+import { errorMessage } from "../i18n";
 import { AlertTriangle, CheckCircle2, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Modal } from "./Primitives";
@@ -135,7 +136,7 @@ export function LedgerDialogs({
           {deleteError && (
             <div role="alert" className="notice error">
               <AlertTriangle size={20} aria-hidden="true" />
-              <p>{tr(deleteError)}</p>
+              <p>{errorMessage(deleteError)}</p>
             </div>
           )}
           <div className="button-pair dialog-actions">

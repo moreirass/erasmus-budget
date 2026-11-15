@@ -1,3 +1,4 @@
+import { errorMessage } from "../i18n";
 import {
   AlertTriangle,
   ArrowLeftRight,
@@ -130,7 +131,7 @@ export function ExchangePanel({
       {fx.error && (
         <p className="form-error" role="alert">
           <AlertTriangle size={18} aria-hidden="true" />
-          {tr(fx.error)}
+          {errorMessage(fx.error)}
         </p>
       )}
       <label className="search">
@@ -883,7 +884,7 @@ export function SettingsForm({
       {error && (
         <p role="alert" className="form-error">
           <AlertTriangle size={18} aria-hidden="true" />
-          {tr(error)}
+          {errorMessage(error)}
         </p>
       )}
       <button className="secondary full">{tr("Save settings")}</button>

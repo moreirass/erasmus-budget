@@ -1,3 +1,4 @@
+import { errorMessage } from "../i18n";
 import { AlertCircle, Repeat2, Star } from "lucide-react";
 import { useState } from "react";
 import {
@@ -205,7 +206,7 @@ export function FavoriteButtons({ data, fx, save }: Props) {
       {error && (
         <p className="form-error" role="alert">
           <AlertCircle size={18} />
-          {tr(error)}
+          {errorMessage(error)}
         </p>
       )}
       {added && (

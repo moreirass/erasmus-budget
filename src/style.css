@@ -4579,3 +4579,155 @@ button {
   padding-top: max(32px, env(safe-area-inset-top));
   padding-bottom: max(24px, env(safe-area-inset-bottom));
 }
+
+/* Calm interface refinement; navigation and data grouping are unchanged. */
+body,
+input,
+select,
+textarea,
+button,
+output {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  text-wrap: balance;
+  line-height: var(--leading-heading);
+}
+p {
+  text-wrap: pretty;
+}
+button:disabled,
+input:disabled,
+select:disabled {
+  opacity: 1;
+  color: var(--disabled);
+  background: var(--low);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+button svg,
+.lucide {
+  stroke-width: 1.75;
+  flex-shrink: 0;
+}
+.panel,
+.balance-card,
+.mini-card,
+.laundry-card,
+.topbar,
+.sidebar,
+.mobile-nav,
+.quick-add {
+  background-image: none;
+  box-shadow: none;
+}
+.panel,
+.balance-card,
+.mini-card,
+.laundry-card {
+  border-radius: var(--radius-lg);
+}
+.transaction-editor section,
+.transaction-editor fieldset {
+  border: 0;
+  background: transparent;
+  padding: var(--space-4) 0;
+  border-radius: 0;
+}
+.balance-number,
+.budget-card h2,
+.laundry-value {
+  white-space: nowrap;
+  font-size: clamp(var(--text-heading), 8vw, var(--text-display));
+  font-weight: 650;
+  letter-spacing: -0.04em;
+}
+.transaction-amount strong,
+.metric dd,
+.legend b {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.amount-hero input {
+  font-size: var(--text-display);
+  font-variant-numeric: tabular-nums;
+}
+.active-term,
+.eyebrow {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.page-heading p {
+  max-width: 64ch;
+}
+.card-kicker,
+.tiny {
+  text-transform: none;
+  letter-spacing: 0;
+}
+.limit-alert,
+.notice.warning {
+  color: var(--text);
+}
+.notice.warning {
+  background: var(--low);
+}
+.group-options button,
+.category-chips button {
+  border-radius: var(--radius);
+}
+.mobile-nav {
+  z-index: var(--layer-nav);
+}
+.topbar {
+  z-index: var(--layer-header);
+}
+.toast,
+.undo-notice {
+  z-index: var(--layer-toast);
+}
+.toast,
+dialog,
+.currency-options {
+  box-shadow: var(--shadow);
+}
+button {
+  transition:
+    transform var(--duration) var(--ease),
+    opacity var(--duration) var(--ease);
+}
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.spin {
+  animation: none;
+}
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+dialog[open],
+.toast,
+.undo-notice {
+  animation: appear var(--duration) var(--ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

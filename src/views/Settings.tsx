@@ -1,3 +1,4 @@
+import { errorMessage } from "../i18n";
 import { useState } from "react";
 import {
   AlertCircle,
@@ -460,7 +461,7 @@ export function SettingsView({
               {authError && (
                 <div className="form-error" role="alert">
                   <AlertCircle size={20} />
-                  <span>{tr(authError)}</span>
+                  <span>{errorMessage(authError)}</span>
                 </div>
               )}
               <p className="help">
@@ -472,7 +473,7 @@ export function SettingsView({
           )}
         </section>
         <section className="panel preferences-panel">
-          <h2>{tr("App preferences")}</h2>
+          <h2>{tr("Appearance & language")}</h2>
           <div className="preference-row">
             <h3>{tr("Appearance")}</h3>
             <div className="segmented" aria-label={tr("Appearance")}>
@@ -560,7 +561,7 @@ export function SettingsView({
           {authError && (
             <div className="form-error" role="alert">
               <AlertCircle size={20} />
-              <span>{tr(authError)}</span>
+              <span>{errorMessage(authError)}</span>
             </div>
           )}
           <div className="button-pair">

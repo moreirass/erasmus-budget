@@ -576,4 +576,28 @@ export const portuguese = {
   "Invalid cloud revision.": "Revisão da cloud inválida.",
   "Your changes have not been saved. Keep editing or discard them.":
     "As alterações ainda não foram guardadas. Continua a editar ou descarta-as.",
+  "Appearance & language": "Aspeto e idioma",
+  "This file is not valid JSON. Choose a Pocket JSON backup or CSV export.":
+    "Este ficheiro não é um JSON válido. Escolhe uma cópia Pocket em JSON ou uma exportação CSV.",
+  "The request could not be completed. Check your connection and configuration, then try again.":
+    "Não foi possível concluir o pedido. Verifica a ligação e a configuração e tenta novamente.",
+  "Reading file…": "A ler ficheiro…",
+  "Preparing download…": "A preparar transferência…",
+  "Download requested": "Transferência pedida",
+  "Totals for both budgets": "Totais dos dois orçamentos",
+  "Budget remaining": "Orçamento disponível",
+  "Search and manage your recorded movements.":
+    "Pesquisa e gere os movimentos registados.",
+  "Review your limits, card and saved data.":
+    "Revê os limites, o cartão e os dados guardados.",
+  "Category spending": "Gastos por categoria",
+  "Recorded spending": "Despesas registadas",
+  "Your first transaction starts here.":
+    "Começa por registar o primeiro movimento.",
+  "{0} of the monthly limit reached": "{0} do limite mensal atingido",
+  "{0} EUR = {1} {2}": "{0} EUR = {1} {2}",
+  "Backup files": "Ficheiros de backup",
+  "Export or restore your records.": "Exporta ou restaura os teus registos.",
+  "This period": "Neste período",
+  "Account and manual sync": "Conta e sincronização manual",
 } as const;

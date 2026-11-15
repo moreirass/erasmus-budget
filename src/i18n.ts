@@ -1,14 +1,18 @@
 import { useSyncExternalStore } from "react";
 import { portuguese } from "./locales/pt.ts";
+import { english } from "./locales/en.ts";
 
 export type Language = "en" | "pt";
 const storageKey = "pocket-language";
 export function readLanguage(): Language {
   try {
-    return localStorage.getItem(storageKey) === "pt" ? "pt" : "en";
-  } catch {
-    return "en";
-  }
+    const saved = localStorage.getItem(storageKey);
+    if (saved === "pt" || saved === "en") return saved;
+  } catch {}
+  return typeof navigator !== "undefined" &&
+    navigator.language?.toLowerCase().startsWith("pt")
+    ? "pt"
+    : "en";
 }
 let language: Language = readLanguage();
 const listeners = new Set<() => void>();
@@ -69,7 +73,11 @@ export function tr(
   message: string,
   values: readonly (string | number)[] = [],
 ): string {
-  if (language === "en") return interpolate(message, values);
+  if (language === "en")
+    return interpolate(
+      (english as Record<string, string>)[message] ?? message,
+      values,
+    );
   if (Object.hasOwn(messages, message))
     return interpolate(messages[message], values);
   if (!values.length) {
@@ -86,7 +94,7 @@ export function kindLabel(kind: string) {
     (
       {
         expense: "Expense",
-        income: "Support",
+        income: "Money received",
         topup: "Top up",
         wash: "Wash",
       } as Record<string, string>
@@ -108,10 +116,39 @@ export function trCount(
   values: readonly [number, ...(string | number)[]],
 ) {
   return tr(
-    values[0] === 1 ? (singularMessages[message] ?? message) : message,
-    values,
+    new Intl.PluralRules(appLocale()).select(values[0]) === "one"
+      ? (singularMessages[message] ?? message)
+      : message,
+    values.map((value) =>
+      typeof value === "number" ? formatNumber(value) : value,
+    ),
   );
 }
 export function displayDate(date: string) {
   return new Date(date + "T12:00:00").toLocaleDateString(appLocale());
+}
+
+export function formatNumber(
+  value: number,
+  options: Intl.NumberFormatOptions = {},
+) {
+  return new Intl.NumberFormat(appLocale(), options).format(value);
+}
+export function formatPercent(value: number) {
+  return formatNumber(value, { style: "percent", maximumFractionDigits: 0 });
+}
+export function errorMessage(message: string) {
+  if (
+    Object.hasOwn(messages, message) ||
+    dynamicMessages.some(({ pattern }) => pattern.test(message))
+  )
+    return tr(message);
+  if (Object.values(messages).includes(message)) return message;
+  if (/JSON|Unexpected token|Unexpected end/i.test(message))
+    return tr(
+      "This file is not valid JSON. Choose a Pocket JSON backup or CSV export.",
+    );
+  return tr(
+    "The request could not be completed. Check your connection and configuration, then try again.",
+  );
 }
