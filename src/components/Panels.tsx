@@ -125,7 +125,11 @@ export function ExchangePanel({
           "Each transaction keeps its rate. This reference may differ from your bank rate. Cached rates are available offline.",
         )}{" "}
       </p>
-      {fx.error && <p className="form-error">{tr(fx.error)}</p>}
+      {fx.error && (
+        <p className="form-error" role="alert">
+          {tr(fx.error)}
+        </p>
+      )}
       <label className="search">
         <Search size={19} />
         <input
@@ -135,6 +139,11 @@ export function ExchangePanel({
           onChange={(e) => setQuery(e.target.value)}
         />
       </label>
+      {!searchCurrencies(fx.currencies, query).length && (
+        <p className="empty-caption" role="status">
+          {tr("No currencies found.")}
+        </p>
+      )}
       <div className="exchange-list">
         {searchCurrencies(fx.currencies, query).map((c) => (
           <button
