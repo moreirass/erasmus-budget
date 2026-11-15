@@ -10,8 +10,9 @@ import {
   Trash2,
   WashingMachine,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { currencyDigits, currencyName, searchCurrencies } from "../fx";
+import { formatAmount } from "../formatAmount";
 import { appLocale, displayDate, kindLabel, tr, trCount } from "../i18n";
 import {
   applyGlobalPlan,
@@ -377,7 +378,11 @@ export function TransactionList({
   remove: (t: Transaction) => void;
   add: () => void;
 }) {
-  const [detail, setDetail] = useState<Transaction | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detail = rows.find((transaction) => transaction.id === detailId);
+  useEffect(() => {
+    if (detailId && !detail) setDetailId(null);
+  }, [detailId, detail]);
   if (!rows.length)
     return (
       <div className="empty-state">
@@ -396,7 +401,10 @@ export function TransactionList({
   return (
     <div className="transactions">
       {detail && (
-        <Modal title={tr("Transaction details")} close={() => setDetail(null)}>
+        <Modal
+          title={tr("Transaction details")}
+          close={() => setDetailId(null)}
+        >
           <dl className="detail-list">
             <dt>{tr("Date")}</dt>
             <dd>{displayDate(detail.date)}</dd>
@@ -405,7 +413,7 @@ export function TransactionList({
               {tr(categories.find((c) => c.id === detail.category)!.name)}
             </dd>
             <dt>{tr("Original amount")}</dt>
-            <dd>{money(detail.amount, detail.currency)}</dd>
+            <dd>{formatAmount(detail.amount, detail.currency)}</dd>
             <dt>
               {tr(detail.kind === "income" ? "Money received" : "Bank outflow")}
             </dt>
@@ -428,7 +436,7 @@ export function TransactionList({
             className="primary full"
             onClick={() => {
               edit(detail);
-              setDetail(null);
+              setDetailId(null);
             }}
           >
             <Pencil size={18} />
@@ -472,7 +480,7 @@ export function TransactionList({
                   <div className="transaction-description">
                     <button
                       className="transaction-title"
-                      onClick={() => setDetail(t)}
+                      onClick={() => setDetailId(t.id)}
                     >
                       {t.note ||
                         (t.kind === "income"
@@ -509,7 +517,7 @@ export function TransactionList({
                       {t.kind === "wash"
                         ? tr("{0} bank outflow", [money(0)])
                         : t.currency !== "EUR"
-                          ? money(t.amount, t.currency)
+                          ? formatAmount(t.amount, t.currency)
                           : t.kind === "income"
                             ? tr("Support received")
                             : tr("Bank outflow")}

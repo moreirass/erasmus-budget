@@ -37,9 +37,13 @@ English is the default language. Open **Settings → Language** and choose **Por
 
 Desktop uses a persistent sidebar, exchange-rate badge and an account/sync status derived from the actual workspace. Mobile uses five navigation controls: Overview, Transactions, a central Add button, Budget, and Settings. Budget and Settings share the same data forms; mobile tabs expose Plan, Exchange rates, Card, Data and Account. Changing pages returns to the top.
 
+The November 15 redesign gives both themes the same semantic palette, readable type scale and consistent controls. Labels are at least 14px, body text is 16px, monetary values use tabular numerals, and interactive controls have 44px minimum targets. At 320px the visible Transactions navigation label becomes Ledger while retaining its full accessible name. Desktop uses two columns where they help scanning; recent activity follows the category guides without leaving a large empty column. See [the design system](docs/DESIGN.md) and [screen/state coverage](docs/COVERAGE.md).
+
 Transactions are shown as day-grouped cards with icons, original-currency amounts, incoming-support styling and each day’s net bank movement (washes excluded). The period summary shows gross spending, support and planned remainder. On desktop, laundry and charts appear alongside the ledger. All metrics are calculated from user data.
 
 The transaction editor is a centered dialog on desktop and a scrolling bottom sheet on mobile. It provides type controls, selectable budget-group cards, category chips, the full currency picker and the existing validation. The rate settings include a searchable reference-rate explorer and a simple EUR converter. Card settings include real laundry history and quick actions.
+
+Select a transaction's title to inspect its date, category, original amount, saved conversion and bank movement before editing. Search with no matches has a separate Clear filters action. Closing a changed transaction, recurring-rule or favourite editor asks whether to keep editing or discard the draft. Deleting a transaction shows its details, validates the card's historical credit, and offers Undo after success. Settings tabs stay above their content, and changing tabs preserves the mounted forms. Appearance, language and alerts are under Account; recurring rules and favourites follow Plan.
 
 The supplied mockups contain illustrative data, campus locations, service hours, cycle prices, performance trends and encryption claims. Those examples are not injected into the app. The app does not claim end-to-end encrypted storage or invent an exchange rate, transaction or cloud-sync result.
 
@@ -170,7 +174,7 @@ After a code update, push the changed files and wait for Vercel to finish deploy
 
 ## Verification
 
-The November 9 feature checks also passed a headless Chrome walkthrough of shortcut opening, remembered entry choices, automatic recurring generation, favorites with undo, alerts and backup reminders at 320, 390, 768 and 1440 px, with isolated browser data and mocked rate responses.
+The November 15 redesign was checked in headless Chrome at 320, 390, 768 and 1440px in both themes, with English and Portuguese layouts. The walkthrough covers entries, details, deletion/undo, recurring rules, favourites, plan edits, backup payloads/import and device preferences. Account and conflict states were rendered with mock callbacks; this does not verify live authentication or multi-device sync.
 
 `npm test` currently runs 48 tests covering accounting, migration, dates, ordering, currencies, backup round trips and platform configuration. `npm run build` checks TypeScript and generates the production app and service worker. See [VERIFICATION.md](VERIFICATION.md) for the checks performed and their limits. The redesign passed a Chrome browser smoke check at 320, 390, 768 and 1440px, including mobile navigation, currency search, card filtering, expense creation/editing and light theme. These checks used isolated test data and mocked rate responses; they are not tests on a physical Android device or live Supabase accounts.
 
@@ -183,9 +187,9 @@ Official references: [Vercel Vite](https://vercel.com/docs/frameworks/frontend/v
 - Production headers include CSP, frame-ancestors/X-Frame-Options and Permissions-Policy. Script execution is restricted to same-origin code. Inline styles support React charts; Google Fonts is allowed explicitly. Connections allow Supabase domains and Frankfurter. For a custom Supabase domain, change connect-src. Narrow the wildcard to your project host if desired. Vercel applies these headers; the development server does not automatically apply them.
 - FX responses remain in localStorage, not service-worker runtime caching. Offline use has previously fetched quotes or manual rates. Login/sync need a connection.
 - JSON/CSV backups are unencrypted plain text: keep them private. Account login does not encrypt exported files.
-- The currency picker supports arrows, Enter and Escape, active-descendant and focus restoration. Transaction deletion uses an app dialog and Undo; restoring an entry validates laundry credit. The logout warning remains a native confirmation.
+- The currency picker supports arrows, Enter and Escape, active-descendant and focus restoration. Transaction deletion uses an app dialog and Undo; restoring an entry validates laundry credit. Sign-out uses an app dialog that explains the state of pending changes.
 - Safe areas cover top, bottom and landscape sides. Supabase is a separate production chunk; this is not lazy loading in every configured guest session.
 - Use `npm run format` and `npm run format:check`. Views are in src/views; the editor and shared panels are in src/components.
-- The manifest/document explicitly identify English as the primary interface language. Portuguese design labels and currency-search aliases remain available; a full PT/EN translation and language selector are not implemented.
+- English is the source language; the existing language selector provides Portuguese (Portugal). New interface messages use the same translation mechanism. User-entered notes and exported field names are not translated.
 
 Consult VERIFICATION.md for the latest checks and dated audit counts; see IMPROVEMENTS.md for the status of each review point.

@@ -1,9 +1,11 @@
 import { AlertTriangle, CheckCircle2, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Modal } from "./Primitives";
+import { UnsavedDialog } from "./UnsavedDialog";
 import { TransactionForm } from "./TransactionEditor";
 import { displayDate, kindLabel, tr } from "../i18n";
-import { money, validateData, type Data, type Transaction } from "../model";
+import { validateData, type Data, type Transaction } from "../model";
+import { formatAmount } from "../formatAmount";
 import type { useExchangeRates } from "../useExchangeRates";
 import type { useLedger } from "../hooks/useLedger";
 
@@ -38,23 +40,12 @@ function EditorDialog({
   close: () => void;
   save: (transaction: Transaction) => void;
 }) {
-  const [dirty, setDirty] = useState(false);
-  const [discard, setDiscard] = useState(false);
-  useEffect(() => {
-    if (!dirty) return;
-    const beforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-    };
-    window.addEventListener("beforeunload", beforeUnload);
-    return () => window.removeEventListener("beforeunload", beforeUnload);
-  }, [dirty]);
   return (
-    <>
-      <Modal
-        title={tr(initial ? "Edit transaction" : "New transaction")}
-        close={() => (dirty ? setDiscard(true) : close())}
-      >
+    <UnsavedDialog
+      title={tr(initial ? "Edit transaction" : "New transaction")}
+      close={close}
+    >
+      {(markDirty) => (
         <TransactionForm
           data={data}
           month={month}
@@ -62,33 +53,10 @@ function EditorDialog({
           initialKind={initialKind}
           fx={fx}
           save={save}
-          onDirtyChange={setDirty}
+          onDirtyChange={markDirty}
         />
-      </Modal>
-      {discard && (
-        <Modal
-          title={tr("Discard unsaved changes?")}
-          close={() => setDiscard(false)}
-        >
-          <div className="notice warning">
-            <AlertTriangle aria-hidden="true" size={20} />
-            <p>
-              {tr(
-                "This transaction has not been saved. Keep editing or discard your changes.",
-              )}
-            </p>
-          </div>
-          <div className="button-pair dialog-actions">
-            <button className="primary" onClick={() => setDiscard(false)}>
-              {tr("Keep editing")}
-            </button>
-            <button className="danger" onClick={close}>
-              {tr("Discard changes")}
-            </button>
-          </div>
-        </Modal>
       )}
-    </>
+    </UnsavedDialog>
   );
 }
 
@@ -156,7 +124,7 @@ export function LedgerDialogs({
               </p>
             </div>
             <strong>
-              {money(pendingDelete.amount, pendingDelete.currency)}
+              {formatAmount(pendingDelete.amount, pendingDelete.currency)}
             </strong>
           </div>
           <p className="help">

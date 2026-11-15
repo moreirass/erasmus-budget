@@ -574,4 +574,6 @@ export const portuguese = {
   "Not synced yet": "Ainda sem sincronização",
   "Invalid backup interval.": "Intervalo de backup inválido.",
   "Invalid cloud revision.": "Revisão da cloud inválida.",
+  "Your changes have not been saved. Keep editing or discard them.":
+    "As alterações ainda não foram guardadas. Continua a editar ou descarta-as.",
 } as const;

@@ -5,16 +5,17 @@ import {
   monthEnd,
   favoriteTransaction,
   makeTransaction,
-  money,
   today,
   type Data,
   type Favorite,
   type Transaction,
 } from "../model";
 import { tr } from "../i18n";
+import { formatAmount } from "../formatAmount";
+import { UnsavedDialog } from "./UnsavedDialog";
 import type { useExchangeRates } from "../useExchangeRates";
 import { TransactionForm } from "./TransactionEditor";
-import { Modal, Field } from "./Primitives";
+import { Field } from "./Primitives";
 type Props = {
   data: Data;
   fx: ReturnType<typeof useExchangeRates>;
@@ -36,7 +37,7 @@ export function FavoriteManager({ data, fx, save }: Props) {
       {(data.favorites ?? []).map((f) => (
         <div className="allocation-total template-row" key={f.id}>
           <span>
-            {f.name} · {money(f.amount, f.currency)}
+            {f.name} · {formatAmount(f.amount, f.currency)}
           </span>
           <div className="button-pair">
             <button onClick={() => setEditing(f)}>{tr("Edit")}</button>
@@ -97,67 +98,70 @@ function FavoriteEditor({
       })
     : undefined;
   return (
-    <Modal title={tr("Favorites")} close={close}>
-      <TransactionForm
-        data={data}
-        month={data.settings.start}
-        initial={initial}
-        initialKind="expense"
-        fx={fx}
-        ruleMode
-        expenseOnly
-        extraFields={
-          <>
-            <Field label={tr("Favorite name")}>
-              <input
-                required
-                maxLength={100}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Field>
-            <Field label={tr("Fixed manual rate (optional)")}>
-              <input
-                type="number"
-                min="0.000000000001"
-                step="any"
-                value={rate}
-                onChange={(e) => setRate(e.target.value)}
-              />
-            </Field>
-            <p className="help">
-              {tr(
-                "Favorites use today's date and their own currency. Leave the rate empty to use cached rates.",
-              )}
-            </p>
-          </>
-        }
-        save={(t) => {
-          const f: Favorite = {
-            id: favorite?.id ?? crypto.randomUUID(),
-            name: name.trim(),
-            amount: t.amount,
-            currency: t.currency,
-            category: t.category,
-            travelType: t.travelType,
-            ...(rate ? { manualRate: Number(rate) } : {}),
-          };
-          if (
-            save(
-              {
-                ...data,
-                favorites: [
-                  ...(data.favorites ?? []).filter((x) => x.id !== f.id),
-                  f,
-                ],
-              },
-              "Favorite saved",
+    <UnsavedDialog title={tr("Favorites")} close={close}>
+      {(markDirty) => (
+        <TransactionForm
+          onDirtyChange={markDirty}
+          data={data}
+          month={data.settings.start}
+          initial={initial}
+          initialKind="expense"
+          fx={fx}
+          ruleMode
+          expenseOnly
+          extraFields={
+            <>
+              <Field label={tr("Favorite name")}>
+                <input
+                  required
+                  maxLength={100}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </Field>
+              <Field label={tr("Fixed manual rate (optional)")}>
+                <input
+                  type="number"
+                  min="0.000000000001"
+                  step="any"
+                  value={rate}
+                  onChange={(e) => setRate(e.target.value)}
+                />
+              </Field>
+              <p className="help">
+                {tr(
+                  "Favorites use today's date and their own currency. Leave the rate empty to use cached rates.",
+                )}
+              </p>
+            </>
+          }
+          save={(t) => {
+            const f: Favorite = {
+              id: favorite?.id ?? crypto.randomUUID(),
+              name: name.trim(),
+              amount: t.amount,
+              currency: t.currency,
+              category: t.category,
+              travelType: t.travelType,
+              ...(rate ? { manualRate: Number(rate) } : {}),
+            };
+            if (
+              save(
+                {
+                  ...data,
+                  favorites: [
+                    ...(data.favorites ?? []).filter((x) => x.id !== f.id),
+                    f,
+                  ],
+                },
+                "Favorite saved",
+              )
             )
-          )
-            close();
-        }}
-      />
-    </Modal>
+              close();
+          }}
+        />
+      )}
+    </UnsavedDialog>
   );
 }
 export function FavoriteButtons({ data, fx, save }: Props) {
@@ -194,7 +198,7 @@ export function FavoriteButtons({ data, fx, save }: Props) {
               }
             }}
           >
-            {f.name} · {money(f.amount, f.currency)}
+            {f.name} · {formatAmount(f.amount, f.currency)}
           </button>
         ))}
       </div>
