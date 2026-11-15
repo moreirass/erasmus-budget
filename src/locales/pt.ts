@@ -1,5 +1,14 @@
 // English source messages are the canonical keys. Keep placeholders unchanged.
 export const portuguese = {
+  Category: "Categoria",
+  Note: "Nota",
+  "Try another search or clear your filters.":
+    "Experimenta outra pesquisa ou limpa os filtros.",
+  "Clear filters": "Limpar filtros",
+  "No matching transactions": "Nenhum movimento encontrado",
+  "Saved exchange rate": "Taxa de câmbio guardada",
+  "Original amount": "Montante original",
+  "Transaction details": "Detalhes do movimento",
   "Period summary": "Resumo do período",
   "Planned remainder": "Saldo planeado",
   "Your plan is ready. Add a transaction when you have one to record.":

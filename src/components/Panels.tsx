@@ -35,7 +35,7 @@ import {
 } from "../model";
 import { CategoryIcon, categoryInfo } from "../ui";
 import { useExchangeRates } from "../useExchangeRates";
-import { Field } from "./Primitives";
+import { Field, Modal } from "./Primitives";
 const toCents = (s: FormDataEntryValue | null) => Math.round(Number(s) * 100);
 export function ExchangePanel({
   fx,
@@ -363,6 +363,7 @@ export function TransactionList({
   remove: (t: Transaction) => void;
   add: () => void;
 }) {
+  const [detail, setDetail] = useState<Transaction | null>(null);
   if (!rows.length)
     return (
       <div className="empty-state">
@@ -380,6 +381,42 @@ export function TransactionList({
     days = [...new Set(ordered.map((t) => t.date))];
   return (
     <div className="transactions">
+      {detail && (
+        <Modal title={tr("Transaction details")} close={() => setDetail(null)}>
+          <dl className="detail-list">
+            <dt>{tr("Date")}</dt>
+            <dd>{displayDate(detail.date)}</dd>
+            <dt>{tr("Category")}</dt>
+            <dd>
+              {tr(categories.find((c) => c.id === detail.category)!.name)}
+            </dd>
+            <dt>{tr("Original amount")}</dt>
+            <dd>{money(detail.amount, detail.currency)}</dd>
+            <dt>{tr("Bank outflow")}</dt>
+            <dd>
+              {detail.kind === "wash"
+                ? money(0)
+                : `${detail.kind === "income" ? "+" : "−"} ${money(detail.eur)}`}
+            </dd>
+            <dt>{tr("Saved exchange rate")}</dt>
+            <dd>
+              1 EUR = {detail.rate} {detail.currency}
+            </dd>
+            <dt>{tr("Note")}</dt>
+            <dd>{detail.note || "—"}</dd>
+          </dl>
+          <button
+            className="primary full"
+            onClick={() => {
+              edit(detail);
+              setDetail(null);
+            }}
+          >
+            <Pencil size={18} />
+            {tr("Edit")}
+          </button>
+        </Modal>
+      )}
       {days.map((day) => (
         <section className="transaction-day" key={day}>
           <h3>
@@ -414,7 +451,10 @@ export function TransactionList({
                     <CategoryIcon category={c.id} travelType={t.travelType} />
                   </span>
                   <div className="transaction-description">
-                    <strong>
+                    <button
+                      className="transaction-title"
+                      onClick={() => setDetail(t)}
+                    >
                       {t.note ||
                         (t.kind === "income"
                           ? tr("Money received")
@@ -423,7 +463,7 @@ export function TransactionList({
                             : t.kind === "wash"
                               ? tr("Laundry wash")
                               : tr(c.name))}
-                    </strong>
+                    </button>
                     <small>
                       {tr(c.name)}
                       {t.category === "travel"
