@@ -1,4 +1,10 @@
-import { Cloud, Download, Wallet } from "lucide-react";
+import {
+  AlertTriangle,
+  Cloud,
+  Download,
+  FileCheck2,
+  Wallet,
+} from "lucide-react";
 import { Modal } from "./Primitives";
 import { tr, trCount } from "../i18n";
 import type { BudgetStore } from "../hooks/types";
@@ -29,17 +35,20 @@ export function DataDialogs({
           title={tr(pendingImport.type)}
           close={() => setPendingImport(null)}
         >
-          <p>
-            {trCount("{0} transactions in the resulting workspace.", [
-              pendingImport.data.transactions.length,
-            ])}
-          </p>
+          <div className="record-summary import-summary">
+            <FileCheck2 size={28} aria-hidden="true" />
+            <p>
+              {trCount("{0} transactions in the resulting workspace.", [
+                pendingImport.data.transactions.length,
+              ])}
+            </p>
+          </div>
           <p className="help">
             {tr(
               "JSON replaces the full workspace, including plans and balances. CSV keeps current settings and merges transactions. Download a backup first if you want to preserve the current version.",
             )}{" "}
           </p>
-          <div className="button-pair">
+          <div className="button-pair dialog-actions">
             <button onClick={exportJSON}>
               <Download size={16} /> {tr("Back up current")}{" "}
             </button>
@@ -55,7 +64,7 @@ export function DataDialogs({
           close={store.dismissConflict}
         >
           <div className="conflict-banner">
-            <Cloud size={23} />
+            <AlertTriangle size={23} aria-hidden="true" />
             <div>
               <span className="tiny">{tr("ACTION REQUIRED")}</span>
               <h3>{tr("Sync conflict")}</h3>
@@ -64,6 +73,22 @@ export function DataDialogs({
                   "This document changed on this device and in the cloud. Choose which version to keep.",
                 )}{" "}
               </p>
+            </div>
+          </div>
+          <div className="conflict-counts">
+            <div>
+              <span>{tr("Local workspace")}</span>
+              <strong>
+                {trCount("{0} transactions", [data.transactions.length])}
+              </strong>
+            </div>
+            <div>
+              <span>{tr("Cloud version")}</span>
+              <strong>
+                {trCount("{0} transactions", [
+                  store.conflict.data.transactions.length,
+                ])}
+              </strong>
             </div>
           </div>
           <p className="help">
@@ -75,7 +100,7 @@ export function DataDialogs({
               ],
             )}
           </p>
-          <div className="export-buttons">
+          <div className="export-buttons conflict-exports">
             <button onClick={exportBothVersions}>
               {tr("Export both versions")}
             </button>
