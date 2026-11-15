@@ -1,3 +1,4 @@
+import { BusyButton } from "../components/Feedback";
 import { errorMessage } from "../i18n";
 import { useState } from "react";
 import {
@@ -89,6 +90,7 @@ export function SettingsView({
   setDark,
   setToast,
 }: SettingsProps) {
+  const [reading, setReading] = useState(false);
   const [sending, setSending] = useState(false);
   const [authMessage, setAuthMessage] = useState("");
   const [authError, setAuthError] = useState("");
@@ -246,33 +248,37 @@ export function SettingsView({
         <section className="panel data-panel">
           <div className="section-heading">
             <div>
-              <h2>{tr("Your data, your way")}</h2>
-              <p>{tr("Keep a copy. Bring it with you.")}</p>
+              <h2>{tr("Backup files")}</h2>
+              <p>{tr("Export or restore your records.")}</p>
             </div>
             <Download size={22} />
           </div>
           <div className="data-actions">
-            <button className="data-action" onClick={exportJSON}>
+            <BusyButton className="data-action" onClick={exportJSON}>
               <Download size={22} />
               <span>
                 <strong>{tr("Full JSON backup")}</strong>
                 <small>{tr("Plans, transactions, rules and favorites")}</small>
               </span>
-            </button>
-            <button className="data-action" onClick={exportCSV}>
+            </BusyButton>
+            <BusyButton className="data-action" onClick={exportCSV}>
               <Download size={22} />
               <span>
                 <strong>{tr("Transactions CSV")}</strong>
                 <small>{tr("Transaction history for a spreadsheet")}</small>
               </span>
-            </button>
+            </BusyButton>
             <button
               className="data-action import-action"
+              disabled={reading}
+              aria-busy={reading}
               onClick={() => fileRef.current?.click()}
             >
               <Upload size={22} />
               <span>
-                <strong>{tr("Import JSON / CSV")}</strong>
+                <strong>
+                  {tr(reading ? "Reading file…" : "Import JSON / CSV")}
+                </strong>
                 <small>{tr("Review the file before making changes")}</small>
               </span>
             </button>
@@ -281,7 +287,17 @@ export function SettingsView({
             type="file"
             ref={fileRef}
             hidden
-            onChange={(e) => readFile(e.target.files?.[0])}
+            disabled={reading}
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              setReading(true);
+              try {
+                await readFile(file);
+              } finally {
+                setReading(false);
+              }
+            }}
           />
           <div className="privacy-note">
             <AlertCircle size={20} />

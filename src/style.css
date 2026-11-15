@@ -4925,3 +4925,20 @@ body:has(.screen-settings) .quick-add {
 .rate-hero .primary {
   min-height: 56px;
 }
+
+.data-actions {
+  gap: var(--space-4);
+}
+.data-action {
+  border-radius: var(--radius);
+}
+.import-action {
+  background: var(--cta);
+  color: var(--on-cta);
+}
+.import-action small {
+  color: inherit;
+}
+.data-action > span {
+  flex-wrap: wrap;
+}

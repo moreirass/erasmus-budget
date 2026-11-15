@@ -1,3 +1,4 @@
+import { BusyButton } from "./Feedback";
 import { useEffect, useState } from "react";
 import { backupDue, parseBackup, type BackupRecord } from "../backups";
 import { tr, appLocale } from "../i18n";
@@ -81,7 +82,7 @@ export function BackupReminder({
           </>
         )}
       </div>
-      <button onClick={exportJSON}>{tr("Full JSON backup")}</button>
+      <BusyButton onClick={exportJSON}>{tr("Full JSON backup")}</BusyButton>
     </div>
   );
 }

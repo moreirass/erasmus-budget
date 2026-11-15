@@ -1,3 +1,4 @@
+import { BusyButton } from "./Feedback";
 import {
   AlertTriangle,
   Cloud,
@@ -49,9 +50,9 @@ export function DataDialogs({
             )}{" "}
           </p>
           <div className="button-pair dialog-actions">
-            <button onClick={exportJSON}>
+            <BusyButton onClick={exportJSON}>
               <Download size={16} /> {tr("Back up current")}{" "}
-            </button>
+            </BusyButton>
             <button className="primary" onClick={confirmImport}>
               {tr("Confirm import")}{" "}
             </button>
@@ -101,13 +102,15 @@ export function DataDialogs({
             )}
           </p>
           <div className="export-buttons conflict-exports">
-            <button onClick={exportBothVersions}>
+            <BusyButton onClick={exportBothVersions}>
               {tr("Export both versions")}
-            </button>
-            <button onClick={exportJSON}>{tr("Export local JSON")}</button>
-            <button onClick={exportCloudVersion}>
+            </BusyButton>
+            <BusyButton onClick={exportJSON}>
+              {tr("Export local JSON")}
+            </BusyButton>
+            <BusyButton onClick={exportCloudVersion}>
               {tr("Export cloud JSON")}{" "}
-            </button>
+            </BusyButton>
           </div>
           <div className="button-pair">
             <button onClick={() => store.resolveConflict("remote")}>
