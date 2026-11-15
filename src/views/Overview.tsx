@@ -52,16 +52,32 @@ export function OverviewView({
   setFilter,
   setGroup,
 }: ViewProps) {
+  const selectedCash = groupCash(stats);
+  const selectedIncome =
+    group === "travel"
+      ? stats.received.travel
+      : group === "daily"
+        ? stats.income - stats.received.travel
+        : stats.income;
+  const fraction = range ? range.days / periodDays(data, month) : 1;
+  const selectedBudget =
+    group === "all"
+      ? stats.budget
+      : Math.round(
+          (group === "travel"
+            ? plan.limits.travel
+            : plan.budget - plan.limits.travel) * fraction,
+        );
   const alerts =
     data.settings.limitAlerts === false ? [] : limitLevels(data, month);
   return (
     <>
       <dl className="metrics" aria-label={tr("Period summary")}>
-        <Metric label={tr("Money out")} value={money(stats.cash)} />
-        <Metric label={tr("Money received")} value={money(stats.income)} />
+        <Metric label={tr("Money out")} value={money(selectedCash)} />
+        <Metric label={tr("Money received")} value={money(selectedIncome)} />
         <Metric
           label={tr("Planned remainder")}
-          value={money(stats.budget + stats.income - stats.cash)}
+          value={money(selectedBudget + selectedIncome - selectedCash)}
         />
       </dl>
       {!stats.rows.length && (

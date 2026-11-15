@@ -26,6 +26,6 @@ Benefit: the headline summary matches the selected context.
 Affects: presentation/grouping, UI tests and translated labels only; uses existing summary values. No model/accounting/storage/backup/sync/schema change.
 Risk: medium (changes interpretation of the headline figures). Effort: S.
 Alternatives: do nothing; retain global values and explicitly label them as totals for both budgets.
-Recommendation: approve separately; for now retain values and clarify the global scope in copy. Status: APPROVED by the user. Implementation scheduled after visual polish.
+Recommendation: approve separately; for now retain values and clarify the global scope in copy. Status: IMPLEMENTED (P2). Summary figures use existing selected-budget values, including week proration.
 
 Only reply with IDs to approve these, e.g. approve P1; reject P2. Visual styling and the expressly requested language support continue independently. No HIGH IMPACT proposal is needed.
