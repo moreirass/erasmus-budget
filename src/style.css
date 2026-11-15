@@ -536,12 +536,10 @@ main {
   height: 100%;
   padding: 0;
   z-index: 2;
+  /* This click target overlays the content; keep it transparent on hover too. */
   background: transparent !important;
   border: 0;
   border-radius: inherit;
-}
-.budget-card-button:hover {
-  background: var(--low) !important;
 }
 .budget-card-button:focus-visible {
   outline-offset: -5px;
