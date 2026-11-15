@@ -1,5 +1,12 @@
 // English source messages are the canonical keys. Keep placeholders unchanged.
 export const portuguese = {
+  "Cloud version": "Versão na nuvem",
+  "Discard changes": "Descartar alterações",
+  "Keep editing": "Continuar a editar",
+  "This transaction has not been saved. Keep editing or discard your changes.":
+    "Este movimento ainda não foi guardado. Continua a editar ou descarta as alterações.",
+  "Discard unsaved changes?": "Descartar alterações por guardar?",
+  "Amount and currency": "Montante e moeda",
   Category: "Categoria",
   Note: "Nota",
   "Try another search or clear your filters.":

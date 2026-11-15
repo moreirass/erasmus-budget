@@ -3740,3 +3740,158 @@ footer {
     padding: 20px 16px;
   }
 }
+
+/* Transaction sheet, including validation and discard/delete states. */
+.transaction-editor .editor-money,
+.transaction-editor .editor-rate,
+.transaction-editor .editor-details {
+  padding: 20px;
+  margin: 20px 0;
+  background: var(--low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.editor-money h3,
+.editor-details h3 {
+  margin-bottom: 16px;
+}
+.transaction-editor .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.editor-money input[type="number"] {
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+.transaction-editor .field-label,
+.transaction-editor .tiny {
+  font-size: 0.875rem;
+}
+.group-choice {
+  gap: 12px;
+}
+.group-choice button {
+  background: var(--low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-width: 0;
+}
+.group-choice button.selected {
+  background: var(--active);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.group-choice b,
+.group-choice strong {
+  font-size: 1.125rem;
+}
+.group-choice small {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.category-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.category-choices button {
+  min-height: 88px;
+  font-size: 0.875rem;
+  padding: 12px 8px;
+  background: var(--low);
+  border: 1px solid var(--border);
+  white-space: normal;
+  text-overflow: clip;
+  overflow: visible;
+}
+.category-choices button span {
+  white-space: normal;
+  font-size: 0.875rem;
+  overflow: visible;
+  text-overflow: clip;
+}
+.category-choices button.selected {
+  background: var(--active);
+  border-color: var(--primary);
+}
+.editor-actions {
+  position: sticky;
+  bottom: -24px;
+  padding: 16px 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 4;
+}
+.editor-actions button {
+  min-height: 52px;
+}
+.record-summary,
+.import-summary {
+  padding: 20px;
+  background: var(--low);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+.dialog-actions > button {
+  flex: 1 1 150px;
+}
+fieldset {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin: 24px 0;
+}
+legend {
+  padding: 0 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.currency-options {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.currency-results button {
+  min-height: 52px;
+  font-size: 0.875rem;
+}
+.currency-results .keyboard-active {
+  background: var(--active);
+  outline: 2px solid var(--primary);
+}
+.currency-results button span {
+  white-space: normal;
+}
+@media (max-width: 767px) {
+  .transaction-editor .editor-money,
+  .transaction-editor .editor-rate,
+  .transaction-editor .editor-details {
+    padding: 16px;
+  }
+  .transaction-editor .segmented {
+    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .transaction-editor .segmented button {
+    padding: 10px 6px;
+  }
+  .transaction-editor .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .editor-actions {
+    bottom: -20px;
+  }
+}
