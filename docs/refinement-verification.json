@@ -44,7 +44,8 @@
     "Language selector preserves page scroll",
     "Language persisted after reload",
     "Animated dialog cancellation restores interaction",
-    "Reduced motion disables dialog animation"
+    "Reduced motion disables dialog animation",
+    "Final mobile filters and add action reviewed"
   ],
   "browserErrors": [],
   "limitations": [
