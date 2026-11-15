@@ -262,6 +262,11 @@ export function LaundryPanel({
         </span>
       </div>
       <div className="laundry-value">{money(stats.card, "CZK")}</div>
+      {stats.card === 0 && (
+        <p className="card-empty-note">
+          {tr("No card credit. Add a top-up before recording a wash.")}
+        </p>
+      )}
       <p>
         {tr("Accumulated card credit. Washes use the balance already loaded.")}
       </p>
