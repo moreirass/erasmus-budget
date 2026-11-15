@@ -2873,3 +2873,133 @@ h3 {
     scroll-behavior: auto !important;
   }
 }
+
+/* Shared containers and dialogs. */
+.empty-state {
+  padding: 32px 20px;
+  background: var(--low);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  min-height: 0;
+}
+.empty-mark {
+  color: var(--primary);
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+.empty-state p {
+  font-size: 1rem;
+  margin: 8px auto 20px;
+  max-width: 38ch;
+}
+.empty-state h3 {
+  font-size: 1.125rem;
+}
+.empty-state > span {
+  background: var(--surface);
+  color: var(--primary);
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 24px;
+  padding: 20px 0;
+  border-block: 1px solid var(--border);
+}
+.metric {
+  min-width: 0;
+}
+.metric dt {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.metric dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+  font-size: clamp(1.125rem, 2vw, 1.65rem);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+dialog {
+  width: min(660px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  padding: 24px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+dialog::backdrop {
+  background: var(--overlay);
+  backdrop-filter: blur(4px);
+}
+.modal-head {
+  margin-bottom: 24px;
+  gap: 12px;
+}
+.modal-head h2 {
+  font-size: 1.375rem;
+}
+.modal-head .icon-button {
+  min-width: 44px;
+}
+.button-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.button-pair > button {
+  flex: 1 1 120px;
+}
+.segmented {
+  padding: 4px;
+  gap: 4px;
+  background: var(--low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.segmented button {
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  min-height: 44px;
+}
+.segmented button.selected {
+  background: var(--active);
+  color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: none;
+}
+.search {
+  border: 1px solid var(--border);
+  background: var(--low);
+  min-height: 48px;
+  border-radius: var(--radius-sm);
+}
+.search input {
+  font-size: 1rem;
+  background: transparent;
+  border: 0;
+}
+@media (max-width: 767px) {
+  dialog {
+    margin: auto 0 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - env(safe-area-inset-top) - 16px);
+    padding: 20px max(16px, env(safe-area-inset-right))
+      calc(24px + env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+    border-radius: 20px 20px 0 0;
+  }
+  .metrics {
+    gap: 10px;
+  }
+  .metric dt {
+    min-height: 42px;
+  }
+}
