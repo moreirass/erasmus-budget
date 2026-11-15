@@ -4801,3 +4801,21 @@ body:has(.screen-settings) .quick-add {
 .balance-footer {
   gap: var(--space-3);
 }
+
+.transaction-stream {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+.transaction {
+  border-radius: 0;
+}
+.transaction-title {
+  font-weight: 600;
+}
+.detail-list {
+  gap: var(--space-3);
+}
+.detail-list dd {
+  font-variant-numeric: tabular-nums;
+}

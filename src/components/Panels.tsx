@@ -1,3 +1,4 @@
+import { formatNumber, formatPercent } from "../i18n";
 import { errorMessage } from "../i18n";
 import {
   AlertTriangle,
@@ -355,14 +356,14 @@ export function SpendingChart({ spent }: { spent: Record<Category, number> }) {
                 {tr(c.name)}
                 <b>
                   {money(spent[c.id])}
-                  <small>{Math.round((spent[c.id] / total) * 100)}%</small>
+                  <small>{formatPercent(spent[c.id] / total)}</small>
                 </b>
               </div>
             ))}
         </div>
       ) : (
         <p className="empty-caption">
-          {tr("Your story starts with your first expense.")} <br />
+          {tr("Your first transaction starts here.")} <br />
           {tr("No spending recorded yet.")}{" "}
         </p>
       )}
@@ -392,7 +393,7 @@ export function TransactionList({
         <span>
           <ArrowLeftRight size={26} />
         </span>
-        <h3>{tr("A fresh page for your adventures.")}</h3>
+        <h3>{tr("Your first transaction starts here.")}</h3>
         <p>{tr("No transactions in this view.")}</p>
         <button className="text-button" onClick={add}>
           <Plus size={16} /> {tr("Add expense")}{" "}
@@ -427,7 +428,7 @@ export function TransactionList({
             </dd>
             <dt>{tr("Saved exchange rate")}</dt>
             <dd>
-              1 EUR = {detail.rate}{" "}
+              1 EUR = {formatNumber(detail.rate, { maximumFractionDigits: 12 })}{" "}
               {detail.kind === "topup" || detail.kind === "wash"
                 ? "CZK"
                 : detail.currency}
