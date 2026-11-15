@@ -73,16 +73,7 @@ export function AppLayout({
             Pocket<small>{tr("Your Erasmus Companion")}</small>
           </span>
         </a>
-        <div className="active-term">
-          <MapPin size={17} />
-          <div>
-            <span>{tr("ACTIVE TERM")}</span>
-            <strong>
-              Erasmus · {data.settings.start.slice(0, 4)}/
-              {data.settings.end.slice(2, 4)}
-            </strong>
-          </div>
-        </div>
+
         <nav aria-label={tr("Main navigation")}>
           {[
             { name: "Overview", icon: LayoutDashboard },
@@ -186,10 +177,7 @@ export function AppLayout({
               <span className="brand-icon">
                 <Wallet size={22} />
               </span>
-              <span>
-                Pocket <em>Erasmus+</em>
-                <small>ERASMUS · OSTRAVA</small>
-              </span>
+              <span>Pocket</span>
             </span>
           </div>
           <div className="header-actions">
@@ -299,16 +287,10 @@ export function AppLayout({
               </h1>
               <p>
                 {tab === "Overview"
-                  ? tr(
-                      "A clear view of your money. More headspace for Erasmus.",
-                    )
+                  ? tr("Budget remaining")
                   : tab === "Transactions"
-                    ? tr(
-                        "Every coffee, train ride and laundry day, in one place.",
-                      )
-                    : tr(
-                        "Your monthly budgets, laundry credit and data — all in your hands.",
-                      )}
+                    ? tr("Search and manage your recorded movements.")
+                    : tr("Review your limits, card and saved data.")}
               </p>
             </div>
           </div>

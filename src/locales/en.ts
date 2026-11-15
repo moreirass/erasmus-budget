@@ -1,4 +1,3 @@
-// English source catalog. Key parity is enforced by tests.
 export const english = {
   Ledger: "Ledger",
   "No card credit. Add a top-up before recording a wash.":
@@ -576,4 +575,7 @@ export const english = {
   "Export or restore your records.": "Export or restore your records.",
   "This period": "This period",
   "Account and manual sync": "Account and manual sync",
+  "This entry keeps its saved rate from {0}.":
+    "This entry keeps its saved rate from {0}.",
+  "This entry keeps its saved rate.": "This entry keeps its saved rate.",
 } as const;

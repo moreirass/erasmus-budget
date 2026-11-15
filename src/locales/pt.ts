@@ -600,4 +600,7 @@ export const portuguese = {
   "Export or restore your records.": "Exporta ou restaura os teus registos.",
   "This period": "Neste período",
   "Account and manual sync": "Conta e sincronização manual",
+  "This entry keeps its saved rate from {0}.":
+    "Este movimento mantém a taxa guardada de {0}.",
+  "This entry keeps its saved rate.": "Este movimento mantém a taxa guardada.",
 } as const;
