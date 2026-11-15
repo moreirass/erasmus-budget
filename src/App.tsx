@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { Info, AlertCircle, X } from "lucide-react";
 import { BackupReminder } from "./components/BackupReminder";
 import { FavoriteButtons } from "./components/Favorites";
 import { RecurringOverview } from "./components/Recurring";
@@ -115,6 +115,7 @@ export default function App() {
           <DataDialogs {...transfer} store={store} />
           {toast && (
             <div className="toast" role="status">
+              <Info size={20} aria-hidden="true" />
               {tr(toast)}
               <button
                 onClick={() => setToast("")}
@@ -152,6 +153,7 @@ export default function App() {
       )}
       {store.error && (
         <div role="alert" className="notice error">
+          <AlertCircle size={20} aria-hidden="true" />
           {tr(store.error)}
           <button
             onClick={() => store.setError("")}

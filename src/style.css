@@ -4309,3 +4309,78 @@ legend {
 .data-panel .notice input {
   max-width: 160px;
 }
+
+/* Account and preferences: honest status, explicit manual actions. */
+.account-identity {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 20px 0;
+  overflow-wrap: anywhere;
+}
+.account-identity svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.account-identity strong,
+.account-identity small {
+  display: block;
+}
+.account-sync-state {
+  padding: 16px;
+  background: var(--low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 16px 0;
+}
+.account-sync-state p,
+.account-sync-state small {
+  font-size: 0.875rem;
+}
+.preferences-panel h2 {
+  margin-bottom: 24px;
+}
+.preference-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.preference-row > div {
+  flex: 1 1 180px;
+}
+.preference-row select {
+  width: auto;
+  max-width: 100%;
+}
+.check-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 0;
+  font-size: 1rem;
+}
+.check-field input {
+  margin-top: 2px;
+}
+.sync-panel .form-error,
+.sync-panel .notice {
+  margin-top: 16px;
+}
+.sync-status {
+  color: var(--primary);
+}
+.conflict-banner {
+  background: var(--gold-bg);
+  color: var(--gold);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: var(--radius);
+  gap: 12px;
+}
+.conflict-banner p {
+  color: var(--text);
+}
