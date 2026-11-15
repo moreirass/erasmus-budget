@@ -17,7 +17,7 @@ Benefit: navigation does not silently discard a draft.
 Affects: navigation/form behaviour and tests; bilingual discard/restore copy if required. No accounting, storage key, backup, sync or schema change.
 Risk: medium (stale drafts after external data updates). Effort: M.
 Alternatives: do nothing; warn before leaving instead.
-Recommendation: approve separately after the visual work. Status: APPROVED by the user. Implementation scheduled after visual polish.
+Recommendation: approve separately after the visual work. Status: IMPLEMENTED (P1); screen remains mounted, drafts survive page navigation. External saved-data changes still reset forms to the latest committed data.
 
 ## P2 — Scope the Overview summary to the selected budget
 Problem: Overview.tsx global spending/support/remainder metrics stay global while category charts filter to Day to day or Travel.

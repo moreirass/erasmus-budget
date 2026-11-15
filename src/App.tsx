@@ -213,7 +213,7 @@ export default function App() {
         </>
       )}
       {tab === "Transactions" && <TransactionsView {...viewProps} />}
-      {isSettings && (
+      <div hidden={!isSettings}>
         <SettingsView
           {...viewProps}
           {...settings}
@@ -228,7 +228,7 @@ export default function App() {
           setLanguage={prefs.setLanguage}
           setToast={setToast}
         />
-      )}
+      </div>
     </AppLayout>
   );
 }
