@@ -1,79 +1,74 @@
-# Redesign coverage — 15 November 2026
+# UI refinement coverage
 
-Branch: `codex/calm-pocket-redesign`. Base: `240efd2`.
+Branch: codex/pocket-ui-language. Base: ae629f2. The PT/EN selector already existed; this update completes device-language defaults, catalog parity and localized field feedback. Financial notes, brand names, currency codes and backup field names intentionally remain unchanged. No known app-owned interface label remains untranslated; unknown service diagnostics use a localized generic error.
 
-**Done** means the interface exists and was rendered in Chrome, including isolated fixtures where a live account or unusual state was needed. It does not mean physical-device or live-service certification. **Partial** identifies an explicit verification gap. No financial fixtures are bundled into the application; browser checks used separate disposable storage and mocked reference-rate responses.
+## Screen and state coverage
 
-## Screens and states
+Done means implemented and rendered; mock account/PWA states are distinguished from live infrastructure. No fixture records or quotes are bundled into the app.
 
-| Screen       | State or action                                                               | Status | Evidence / boundary                                                                                                             |
-| ------------ | ----------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| Navigation   | Five mobile controls, desktop sidebar, rate and workspace badges              | Done   | 320, 390, 768 and 1440px; navigation actions exercised.                                                                         |
-| Overview     | Month/week selection; Day to day, Travel and Both                             | Done   | All variants rendered; filtering and navigation exercised.                                                                      |
-| Overview     | Spending, money received, planned remainder, selected budget cards            | Done   | Existing summary values; selected card toggles back to Both.                                                                    |
-| Overview     | Category guides, 80%/100% indicators, charts with numeric legends             | Done   | Threshold fixture, labels and values rendered; no colour-only alert.                                                            |
-| Overview     | Recent activity and first-use empty state                                     | Done   | Populated and isolated empty workspaces rendered.                                                                               |
-| Overview     | Favourites, pending recurring occurrences, laundry, backup reminder           | Done   | Launch/undo, confirm/edit/ignore, top-up/wash and reminder controls exercised.                                                  |
-| Transactions | Day groups, daily net bank movement, original amounts                         | Done   | Daily totals retain the model's exclusion of washes from bank movement.                                                         |
-| Transactions | Search, group/category filters, empty and no-results states                   | Done   | No-results has a distinct Clear filters action.                                                                                 |
-| Transactions | Read-only detail and edit handoff                                             | Done   | Focus restoration, original three-decimal currency amounts, live row refresh/removal and opening the editor checked.            |
-| Transactions | Delete confirmation and Undo                                                  | Done   | Entry restored through existing validation; delete summary shows original currency.                                             |
-| Editor       | Expense, Money received, Card top-up and Wash; add/edit                       | Done   | All four kinds saved through the production form and unchanged accounting.                                                      |
-| Editor       | Amount/currency/date, budget cards, categories, note, rate and EUR equivalent | Done   | Bottom sheet/mobile and centred dialog/desktop; no clipped amounts.                                                             |
-| Editor       | Searchable currency picker, keyboard selection, manual rate                   | Done   | Arrows/Enter and manually entered conversion exercised.                                                                         |
-| Editor       | Validation and insufficient historical card credit                            | Done   | Invalid wash rejected and inline error rendered.                                                                                |
-| Editor       | Unsaved changes, Keep editing, Discard, successful save                       | Done   | Manual, favourite, recurring-rule and pending-occurrence guard actions and save bypass exercised.                               |
-| Editor       | Saved and monthly-limit notifications                                         | Done   | Existing notifications retained with icons and accessible text.                                                                 |
-| Budget       | Monthly total/category distribution, month/scope, saved feedback              | Done   | Plan changed and saved; selected month remains selected.                                                                        |
-| Budget       | Replacement warning and invalid distribution                                  | Done   | Following-month warning rendered; mismatch shows feedback and disables Save.                                                    |
-| Budget       | Tracking period, first tracked day, opening balances                          | Done   | Settings rendered; invalid tracking change rejected. Existing model tests retained.                                             |
-| Recurring    | Rule list, empty state, create/edit/delete, schedule/mode                     | Done   | Rule creation, edit and deletion exercised; generated entries unchanged.                                                        |
-| Recurring    | Pending occurrence Confirm/edit/Ignore and automatic Undo                     | Done   | Production components rendered and callbacks exercised.                                                                         |
-| Favourites   | List/empty, create/edit/delete, use/Undo, missing rate                        | Done   | All actions exercised with isolated records.                                                                                    |
-| Laundry      | Balance, history, opening credit and quick actions                            | Done   | Real fixture history displayed; no assumed wash prices or hours.                                                                |
-| Laundry      | Insufficient and blocked-change errors                                        | Done   | Invalid wash rejected; deleting a consumed top-up shows an error and preserves the record.                                      |
-| Exchange     | Searchable currencies, converter, published/fetched dates                     | Done   | Mocked reference response; search and conversion exercised.                                                                     |
-| Exchange     | Refreshing, cached/offline, error and missing rate                            | Done   | Held/failed mock responses render refreshing/error and missing quote; cached fixture renders offline.                           |
-| Data         | JSON/CSV export and reminder interval                                         | Done   | Export Blob contents inspected; disk download completion not checked.                                                           |
-| Data         | Import preview, cancellation, confirmation, duplicates, invalid file          | Done   | Invalid content rejected; duplicate-free CSV merge and preview actions exercised.                                               |
-| Account      | Unconfigured local mode and email-link request/success                        | Done   | Production settings rendered with mock OTP; real email delivery not tested.                                                     |
-| Account      | Pending changes, syncing, synced, offline, error                              | Done   | Production settings rendered with isolated store fixtures in both themes.                                                       |
-| Account      | Conflict; Export both, Keep local, Use cloud                                  | Done   | Both versions displayed and callbacks exercised. Existing sync protocol tests pass; no live cloud write.                        |
-| Account      | Sign-out confirmation                                                         | Done   | Dialog and Cancel exercised with pending-change fixture.                                                                        |
-| Settings     | Dark/light, English/Portuguese, limit alerts                                  | Done   | Theme/language changes persist on reload; preferences rendered.                                                                 |
-| Settings     | Offline notice                                                                | Done   | Offline UI state rendered; no service-worker offline navigation test.                                                           |
-| Settings     | Update available, save-open-forms warning, Reload & update                    | Done   | Actual App renders with mocked PWA hook; warning and reload callback checked. Real service-worker lifecycle remains unverified. |
+| Screen/state                                                            | Status      | Evidence                                                                                                   |
+| ----------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------- |
+| Overview: month/week, Day to day/Travel/Both, figures/cards             | Done        | Browser matrix and selected-budget assertions (P2).                                                        |
+| Categories,80%/100%,numeric chart legends,recent activity               | Done        | Existing threshold fixtures and localized matrix.                                                          |
+| First-use,favourites,pending occurrences,laundry,backup reminder        | Done        | Empty/fixture flows; actions retained.                                                                     |
+| Transactions: daily groups/net movement,search/filters,empty/no-results | Done        | Browser matrix; washes excluded by unchanged accounting.                                                   |
+| Detail,edit,delete/Undo                                                 | Done        | Existing workflow checks; precision retained.                                                              |
+| Newest addition first within day; recorded time                         | Done        | Unit round trips, ordering assertions and browser save/detail assertions. Legacy unknown time is explicit. |
+| Editor: expense,received,top-up,wash; add/edit                          | Done        | Existing production forms with new time field.                                                             |
+| Currency/date/time/group/category/note/rate/EUR equivalent              | Done        | Keyboard picker and saved input preservation; EN/PT.                                                       |
+| Validation,insufficient credit,unsaved choices,success/limit alerts     | Done        | Existing guard/credit tests; localized native validation.                                                  |
+| Budget:total,distribution,scope,replacement/error/success,tracking      | Done        | Form checks; navigation retains drafts (P1).                                                               |
+| Recurring rules:create/edit/delete; Confirm/edit/Ignore; automatic Undo | Done        | Existing workflows retained; schedule dates localized.                                                     |
+| Favourites:list/empty/create/edit/delete/use/Undo/missing rate          | Done        | Existing workflows; new quick entries record time.                                                         |
+| Laundry:balance/history/opening credit/blocked changes                  | Done        | Existing credit tests and blocked top-up fixture.                                                          |
+| Rates:search/converter/refresh/cache/offline/error/missing              | Done        | Mocked network; skeleton and last values retained.                                                         |
+| Data:JSON/CSV export/import/preview/duplicates/invalid/reminder         | Done        | Unit compatibility and browser stable-size reading/export feedback.                                        |
+| Account:local/email-link/pending/syncing/synced/offline/error           | Done (mock) | Real components with mock account/network callbacks.                                                       |
+| Conflict:Export both/Keep local/Use cloud; sign-out                     | Done (mock) | Existing callback/confirmation checks. Live server not tested.                                             |
+| Appearance/language/alerts/offline/update/open-form warning             | Done        | Matrix, preference persistence and mocked PWA state.                                                       |
+| Physical install,real service-worker lifecycle,live Supabase            | Partial     | Not exercised in this environment.                                                                         |
 
-## Delivery checkpoints
+## Twenty UI rules
 
-Every implementation checkpoint ran formatting, **48/48 tests** and the production TypeScript/Vite/PWA build successfully before committing. Subsequent focused checks address changes made after the broad browser pass.
+The brief's related typography and state bullets are grouped into20 review rows.
 
-The broad browser run contains 209 layout/state samples and 20 workflow groups. Follow-up checks cover 6 updated Overview/editor layouts, settled account contrast/focus restoration, and a final 13 workflow groups with 8 additional rendered-state samples. No requested interface is missing. Live-service, physical-device and service-worker lifecycle verification remains outstanding as described below.
+| Rule                                               | Where applied                                                            | Status                                                                       |
+| -------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| 1 Remove filler badges                             | AppLayout,empty marks,term/mobile branding                               | Done                                                                         |
+| 2 Remove redundant labels                          | Page introductions,data headings,editor rate copy                        | Done                                                                         |
+| 3 Specific headlines                               | Category spending,backup files,account/manual sync                       | Done                                                                         |
+| 4 Balanced headings;unbroken amounts               | Shared CSS,metrics,rows,budget cards                                     | Done                                                                         |
+| 5 Defined type scale and fonts                     | tokens.css;14/16/20/24/32/48scale                                        | Done                                                                         |
+| 6 No decorative italics/bold/monospace             | Shared body/value fonts and branding                                     | Done                                                                         |
+| 7 Tabular locale-aware numbers                     | Values,rates,percentages,dates,time                                      | Done                                                                         |
+| 8 AA contrast/readable secondary and disabled text | Dark/light tokens;computed text checks including disabled controls       | Done in sampled states                                                       |
+| 9 Primary task gets visual weight                  | Remaining figures,editor amount,laundry credit                           | Done                                                                         |
+| 10 Group through spacing;reduce nested boxes       | Plan/editor/template panels;spacing scale                                | Done                                                                         |
+| 11 Optical alignment                               | Lucide normalization;rendered screenshots                                | Done                                                                         |
+| 12 Nested radius rule                              | Surface tokens and inner-panel/fieldset overrides                        | Done: nested surfaces and segmented controls derive inner radii from padding |
+| 13 Semantic token system                           | Colours,type,motion,layers;layout geometry remains in CSS                | Done                                                                         |
+| 14 One mint accent;semantic gold                   | Actions/selection/focus;currency/laundry;green chart palette             | Done                                                                         |
+| 15 One dominant CTA;distinct destructive action    | Page/modal styles;confirmed deletion and sign-out                        | Done                                                                         |
+| 16 Consistent icons/accessible names               | Lucide16/20/24,1.75stroke;existing aria labels                           | Done                                                                         |
+| 17 No embellishments                               | No gradients/glows/illustrations;floating elevation only                 | Done                                                                         |
+| 18 Async loading feedback                          | BusyButton,Skeleton,file reading,FX,sync,email                           | Done; browser controls disk download completion                              |
+| 19 Empty/error/offline/success states              | Existing screens plus localized fallback diagnostics                     | Done                                                                         |
+| 20 Useful motion/reduced motion                    | Transform bars,press,dialog/toast entry,optional native exit transitions | Done; browsers without View Transitions close immediately                    |
 
-| Step                               | Commit    | Main files                                                                            | Result |
-| ---------------------------------- | --------- | ------------------------------------------------------------------------------------- | ------ |
-| Tokens/base                        | `ca3a138` | `src/tokens.css`, `src/style.css`, `docs/DESIGN.md`                                   | Pass   |
-| Shared components                  | `7c9922e` | `src/components/Primitives.tsx`, styles                                               | Pass   |
-| Layout/navigation                  | `d17c3bd` | `AppLayout.tsx`, `PeriodControls.tsx`, translations/styles                            | Pass   |
-| Overview                           | `378581a` | `src/views/Overview.tsx`, `Panels.tsx`, translations/styles                           | Pass   |
-| Transactions                       | `a92a10a` | `src/views/Transactions.tsx`, `Panels.tsx`, translations/styles                       | Pass   |
-| Editor                             | `c638bf0` | `TransactionEditor.tsx`, `LedgerDialogs.tsx`, translations/styles                     | Pass   |
-| Budget/settings navigation         | `78b111e` | `src/views/Settings.tsx`, `src/App.tsx`, translations/styles                          | Pass   |
-| Recurring/favourites               | `40916cd` | `Recurring.tsx`, `Favorites.tsx`, translations/styles                                 | Pass   |
-| Laundry                            | `11e9df6` | `Panels.tsx`, translations/styles                                                     | Pass   |
-| Exchange                           | `5d870e2` | `Panels.tsx`, styles                                                                  | Pass   |
-| Data                               | `2e285f2` | `DataDialogs.tsx`, styles                                                             | Pass   |
-| Account/preferences                | `6dcfd63` | `Settings.tsx`, `App.tsx`, styles                                                     | Pass   |
-| Theme/accessibility polish         | `bf31fe5` | tokens, styles, navigation/translations                                               | Pass   |
-| Overview columns/detail correction | `4814cae` | `Overview.tsx`, `Panels.tsx`, styles                                                  | Pass   |
-| Precision/shared discard guard     | `870ac28` | `formatAmount.ts`, `UnsavedDialog.tsx`, ledger/recurring/favourite components, README | Pass   |
+## Proposals
 
-## Limits and review
+| ID  | Change                                           | Impact                                                    | Recommendation           | Status                                       |
+| --- | ------------------------------------------------ | --------------------------------------------------------- | ------------------------ | -------------------------------------------- |
+| P1  | Preserve settings drafts across pages            | UI lifecycle;no persisted format change                   | Keep                     | Approved and implemented,e2f8564             |
+| P2  | Scope Overview summary to selected budget        | Presentation only;existing summary values                 | Keep                     | Approved and implemented,ce6b1ea             |
+| P3  | Latest addition first and optional recorded time | HIGH IMPACT:metadata validation/comparator and CSV column | Keep;update both devices | Explicitly requested and implemented,f9e5d46 |
 
-Review screenshots: [dark mobile Overview](previews/overview-dark-mobile.png), [light desktop Overview](previews/overview-light-desktop.png), [mobile editor](previews/editor-dark-mobile.png). These contain isolated QA records and mocked rates only. They are documentation, not preloaded application data.
+P3 compatibility/rollback is documented in PROPOSALS.md. Amounts,exchange conversion,allocation,credit-validation rules,storage keys,sync protocol and Supabase schema are unchanged. P1 preserves drafts across navigation, not across a browser reload; committed external changes still reset forms to the latest saved data.
 
-- Accounting, hooks, persistence, sync, backup formats, exchange-rate retrieval, Supabase schema, package manifests and lockfile have no diff from the base commit.
-- Browser checks used Chrome with production headers and CSP, mocked Frankfurter responses and blocked service workers. Account fixtures render the real components but substitute authentication/network callbacks.
-- Computed text-contrast sampling, target/font sizes, amounts and overflow were inspected. This is not a full screen-reader audit or accessibility certification. No physical Android/iOS device or notch/landscape device was available.
-- No real Supabase authentication, cross-account RLS test, two-device network sync or conflict was performed. No changes were pushed or deployed.
-- See [VERIFICATION.md](../VERIFICATION.md) for test details and historical checks. Dependency audit counts are dated; no new audit or dependency upgrade is claimed for this UI work.
+## Step record
+
+Every implementation commit passed tests and production build. Initial language work increased48tests to50; time/ordering coverage increased50to52. Commit history contains the ordered screen refinements and separate proposal commits. Review source with git diff ae629f2..HEAD. Screenshot fixtures are explicitly QA-only; compare docs/previews with the current files referenced in VERIFICATION.md.
+
+## Remaining verification
+
+No physical Android/iOS install,real offline SW navigation/update,live email delivery,live two-device sync or full assistive-technology certification. Localhost preview HTTP was blocked/timed out in this environment; Chrome QA served the built assets by same-origin interception with production CSP. No GitHub push or deployment was performed. Figma was not supplied a file/node destination; no external design file or new hosted Site was created.

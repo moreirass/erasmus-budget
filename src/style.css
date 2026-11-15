@@ -5025,3 +5025,27 @@ body:has(.screen-settings) .quick-add {
 .empty-mark {
   display: none;
 }
+/* Nested surfaces derive their radius from the enclosing surface padding. */
+.panel,
+.balance-card,
+.mini-card,
+dialog {
+  --inner-radius: max(0px, calc(var(--radius-lg) - var(--space-4)));
+}
+dialog {
+  border-radius: var(--radius-lg);
+}
+.panel .notice,
+.panel .data-action,
+dialog .amount-hero,
+.balance-card .track,
+.balance-card .track > span {
+  border-radius: var(--inner-radius);
+}
+.segmented {
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
+}
+.segmented button {
+  border-radius: calc(var(--radius-lg) - var(--space-1));
+}

@@ -33,7 +33,7 @@ This separation preserves the existing interface, storage keys, backup format, s
 
 ## Interface and navigation
 
-English is the default language. Open **Settings → Language** and choose **Português (Portugal)** to switch immediately. The device remembers the choice across reloads and shares it between open tabs. Navigation, forms, categories, app messages, currency names, dates and amounts follow the selected language. Personal notes, financial values and JSON/CSV field names remain unchanged. Translations live in `src/locales/pt.ts`, with English source messages as keys.
+On first launch, a Portuguese device language selects Português (Portugal); other device languages select English. A saved choice always takes priority. Open **Settings → Appearance & language** and choose **Português (Portugal)** to switch immediately. The device remembers the choice across reloads and shares it between open tabs. Navigation, forms, categories, app messages, currency names, dates and amounts follow the selected language. Personal notes, financial values and JSON/CSV field names remain unchanged. Translations live in `src/locales/pt.ts`, with English source messages as keys.
 
 Desktop uses a persistent sidebar, exchange-rate badge and an account/sync status derived from the actual workspace. Mobile uses five navigation controls: Overview, Transactions, a central Add button, Budget, and Settings. Budget and Settings share the same data forms; mobile tabs expose Plan, Exchange rates, Card, Data and Account. Changing pages returns to the top.
 
@@ -104,9 +104,9 @@ On 3 November 2026 the service returned 165 searchable non-crypto currencies. Co
 
 Rates and catalog are cached separately from the financial document, so refreshes do not create Supabase conflicts. Offline entries can use cached rates; without a rate you must enter one manually. Each entry saves its currency, EUR conversion, rate and optional publication/source metadata. Editing starts with the entry’s saved rate, preserving historical valuations. Foreign amounts use currency-specific integer minor units (JPY has no fractional digits, KWD has three). Budgets stay in EUR; the laundry card stays in CZK with EUR/CZK-only top-ups and washes. Bank fees are not inferred.
 
-Transactions are grouped by day, newest day first, then first-added first within a day. Editing an entry preserves its insertion order. Older entries receive an insertion sequence based on their existing stored order; previously lost creation chronology cannot be reconstructed. Sequence numbers travel with JSON, CSV and cloud sync.
+Transactions are grouped by day, newest day first, then last-added first within a day. Editing an entry preserves its insertion order. Older entries receive an insertion sequence based on their existing stored order; previously lost creation chronology cannot be reconstructed. Sequence numbers travel with JSON, CSV and cloud sync.
 
-JSON saves all settings, plans, history and legacy metadata. Import replaces the workspace after confirmation. CSV exports transactions, including travel categories and insertion order. CSV import merges IDs, skips identical records and rejects changed duplicates. Original 10-column, previous 12-column and 13-column Pocket CSVs are also accepted. New CSVs include rateDate and rateSource. Amount is always in the original currency’s minor units; eur and card credit remain in EUR/CZK cents. Use JSON when moving the complete budget. Export backups before clearing browser storage. Refund/negative entries are not supported; use income for support and edit/delete mistakes.
+JSON saves all settings, plans, history and legacy metadata. Import replaces the workspace after confirmation. CSV exports transactions, including travel categories and insertion order. CSV import merges IDs, skips identical records and rejects changed duplicates. Original 10-column, previous 12-column and 13-column Pocket CSVs are also accepted. New CSVs include rateDate, rateSource and time. Previous 15-column CSVs remain supported. Amount is always in the original currency’s minor units; eur and card credit remain in EUR/CZK cents. Use JSON when moving the complete budget. Export backups before clearing browser storage. Refund/negative entries are not supported; use income for support and edit/delete mistakes.
 
 ## Existing budgets migrate automatically
 
@@ -176,7 +176,7 @@ After a code update, push the changed files and wait for Vercel to finish deploy
 
 The November 15 redesign was checked in headless Chrome at 320, 390, 768 and 1440px in both themes, with English and Portuguese layouts. The walkthrough covers entries, details, deletion/undo, recurring rules, favourites, plan edits, backup payloads/import and device preferences. Account and conflict states were rendered with mock callbacks; this does not verify live authentication or multi-device sync.
 
-`npm test` currently runs 48 tests covering accounting, migration, dates, ordering, currencies, backup round trips and platform configuration. `npm run build` checks TypeScript and generates the production app and service worker. See [VERIFICATION.md](VERIFICATION.md) for the checks performed and their limits. The redesign passed a Chrome browser smoke check at 320, 390, 768 and 1440px, including mobile navigation, currency search, card filtering, expense creation/editing and light theme. These checks used isolated test data and mocked rate responses; they are not tests on a physical Android device or live Supabase accounts.
+`npm test` currently runs 52 tests covering accounting, migration, dates, ordering, currencies, backup round trips and platform configuration. `npm run build` checks TypeScript and generates the production app and service worker. See [VERIFICATION.md](VERIFICATION.md) for the checks performed and their limits. The redesign passed a Chrome browser smoke check at 320, 390, 768 and 1440px, including mobile navigation, currency search, card filtering, expense creation/editing and light theme. These checks used isolated test data and mocked rate responses; they are not tests on a physical Android device or live Supabase accounts.
 
 Official references: [Vercel Vite](https://vercel.com/docs/frameworks/frontend/vite), [Supabase keys](https://supabase.com/docs/guides/getting-started/api-keys), [Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
 
@@ -193,3 +193,11 @@ Official references: [Vercel Vite](https://vercel.com/docs/frameworks/frontend/v
 - English is the source language; the existing language selector provides Portuguese (Portugal). New interface messages use the same translation mechanism. User-entered notes and exported field names are not translated.
 
 Consult VERIFICATION.md for the latest checks and dated audit counts; see IMPROVEMENTS.md for the status of each review point.
+
+## UI and language refinement
+
+The selector already existed and has been completed with device-language defaults, independent EN/PT catalogs, key-parity tests, localized field validation, and immediate updates to the document title and language. Switching language keeps mounted drafts, values and scroll position. Personal notes, brand names, currency codes and exported field names remain unchanged. Unrecognized provider diagnostics use a localized recovery message.
+
+The approved changes preserve settings drafts when navigating away and scope the Overview summary to the selected budget. New manual transactions have an editable time in Ostrava time (Europe/Prague); quick favourite entries record the current time. Older and scheduled transactions with no known time display “Time not recorded”. Editing does not move an entry to the top: ordering uses its original insertion sequence, descending within each date. No time is invented for old records. JSON carries optional time metadata; CSV adds a final time column while continuing to read older headers. Update both devices before editing this version; older clients may omit times on edits and do not read the new CSV header. Keep a full JSON backup before rollback. No SQL change is needed.
+
+See [coverage and the 20 UI rules](docs/COVERAGE.md), [approved proposals and compatibility](docs/PROPOSALS.md), and [verification](VERIFICATION.md).

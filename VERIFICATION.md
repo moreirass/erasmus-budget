@@ -1,5 +1,18 @@
 # Verification
 
+## Bilingual UI refinement and transaction time
+
+Base ae629f2; branch codex/pocket-ui-language. See docs/COVERAGE.md for all screens,20 UI rules and proposals; docs/PROPOSALS.md records approval/impact/rollback. The language selector already existed and was completed, not invented anew.
+
+- 52tests pass (48existing plus catalog/device-language and time-compatibility coverage); production TypeScript/Vite/PWA build and formatting pass. Every implementation commit passed its applicable50/52tests and build. No new dependencies.
+- 176 rendered state/layout samples cover320/390/768/1440px, both themes and EN/PT. After correcting a narrow-screen metric overflow, no document overflow, sampled clipped amounts, text below14px, controls below44px or computed text-contrast failures remained. Disabled text was included. This is sampling, not accessibility certification.
+- Targeted browser checks confirm P1 draft retention across navigation, P2 scoped totals, P3 recorded time and latest-added-first display, mid-form locale changes retaining input nodes/values/time/sheet scroll, language-selector page-scroll preservation, saved language after reload, export feedback and stable-size/disabled import reading.
+- Motion checks exercise animated dialog cancellation and reduced-motion disabling. Exit transitions use the optional native View Transitions API; unsupported browsers perform the action immediately. No looping decoration.
+- Date/time metadata is optional. Time is HH:mm in Europe/Prague; legacy/scheduled unknown times remain absent. The new16-column CSV includes time and reads old10/12/13/15-column CSVs. Tests verify old CSV merge preserves an existing time, JSON/CSV round trips, invalid-time rejection and insertion order unaffected by edits/recorded time.
+- P3 deliberately changes transaction metadata validation, display ordering and CSV shape with user authorization. Financial arithmetic, historical credit validation, storage keys, sync protocol and SQL schema are unchanged. P1/P2 only affect presentation/lifecycle. Language/visual feedback extend existing hooks without replacing the state layer.
+- Built assets were served to isolated Chrome contexts through same-origin interception with production CSP. Frankfurter/account responses are mocked; no personal records/accounts were accessed. Localhost HTTP preview was blocked/timed out despite Vite starting, so a live preview could not be verified.
+- No physical device install, real SW offline/update lifecycle, live email delivery, live Supabase two-device sync or download-file completion was checked. Source remained local; no push/deployment. Figma had no supplied destination/source file; no new Figma file or hosted Site was created.
+
 ## Interface redesign — 15 November 2026
 
 Branch `codex/calm-pocket-redesign`, based on `240efd2`. Implementation follows the ordered checkpoints in [docs/COVERAGE.md](docs/COVERAGE.md); design rules and the short audit are in [docs/DESIGN.md](docs/DESIGN.md).

@@ -3,6 +3,7 @@
 Base: ae629f2. Branch: codex/pocket-ui-language.
 
 ## Audit
+
 - Language selector already exists in Settings/Account; i18n.ts defaults to English rather than device language. There is one PT dictionary but no independently checked EN catalog.
 - AppLayout.tsx still includes decorative Erasmus badges, an ornamental term label and generic introductory copy.
 - style.css contains historical gradients, shadows, raw dimensions, inconsistent icon sizes and disabled opacity that weakens contrast. Tokens lack type, motion and layering scales.
@@ -11,6 +12,7 @@ Base: ae629f2. Branch: codex/pocket-ui-language.
 - Settings forms are preserved between settings tabs, but unmount when leaving the screen. Global Overview totals remain global when a single budget is selected.
 
 ## P1 — Preserve settings drafts across page navigation
+
 Problem: Settings.tsx unmounts when moving to Overview/Transactions, losing unsaved plan/tracking fields.
 Proposal: keep the screen mounted or retain drafts in its existing hook.
 Benefit: navigation does not silently discard a draft.
@@ -20,6 +22,7 @@ Alternatives: do nothing; warn before leaving instead.
 Recommendation: approve separately after the visual work. Status: IMPLEMENTED (P1); screen remains mounted, drafts survive page navigation. External saved-data changes still reset forms to the latest committed data.
 
 ## P2 — Scope the Overview summary to the selected budget
+
 Problem: Overview.tsx global spending/support/remainder metrics stay global while category charts filter to Day to day or Travel.
 Proposal: filter all three summary figures to the chosen budget, while Both retains current totals.
 Benefit: the headline summary matches the selected context.
@@ -31,6 +34,7 @@ Recommendation: approve separately; for now retain values and clarify the global
 Only reply with IDs to approve these, e.g. approve P1; reject P2. Visual styling and the expressly requested language support continue independently. No HIGH IMPACT proposal is needed.
 
 ## P3 — Newest entries within each day and recorded time — HIGH IMPACT
+
 Approved by the user's explicit follow-up request. Days remain descending; insertion sequence within a day becomes descending (editing never changes order). Optional time metadata stores HH:mm in Europe/Prague; new manual entries default to current time and permit editing. Legacy and scheduled entries with unknown time say Time not recorded. Favourite quick entries record current time.
 Affects model transaction metadata/validation/comparator, optional JSON property, appended CSV time column, bilingual editor/list/detail, tests. No amount, conversion, allocation, credit-validation rules, storage keys, sync protocol or SQL schema changes. Risk medium; effort M. Alternative do nothing rejected by the direct request.
 Migration: no invented times; old10/12/13/15-column CSVs remain readable; new exports16columns. Older CSV merging preserves an existing recorded time. JSON version unchanged. Update both devices before editing; old clients may drop time metadata when editing. Rollback: export a complete JSON first, return to previous client; original financial fields remain compatible, but older clients cannot import the new CSV header. Retain the JSON for time recovery.
