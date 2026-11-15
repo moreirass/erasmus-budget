@@ -22,7 +22,8 @@ const previousFields = [
   "legacyCategory",
 ] as const;
 const orderedFields = [...previousFields, "addedOrder"] as const;
-const fields = [...orderedFields, "rateDate", "rateSource"] as const;
+const rateFields = [...orderedFields, "rateDate", "rateSource"] as const;
+const fields = [...rateFields, "time"] as const;
 export function toCSV(d: Data) {
   return [
     fields.join(","),
@@ -75,7 +76,9 @@ export function importCSV(text: string, d: Data): Data {
         ? previousFields
         : head?.length === orderedFields.length
           ? orderedFields
-          : fields;
+          : head?.length === rateFields.length
+            ? rateFields
+            : fields;
   if (
     !head ||
     columns.some((f, i) => head[i] !== f) ||
@@ -103,11 +106,14 @@ export function importCSV(text: string, d: Data): Data {
     if (!o.addedOrder) delete o.addedOrder;
     if (!o.rateDate) delete o.rateDate;
     if (!o.rateSource) delete o.rateSource;
+    if (!o.time) delete o.time;
     return migrateTransaction(o);
   });
   const byId = new Map(d.transactions.map((t) => [t.id, t]));
   for (const t of tx) {
     const existing = byId.get(t.id);
+    if (existing?.time && !columns.includes("time" as never))
+      t.time = existing.time;
     if (existing && !t.addedOrder) t.addedOrder = existing.addedOrder;
     if (existing && fields.some((f) => existing[f] !== t[f]))
       throw new Error(

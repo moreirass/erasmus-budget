@@ -47,3 +47,7 @@ Limites: recorrências só são processadas com a app aberta/retomada; taxas em 
 - Mantidos o comportamento, o aspeto, as chaves de armazenamento, os formatos JSON/CSV, as regras de contabilidade e o protocolo Supabase. Sem classes ou bibliotecas adicionais.
 
 Validação da reestruturação: 48 testes, build e format:check; percursos Chrome com dados isolados para adicionar/editar/apagar/anular, pesquisa, navegação de períodos, persistência do mês/âmbito do plano, conteúdo das exportações e confirmação/cancelamento das importações, preferências após recarregar e funcionalidades recentes. Sem ensaio Supabase real nem confirmação de conclusão dos downloads em disco.
+
+## Atualização de interface e idioma
+
+O seletor PT/EN já existe e foi completado com deteção do idioma inicial do dispositivo, catálogos com igualdade de chaves testada e validação de campos localizada. Os apontamentos de novembro 3 acima são históricos. A validação atual é de 52 testes; consultar VERIFICATION.md e docs/COVERAGE.md.

@@ -347,13 +347,13 @@ it("sorts by date then insertion order and preserves that order on edits and CSV
   d.transactions = [d.transactions[1], d.transactions[2], edited];
   assert.deepEqual(
     [...d.transactions].sort(transactionOrder).map((t) => t.id),
-    ["new-day", "first", "second"],
+    ["new-day", "second", "first"],
   );
   assert.deepEqual(
     importCSV(toCSV(d), freshData())
       .transactions.sort(transactionOrder)
       .map((t) => t.id),
-    ["new-day", "first", "second"],
+    ["new-day", "second", "first"],
   );
   const legacy = structuredClone(d);
   legacy.transactions.forEach((t) => delete t.addedOrder);
@@ -502,5 +502,43 @@ it("editing only the final month does not create an out-of-period plan", () => {
   assert.deepEqual(
     Object.keys(result.plans).sort(),
     [...new Set([...originalKeys, d.settings.end])].sort(),
+  );
+});
+it("preserves optional time metadata and reads older CSV headers without inventing times", () => {
+  const d = freshData();
+  d.transactions = [tx({ time: "17:42", addedOrder: 1 })];
+  assert.equal(importCSV(toCSV(d), freshData()).transactions[0].time, "17:42");
+  assert.equal(
+    validateData(JSON.parse(JSON.stringify(d))).transactions[0].time,
+    "17:42",
+  );
+  const previous = toCSV(d)
+    .split("\r\n")
+    .map((line) => line.slice(0, line.lastIndexOf(",")))
+    .join("\r\n");
+  assert.equal(
+    importCSV(previous, freshData()).transactions[0].time,
+    undefined,
+  );
+  assert.equal(importCSV(previous, d).transactions[0].time, "17:42");
+  for (const time of ["24:00", "12:60", "9:05", "bad"])
+    assert.throws(
+      () =>
+        validateData({ ...d, transactions: [{ ...d.transactions[0], time }] }),
+      /time/,
+    );
+});
+it("orders same-day entries by addition rather than recorded time or later edits", () => {
+  const first = tx({ id: "earlier-add", addedOrder: 1, time: "21:00" });
+  const last = tx({ id: "later-add", addedOrder: 2, time: "09:00" });
+  assert.deepEqual(
+    [first, last].sort(transactionOrder).map((t) => t.id),
+    ["later-add", "earlier-add"],
+  );
+  assert.deepEqual(
+    [{ ...first, note: "edited" }, last]
+      .sort(transactionOrder)
+      .map((t) => t.id),
+    ["later-add", "earlier-add"],
   );
 });

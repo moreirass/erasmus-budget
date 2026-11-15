@@ -1,3 +1,5 @@
+import { BusyButton } from "../components/Feedback";
+import { errorMessage } from "../i18n";
 import { useState } from "react";
 import {
   AlertCircle,
@@ -88,6 +90,7 @@ export function SettingsView({
   setDark,
   setToast,
 }: SettingsProps) {
+  const [reading, setReading] = useState(false);
   const [sending, setSending] = useState(false);
   const [authMessage, setAuthMessage] = useState("");
   const [authError, setAuthError] = useState("");
@@ -116,7 +119,7 @@ export function SettingsView({
             aria-controls={`settings-${id}`}
             onClick={() => setSettingsSection(id)}
           >
-            <Icon size={18} /> <span>{tr(label)}</span>
+            <Icon size={20} /> <span>{tr(label)}</span>
           </button>
         ))}
       </nav>
@@ -245,33 +248,37 @@ export function SettingsView({
         <section className="panel data-panel">
           <div className="section-heading">
             <div>
-              <h2>{tr("Your data, your way")}</h2>
-              <p>{tr("Keep a copy. Bring it with you.")}</p>
+              <h2>{tr("Backup files")}</h2>
+              <p>{tr("Export or restore your records.")}</p>
             </div>
-            <Download size={22} />
+            <Download size={24} />
           </div>
           <div className="data-actions">
-            <button className="data-action" onClick={exportJSON}>
-              <Download size={22} />
+            <BusyButton className="data-action" onClick={exportJSON}>
+              <Download size={24} />
               <span>
                 <strong>{tr("Full JSON backup")}</strong>
                 <small>{tr("Plans, transactions, rules and favorites")}</small>
               </span>
-            </button>
-            <button className="data-action" onClick={exportCSV}>
-              <Download size={22} />
+            </BusyButton>
+            <BusyButton className="data-action" onClick={exportCSV}>
+              <Download size={24} />
               <span>
                 <strong>{tr("Transactions CSV")}</strong>
                 <small>{tr("Transaction history for a spreadsheet")}</small>
               </span>
-            </button>
+            </BusyButton>
             <button
               className="data-action import-action"
+              disabled={reading}
+              aria-busy={reading}
               onClick={() => fileRef.current?.click()}
             >
-              <Upload size={22} />
+              <Upload size={24} />
               <span>
-                <strong>{tr("Import JSON / CSV")}</strong>
+                <strong>
+                  {tr(reading ? "Reading file…" : "Import JSON / CSV")}
+                </strong>
                 <small>{tr("Review the file before making changes")}</small>
               </span>
             </button>
@@ -280,7 +287,17 @@ export function SettingsView({
             type="file"
             ref={fileRef}
             hidden
-            onChange={(e) => readFile(e.target.files?.[0])}
+            disabled={reading}
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              setReading(true);
+              try {
+                await readFile(file);
+              } finally {
+                setReading(false);
+              }
+            }}
           />
           <div className="privacy-note">
             <AlertCircle size={20} />
@@ -321,7 +338,7 @@ export function SettingsView({
               <h2>
                 <Cloud size={20} /> {tr("Account & sync")}
               </h2>
-              <p>{tr("Your devices, one budget")}</p>
+              <p>{tr("Account and manual sync")}</p>
             </div>
           </div>
           {!online && (
@@ -387,7 +404,7 @@ export function SettingsView({
                   onClick={() => store.sync()}
                   disabled={store.busy || !online}
                 >
-                  <RefreshCw size={18} className={store.busy ? "spin" : ""} />{" "}
+                  <RefreshCw size={20} className={store.busy ? "spin" : ""} />{" "}
                   {tr(store.busy ? "Syncing…" : "Sync now")}
                 </button>
                 <button
@@ -396,7 +413,7 @@ export function SettingsView({
                     setConfirmSignOut(true);
                   }}
                 >
-                  <LogOut size={18} /> {tr("Sign out")}
+                  <LogOut size={20} /> {tr("Sign out")}
                 </button>
               </div>
               <p className="help">
@@ -439,7 +456,7 @@ export function SettingsView({
                   name="email"
                   required
                   autoComplete="email"
-                  placeholder="you@example.com"
+                  placeholder={tr("you@example.com")}
                   disabled={sending}
                 />
               </Field>
@@ -448,7 +465,7 @@ export function SettingsView({
                 type="submit"
                 disabled={sending || !online}
               >
-                {sending && <RefreshCw size={18} className="spin" />}
+                {sending && <RefreshCw size={20} className="spin" />}
                 {tr(sending ? "Sending sign-in link…" : "Send sign-in link")}
               </button>
               {authMessage && (
@@ -460,7 +477,7 @@ export function SettingsView({
               {authError && (
                 <div className="form-error" role="alert">
                   <AlertCircle size={20} />
-                  <span>{tr(authError)}</span>
+                  <span>{errorMessage(authError)}</span>
                 </div>
               )}
               <p className="help">
@@ -472,7 +489,7 @@ export function SettingsView({
           )}
         </section>
         <section className="panel preferences-panel">
-          <h2>{tr("App preferences")}</h2>
+          <h2>{tr("Appearance & language")}</h2>
           <div className="preference-row">
             <h3>{tr("Appearance")}</h3>
             <div className="segmented" aria-label={tr("Appearance")}>
@@ -482,7 +499,7 @@ export function SettingsView({
                 aria-pressed={dark}
                 onClick={() => setDark(true)}
               >
-                <Moon size={18} />
+                <Moon size={20} />
                 {tr("Dark")}
               </button>
               <button
@@ -491,7 +508,7 @@ export function SettingsView({
                 aria-pressed={!dark}
                 onClick={() => setDark(false)}
               >
-                <Sun size={18} />
+                <Sun size={20} />
                 {tr("Light")}
               </button>
             </div>
@@ -560,7 +577,7 @@ export function SettingsView({
           {authError && (
             <div className="form-error" role="alert">
               <AlertCircle size={20} />
-              <span>{tr(authError)}</span>
+              <span>{errorMessage(authError)}</span>
             </div>
           )}
           <div className="button-pair">

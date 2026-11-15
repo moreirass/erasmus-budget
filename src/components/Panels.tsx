@@ -1,3 +1,7 @@
+import { displayTime } from "../time";
+import { Skeleton } from "./Feedback";
+import { formatNumber, formatPercent } from "../i18n";
+import { errorMessage } from "../i18n";
 import {
   AlertTriangle,
   ArrowLeftRight,
@@ -54,7 +58,7 @@ export function ExchangePanel({
       <div className="section-heading">
         <div>
           <h2>
-            <RefreshCw size={21} /> {tr("Exchange rates")}{" "}
+            <RefreshCw size={20} /> {tr("Exchange rates")}{" "}
           </h2>
           <p>{tr("Frankfurter reference rates · EUR base")}</p>
         </div>
@@ -64,7 +68,7 @@ export function ExchangePanel({
           disabled={fx.busy}
           aria-label={tr("Refresh rates")}
         >
-          <RefreshCw size={18} className={fx.busy ? "spin" : ""} />
+          <RefreshCw size={20} className={fx.busy ? "spin" : ""} />
         </button>
       </div>
       <div className="rate-hero">
@@ -73,11 +77,15 @@ export function ExchangePanel({
           {money(100)}{" "}
           <span>
             ≈{" "}
-            {quote
-              ? quote.rate.toLocaleString(appLocale(), {
-                  maximumFractionDigits: 6,
-                })
-              : "—"}{" "}
+            {quote ? (
+              quote.rate.toLocaleString(appLocale(), {
+                maximumFractionDigits: 6,
+              })
+            ) : fx.busy ? (
+              <Skeleton label={tr("Loading reference rate…")} />
+            ) : (
+              "—"
+            )}{" "}
             {code}
           </span>
         </strong>
@@ -91,7 +99,7 @@ export function ExchangePanel({
           disabled={fx.busy}
           onClick={() => fx.refresh(true)}
         >
-          <RefreshCw size={18} />
+          <RefreshCw size={20} />
           {fx.busy ? tr("Refreshing…") : tr("Refresh rates online")}
         </button>
         <small>
@@ -129,12 +137,12 @@ export function ExchangePanel({
       </p>
       {fx.error && (
         <p className="form-error" role="alert">
-          <AlertTriangle size={18} aria-hidden="true" />
-          {tr(fx.error)}
+          <AlertTriangle size={20} aria-hidden="true" />
+          {errorMessage(fx.error)}
         </p>
       )}
       <label className="search">
-        <Search size={19} />
+        <Search size={20} />
         <input
           aria-label={tr("Search exchange currencies")}
           placeholder={tr("Search currency, name or code…")}
@@ -219,7 +227,8 @@ export function PeriodSummary({
       <div className="track">
         <span
           style={{
-            width: `${Math.min(100, used)}%`,
+            width: "100%",
+            transform: `scaleX(${Math.min(100, used) / 100})`,
             background: used > 100 ? "var(--error)" : "var(--primary)",
           }}
         />
@@ -270,7 +279,7 @@ export function LaundryPanel({
     <div className="laundry-card">
       <div className="section-heading">
         <span className="laundry-title">
-          <WashingMachine size={22} /> {tr("CZK CARD CREDIT")}{" "}
+          <WashingMachine size={24} /> {tr("CZK CARD CREDIT")}{" "}
         </span>
       </div>
       <div className="laundry-value">{money(stats.card, "CZK")}</div>
@@ -354,14 +363,14 @@ export function SpendingChart({ spent }: { spent: Record<Category, number> }) {
                 {tr(c.name)}
                 <b>
                   {money(spent[c.id])}
-                  <small>{Math.round((spent[c.id] / total) * 100)}%</small>
+                  <small>{formatPercent(spent[c.id] / total)}</small>
                 </b>
               </div>
             ))}
         </div>
       ) : (
         <p className="empty-caption">
-          {tr("Your story starts with your first expense.")} <br />
+          {tr("Your first transaction starts here.")} <br />
           {tr("No spending recorded yet.")}{" "}
         </p>
       )}
@@ -389,9 +398,9 @@ export function TransactionList({
     return (
       <div className="empty-state">
         <span>
-          <ArrowLeftRight size={26} />
+          <ArrowLeftRight size={24} />
         </span>
-        <h3>{tr("A fresh page for your adventures.")}</h3>
+        <h3>{tr("Your first transaction starts here.")}</h3>
         <p>{tr("No transactions in this view.")}</p>
         <button className="text-button" onClick={add}>
           <Plus size={16} /> {tr("Add expense")}{" "}
@@ -410,6 +419,8 @@ export function TransactionList({
           <dl className="detail-list">
             <dt>{tr("Date")}</dt>
             <dd>{displayDate(detail.date)}</dd>
+            <dt>{tr("Time (Ostrava)")}</dt>
+            <dd>{displayTime(detail.time)}</dd>
             <dt>{tr("Category")}</dt>
             <dd>
               {tr(categories.find((c) => c.id === detail.category)!.name)}
@@ -426,7 +437,7 @@ export function TransactionList({
             </dd>
             <dt>{tr("Saved exchange rate")}</dt>
             <dd>
-              1 EUR = {detail.rate}{" "}
+              1 EUR = {formatNumber(detail.rate, { maximumFractionDigits: 12 })}{" "}
               {detail.kind === "topup" || detail.kind === "wash"
                 ? "CZK"
                 : detail.currency}
@@ -441,7 +452,7 @@ export function TransactionList({
               setDetailId(null);
             }}
           >
-            <Pencil size={18} />
+            <Pencil size={20} />
             {tr("Edit")}
           </button>
         </Modal>
@@ -480,6 +491,12 @@ export function TransactionList({
                     <CategoryIcon category={c.id} travelType={t.travelType} />
                   </span>
                   <div className="transaction-description">
+                    <time
+                      className="transaction-time"
+                      dateTime={t.time ? `${t.date}T${t.time}` : t.date}
+                    >
+                      {displayTime(t.time)}
+                    </time>
                     <button
                       className="transaction-title"
                       onClick={() => setDetailId(t.id)}
@@ -732,7 +749,7 @@ export function BudgetForm({
         </div>
         {!balanced && (
           <p className="form-error" role="status">
-            <AlertTriangle size={18} aria-hidden="true" />
+            <AlertTriangle size={20} aria-hidden="true" />
             {tr("Adjust day-to-day allocations by {0} to match this budget.", [
               money(Math.round(budget * 100) - total),
             ])}
@@ -765,13 +782,13 @@ export function BudgetForm({
       </fieldset>
       <div className="allocation-total">
         <span className="plan-total-label">
-          <ChartPie size={22} />
+          <ChartPie size={24} />
           {tr("Combined monthly total")}
         </span>
         <b>{money(Math.round(budget * 100) + limits.travel)}</b>
       </div>
       <p className="budget-rule">
-        <CheckCircle2 size={18} />
+        <CheckCircle2 size={20} />
         {tr("Two independent budgets. Only laundry credit carries over.")}
       </p>
       <Field label={tr("Apply changes to")}>
@@ -794,7 +811,7 @@ export function BudgetForm({
           </p>
         )}
       <button className="primary full" disabled={!balanced}>
-        <Check size={18} />
+        <Check size={20} />
         {tr("Save monthly plan")}
       </button>
     </form>
@@ -882,8 +899,8 @@ export function SettingsForm({
       </Field>
       {error && (
         <p role="alert" className="form-error">
-          <AlertTriangle size={18} aria-hidden="true" />
-          {tr(error)}
+          <AlertTriangle size={20} aria-hidden="true" />
+          {errorMessage(error)}
         </p>
       )}
       <button className="secondary full">{tr("Save settings")}</button>

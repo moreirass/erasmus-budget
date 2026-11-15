@@ -1,3 +1,5 @@
+import { visualFeedback } from "./visualFeedback";
+import { errorMessage } from "./i18n";
 import { useEffect, useState } from "react";
 import { Info, AlertCircle, X } from "lucide-react";
 import { BackupReminder } from "./components/BackupReminder";
@@ -116,9 +118,9 @@ export default function App() {
           {toast && (
             <div className="toast" role="status">
               <Info size={20} aria-hidden="true" />
-              {tr(toast)}
+              {errorMessage(toast)}
               <button
-                onClick={() => setToast("")}
+                onClick={() => visualFeedback(() => setToast(""))}
                 aria-label={tr("Dismiss notification")}
               >
                 <X size={16} />
@@ -155,7 +157,7 @@ export default function App() {
       {store.error && (
         <div role="alert" className="notice error">
           <AlertCircle size={20} aria-hidden="true" />
-          {tr(store.error)}
+          {errorMessage(store.error)}
           <button
             onClick={() => store.setError("")}
             aria-label={tr("Dismiss error")}
@@ -212,7 +214,7 @@ export default function App() {
         </>
       )}
       {tab === "Transactions" && <TransactionsView {...viewProps} />}
-      {isSettings && (
+      <div hidden={!isSettings}>
         <SettingsView
           {...viewProps}
           {...settings}
@@ -227,7 +229,7 @@ export default function App() {
           setLanguage={prefs.setLanguage}
           setToast={setToast}
         />
-      )}
+      </div>
     </AppLayout>
   );
 }

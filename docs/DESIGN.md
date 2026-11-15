@@ -1,29 +1,28 @@
 # Pocket interface system
 
-## Audit
+## Direction and structure
 
-The existing screens repeat the add action and introductory text, use multiple card styles, mix 8–13 px labels with large headings, and place long management lists ahead of the settings tabs. The ledger has no separate no-results or detail state. Fixed colors and repeated responsive overrides weaken light-theme consistency.
-
-## Direction
-
-A quiet financial notebook: forest surfaces, mint selection/actions, gold reserved for currency/card information. Primary hierarchy: period → remaining budgets → spending detail → activity. No invented forecasts or records.
+Forest surfaces, one mint action/selection accent, gold only for currency/laundry and semantic error styling. Preserve all destinations, form actions, grouping and calculations. Pending behavioural ideas live in PROPOSALS.md.
 
 ## Tokens
 
-Colors live in src/tokens.css with complete light/dark palettes: canvas, surface, inset, elevated, active, text, muted, border, action, gold, error, and seven chart categories. CSS components consume these tokens. Dark is the existing new-device default. Text/muted pairs target 4.5:1; controls have visible borders/focus and 44 px minimum touch targets.
-
-Inter body 16/24 px; Plus Jakarta Sans headings 28–36/1.2, section headings 20/1.35. Secondary text never below 14 px. Monetary values use tabular numerals and wrap rather than truncate. Spacing scale 4, 8, 12, 16, 24, 32, 48 px; radii 8, 12, 20 px. Subtle token shadows only for floating surfaces.
+Colour roles: canvas, surface, inset, elevated, active, text, muted, disabled, border, action/on-action, gold/background, error/background. Seven chart series use shades of the existing green palette with numeric legends; laundry alone may use gold.
+Type: Inter body and monetary values; Plus Jakarta Sans headings. 14/16/20/24/32/48px scale; 16px mobile body. Tabular numerals for financial values, dates, rates and percentages. Balanced heading wrapping, unbroken amounts.
+Spacing: 4/8/12/16/24/32/48px. Radius: 16px outer, 8px inner at 8px padding, square inner at 16px padding. Touch minimum 44px. Shadow only on floating menus/dialogs/toasts. Layers: header 10, navigation 20, toast 40, modal 50.
+Motion: 180ms ease-out; transform/opacity only, finite feedback. Reduced motion disables animations/transitions. Refresh progress retains previous values without decorative loops.
 
 ## Components
 
-Native buttons/inputs/selects use one base treatment with primary, secondary, icon and text variants. Shared Field, Modal, EmptyState, Metric and Notice components handle repeated presentation. Segmented controls and chips expose pressed state. Budget bars always accompany numeric labels; alerts pair icon and text. Transaction rows keep amount and actions visible, with an optional detail dialog. Native dialog focus containment/restoration is preserved; editor cancellation explicitly handles unsaved changes.
+Native accessible controls with shared primary/secondary/destructive styles; Field, Search, chips, Metric, bars, transaction rows, Notice, EmptyState, Skeleton/BusyButton, Modal/UnsavedDialog. One dominant action per current screen or modal; contextual actions remain available with lower visual weight. Lucide icons, 1.75 stroke, 16/20/24 grid. No decorative badges, emoji, gradients or illustrations.
 
 ## Layout
 
-At 1024+ px: 240 px persistent sidebar, compact top bar, centred maximum-width content; two-column overview/ledger/settings where useful. At 768–1023 px: compact sidebar and two-column layouts only when readable. Below 768 px: five-control bottom navigation, safe areas on every edge, single-column content, wrapping settings tabs and a scrolling editor sheet. The central Add is the mobile creation action; desktop uses the top bar.
+Existing mobile five-control navigation and settings tabs preserved. Desktop sidebar and two columns retained. Spacing groups related content; forms avoid nested bordered cards. Safe areas on all edges. Check 320/390/768/1440px in EN/PT and dark/light.
 
-Settings tabs precede content. Plan includes recurring/favourite management after the budget, not before it. Language, theme and alerts remain easy to reach. Account and Data explain manual sync and unencrypted files. EN source strings use the existing tr mechanism with pt-PT mappings.
+## Language
 
-## Boundaries and validation
+English source keys and a separate English catalog, PT-PT equivalents with identical keys and placeholders. First launch uses navigator language (pt variants→pt; otherwise en); saved choice wins. Runtime switching preserves mounted inputs/scroll. Intl handles dates, numbers, currency, percentages and plurals. Titles/lang/accessible names update. Data, notes, storage keys and machine-readable exports never translate. Unknown provider errors use localized generic UI feedback; technical diagnostics remain unchanged internally.
 
-No changes to model.ts, hooks, store.ts, sync protocol, schema, storage identifiers or backup formats. Keep recurring processing mounted off-screen. Every stage runs the 48 unit tests and production build before a commit. Final Chrome checks cover both themes, EN/PT, 320/390/768/1440 widths and isolated interaction/error states. Physical devices and live Supabase are reported separately.
+## Verification
+
+Run tests/build at every commit, plus dictionary parity/source-key checks. Browser matrix uses disposable data and mocked networking. Verify language switch mid-form, long PT labels, busy states, reduced motion and dialog focus. Live Supabase, physical devices and real SW lifecycle remain separate verification boundaries.

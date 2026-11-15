@@ -14,6 +14,48 @@ export function useAppPrefs() {
         ),
       );
   }, [language]);
+  useEffect(() => {
+    const invalid = (event: Event) => {
+      const input = event.target;
+      if (!(
+        input instanceof HTMLInputElement ||
+        input instanceof HTMLSelectElement ||
+        input instanceof HTMLTextAreaElement
+      ))
+        return;
+      input.setCustomValidity("");
+      const validity = input.validity;
+      input.setCustomValidity(
+        tr(
+          validity.valueMissing
+            ? "Please complete this field."
+            : validity.rangeOverflow || validity.rangeUnderflow
+              ? "Enter a value within the allowed range."
+              : validity.patternMismatch
+                ? "Use the required format."
+                : "Enter a valid value.",
+        ),
+      );
+    };
+    const clear = (event: Event) => {
+      const input = event.target;
+      if (
+        input instanceof HTMLInputElement ||
+        input instanceof HTMLSelectElement ||
+        input instanceof HTMLTextAreaElement
+      )
+        input.setCustomValidity("");
+    };
+    document.addEventListener("invalid", invalid, true);
+    document.addEventListener("input", clear, true);
+    document
+      .querySelectorAll("input, select, textarea")
+      .forEach((input) => (input as HTMLInputElement).setCustomValidity(""));
+    return () => {
+      document.removeEventListener("invalid", invalid, true);
+      document.removeEventListener("input", clear, true);
+    };
+  }, [language]);
   const [dark, setDark] = useState(() => {
     try {
       const saved = localStorage.getItem("pocket-theme");

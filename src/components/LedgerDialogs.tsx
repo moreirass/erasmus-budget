@@ -1,3 +1,4 @@
+import { errorMessage } from "../i18n";
 import { AlertTriangle, CheckCircle2, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Modal } from "./Primitives";
@@ -112,7 +113,7 @@ export function LedgerDialogs({
         >
           <div className="record-summary">
             <span className="record-summary-icon">
-              <Trash2 size={22} aria-hidden="true" />
+              <Trash2 size={24} aria-hidden="true" />
             </span>
             <div>
               <strong>
@@ -135,7 +136,7 @@ export function LedgerDialogs({
           {deleteError && (
             <div role="alert" className="notice error">
               <AlertTriangle size={20} aria-hidden="true" />
-              <p>{tr(deleteError)}</p>
+              <p>{errorMessage(deleteError)}</p>
             </div>
           )}
           <div className="button-pair dialog-actions">
@@ -143,7 +144,7 @@ export function LedgerDialogs({
               {tr("Cancel")}
             </button>
             <button className="danger" onClick={confirmDelete}>
-              <Trash2 size={18} aria-hidden="true" />
+              <Trash2 size={20} aria-hidden="true" />
               {tr("Delete")}
             </button>
           </div>
@@ -159,7 +160,7 @@ export function LedgerDialogs({
             aria-label={tr("Dismiss undo option")}
             onClick={() => setRemoved(null)}
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
       )}

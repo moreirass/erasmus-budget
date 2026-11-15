@@ -1,0 +1,35 @@
+{
+  "matrix": [
+    {
+      "label": "pt-mid-edit",
+      "contrastProblems": [],
+      "overflow": false,
+      "smallText": [],
+      "smallTargets": [],
+      "clippedAmounts": []
+    },
+    {
+      "label": "pt-import-reading",
+      "contrastProblems": [],
+      "overflow": false,
+      "smallText": [],
+      "smallTargets": [],
+      "clippedAmounts": []
+    }
+  ],
+  "checks": [
+    "P2 selected-budget totals match cards",
+    "P1 unsaved monthly plan survives page navigation",
+    "Language switch preserves input DOM, values, recorded time and sheet scroll",
+    "P3 newly added movement first within date with persisted time in details",
+    "Export confirmation and disabled stable-size import progress",
+    "Language selector preserves page scroll",
+    "Language persisted after reload"
+  ],
+  "errors": [],
+  "limitations": [
+    "Service workers blocked; not an offline-installation test.",
+    "Frankfurter replies mocked in isolated context.",
+    "No physical device or live Supabase authentication/sync tested."
+  ]
+}

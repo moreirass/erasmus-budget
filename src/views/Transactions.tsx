@@ -52,7 +52,7 @@ export function TransactionsView({
         <div className="transaction-stream">
           <div className="transaction-tools">
             <label className="search">
-              <Search size={19} />
+              <Search size={20} />
               <input
                 aria-label={tr("Search transactions")}
                 placeholder={tr("Search notes, coffees, trains…")}
@@ -134,7 +134,7 @@ export function TransactionsView({
           </div>
           <div className="panel fx-detail">
             <h2>
-              <RefreshCw size={18} /> EUR / CZK
+              <RefreshCw size={20} /> EUR / CZK
             </h2>
             <strong>
               {fx.cache?.rates.CZK

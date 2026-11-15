@@ -1,3 +1,4 @@
+import { formatPercent } from "../i18n";
 import { Metric } from "../components/Primitives";
 import { limitLevels } from "../model";
 import {
@@ -51,16 +52,32 @@ export function OverviewView({
   setFilter,
   setGroup,
 }: ViewProps) {
+  const selectedCash = groupCash(stats);
+  const selectedIncome =
+    group === "travel"
+      ? stats.received.travel
+      : group === "daily"
+        ? stats.income - stats.received.travel
+        : stats.income;
+  const fraction = range ? range.days / periodDays(data, month) : 1;
+  const selectedBudget =
+    group === "all"
+      ? stats.budget
+      : Math.round(
+          (group === "travel"
+            ? plan.limits.travel
+            : plan.budget - plan.limits.travel) * fraction,
+        );
   const alerts =
     data.settings.limitAlerts === false ? [] : limitLevels(data, month);
   return (
     <>
       <dl className="metrics" aria-label={tr("Period summary")}>
-        <Metric label={tr("Money out")} value={money(stats.cash)} />
-        <Metric label={tr("Money received")} value={money(stats.income)} />
+        <Metric label={tr("Money out")} value={money(selectedCash)} />
+        <Metric label={tr("Money received")} value={money(selectedIncome)} />
         <Metric
           label={tr("Planned remainder")}
-          value={money(stats.budget + stats.income - stats.cash)}
+          value={money(selectedBudget + selectedIncome - selectedCash)}
         />
       </dl>
       {!stats.rows.length && (
@@ -95,7 +112,8 @@ export function OverviewView({
           <div className="track">
             <span
               style={{
-                width: `${Math.max(0, Math.min(100, ((stats.cash - stats.spent.travel) / Math.max(1, Math.round((plan.budget - plan.limits.travel) * (range ? range.days / periodDays(data, month) : 1)))) * 100))}%`,
+                width: "100%",
+                transform: `scaleX(${Math.max(0, Math.min(100, ((stats.cash - stats.spent.travel) / Math.max(1, Math.round((plan.budget - plan.limits.travel) * (range ? range.days / periodDays(data, month) : 1)))) * 100)) / 100})`,
               }}
             />
           </div>
@@ -137,7 +155,7 @@ export function OverviewView({
             onClick={() => selectBudget("travel")}
           />
           <div className="mini-icon blue">
-            <Plane size={21} />
+            <Plane size={20} />
           </div>
           <span className="tiny">
             {tr(
@@ -150,7 +168,8 @@ export function OverviewView({
           <div className="track">
             <span
               style={{
-                width: `${Math.max(0, Math.min(100, (stats.spent.travel / Math.max(1, Math.round(plan.limits.travel * (range ? range.days / periodDays(data, month) : 1)))) * 100))}%`,
+                width: "100%",
+                transform: `scaleX(${Math.max(0, Math.min(100, (stats.spent.travel / Math.max(1, Math.round(plan.limits.travel * (range ? range.days / periodDays(data, month) : 1)))) * 100)) / 100})`,
               }}
             />
           </div>
@@ -174,7 +193,7 @@ export function OverviewView({
       </section>
       <div className="under-hero">
         <span>
-          <Check size={14} />{" "}
+          <Check size={16} />{" "}
           {group === "all"
             ? tr("Tap a budget card to filter · tap again for both")
             : group === "daily"
@@ -193,7 +212,7 @@ export function OverviewView({
           <div className="panel category-panel">
             <div className="section-heading">
               <div>
-                <h2>{tr("Where it’s going")}</h2>
+                <h2>{tr("Category spending")}</h2>
                 <p>
                   {tr(
                     view === "week"
@@ -209,7 +228,7 @@ export function OverviewView({
                   setSettingsSection("plan");
                 }}
               >
-                {tr("Edit limits")} <ArrowUpRight size={15} />
+                {tr("Edit limits")} <ArrowUpRight size={16} />
               </button>
             </div>
             <div className="category-list">
@@ -240,9 +259,11 @@ export function OverviewView({
                             {alerts.some((a) => a.category === c.id) && (
                               <small className="limit-alert" role="status">
                                 <AlertTriangle size={16} aria-hidden="true" />
-                                {tr("Monthly limit: {0}% reached", [
-                                  alerts.find((a) => a.category === c.id)!
-                                    .threshold,
+                                {tr("{0} of the monthly limit reached", [
+                                  formatPercent(
+                                    alerts.find((a) => a.category === c.id)!
+                                      .threshold / 100,
+                                  ),
                                 ])}
                               </small>
                             )}
@@ -255,7 +276,8 @@ export function OverviewView({
                         <div className="track">
                           <span
                             style={{
-                              width: `${Math.min(100, (spent / Math.max(1, cap)) * 100)}%`,
+                              width: "100%",
+                              transform: `scaleX(${Math.min(100, (spent / Math.max(1, cap)) * 100) / 100})`,
                               background:
                                 spent > cap
                                   ? "var(--error)"
@@ -290,7 +312,7 @@ export function OverviewView({
                 className="text-button"
                 onClick={() => setTab("Transactions")}
               >
-                {tr("View all")} <ArrowUpRight size={15} />
+                {tr("View all")} <ArrowUpRight size={16} />
               </button>
             </div>
             <TransactionList
@@ -331,7 +353,7 @@ export function OverviewView({
             <div className="laundry-card">
               <div className="section-heading">
                 <span className="laundry-title">
-                  <WashingMachine size={21} /> {tr("Laundry card")}{" "}
+                  <WashingMachine size={20} /> {tr("Laundry card")}{" "}
                 </span>
                 <span className="pill">{tr("CZK CREDIT")}</span>
               </div>
@@ -375,7 +397,10 @@ export function OverviewView({
                     <span>{money(groupCash(s))}</span>
                     <div className="bar-slot">
                       <div
-                        style={{ width: `${(groupCash(s) / max) * 100}%` }}
+                        style={{
+                          width: "100%",
+                          transform: `scaleX(${((groupCash(s) / max) * 100) / 100})`,
+                        }}
                       />
                     </div>
                     <small>

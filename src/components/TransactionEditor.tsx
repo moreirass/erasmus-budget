@@ -1,3 +1,5 @@
+import { currentTime } from "../time";
+import { errorMessage } from "../i18n";
 import { lastEntry } from "../quickEntry";
 import {
   AlertTriangle,
@@ -152,6 +154,7 @@ export function TransactionForm({
           Math.max(0, ...data.transactions.map((t) => t.addedOrder ?? 0)) + 1,
         id: initial?.id ?? crypto.randomUUID(),
         date: String(f.get("date")),
+        ...(f.get("time") ? { time: String(f.get("time")) } : {}),
         kind,
         category,
         amount: Math.round(Number(amount) * currencyFactor(currency)),
@@ -311,11 +314,11 @@ export function TransactionForm({
                     "No cached rate for this currency. Refresh online or choose a manual bank rate.",
                   )
               : rateMode === "saved"
-                ? tr("This entry keeps its saved rate{0}.", [
-                    initial?.rateDate
-                      ? tr(" from {0}", [displayDate(initial.rateDate)])
-                      : "",
-                  ])
+                ? initial?.rateDate
+                  ? tr("This entry keeps its saved rate from {0}.", [
+                      displayDate(initial.rateDate),
+                    ])
+                  : tr("This entry keeps its saved rate.")
                 : tr(
                     "Enter your effective bank rate. It may differ from the reference rate.",
                   )}
@@ -325,13 +328,13 @@ export function TransactionForm({
             disabled={fx.busy}
             onClick={() => fx.refresh(true)}
           >
-            <RefreshCw size={15} />{" "}
+            <RefreshCw size={16} />{" "}
             {fx.busy ? tr("Refreshing…") : tr("Refresh rates")}
           </button>
           {fx.error && (
             <p className="form-error" role="status">
-              <AlertTriangle size={18} aria-hidden="true" />
-              {tr(fx.error)}
+              <AlertTriangle size={20} aria-hidden="true" />
+              {errorMessage(fx.error)}
             </p>
           )}
         </section>
@@ -367,7 +370,7 @@ export function TransactionForm({
                 onDirtyChange?.(true);
               }}
             >
-              <Wallet size={19} />
+              <Wallet size={20} />
               <b>{tr("Day to day")}</b>
               <small>{tr("Everyday expenses")}</small>
             </button>
@@ -380,7 +383,7 @@ export function TransactionForm({
                 onDirtyChange?.(true);
               }}
             >
-              <Plane size={19} />
+              <Plane size={20} />
               <b>{tr("Travel & tourism")}</b>
               <small>{tr("An independent limit")}</small>
             </button>
@@ -442,6 +445,16 @@ export function TransactionForm({
           />
         </Field>
       </div>
+      {!ruleMode && (
+        <Field label={tr("Time (Ostrava)")}>
+          <input
+            type="time"
+            name="time"
+            required={!initial}
+            defaultValue={initial ? (initial.time ?? "") : currentTime()}
+          />
+        </Field>
+      )}
       <Field label={tr("Note (optional)")}>
         <input
           name="note"
@@ -472,13 +485,13 @@ export function TransactionForm({
       {extraFields}
       {error && (
         <p ref={errorRef} tabIndex={-1} className="form-error" role="alert">
-          <AlertTriangle size={18} aria-hidden="true" />
-          {tr(error)}
+          <AlertTriangle size={20} aria-hidden="true" />
+          {errorMessage(error)}
         </p>
       )}
       <div className="editor-actions">
         <button className="primary full" type="submit">
-          <Check size={18} />{" "}
+          <Check size={20} />{" "}
           {tr(
             {
               expense: "Save expense",

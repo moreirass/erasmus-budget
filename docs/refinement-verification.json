@@ -1,0 +1,56 @@
+{
+  "base": "ae629f2",
+  "branch": "codex/pocket-ui-language",
+  "tests": {
+    "passed": 52,
+    "failed": 0
+  },
+  "build": "passed",
+  "format": "passed",
+  "matrix": {
+    "samples": 176,
+    "widths": [320, 390, 768, 1440],
+    "languages": ["en", "pt-PT"],
+    "themes": ["dark", "light"],
+    "findings": [],
+    "errors": []
+  },
+  "workflowChecks": [
+    "Expense entry saves EUR snapshot",
+    "Read-only transaction detail",
+    "Edit, custom delete and undo preserve entries",
+    "Currency keyboard and manual-rate entry",
+    "Money received, top-up and wash save through existing validation",
+    "Insufficient historical credit rejected in editor",
+    "Unsaved editor confirmation preserves draft or discards explicitly",
+    "Favorite launch/undo and missing-rate state",
+    "Recurring occurrence edited/confirmed and ignored",
+    "Favorite creation",
+    "Favorite edit/delete",
+    "Recurring rule creation",
+    "Recurring rule edit/delete",
+    "Monthly plan adjustment and month selection persistence",
+    "JSON/CSV export contents, invalid import, preview cancellation, duplicate-free CSV merge",
+    "Local-only account state",
+    "Appearance/language persistence and overdue backup reminder",
+    "Mock email-link request and success state",
+    "Conflict fixture renders; export-both and both resolution callbacks fire",
+    "Unsynced sign-out confirmation and cancel",
+    "P2 selected-budget totals match cards",
+    "P1 unsaved monthly plan survives page navigation",
+    "Language switch preserves input DOM, values, recorded time and sheet scroll",
+    "P3 newly added movement first within date with persisted time in details",
+    "Export confirmation and disabled stable-size import progress",
+    "Language selector preserves page scroll",
+    "Language persisted after reload",
+    "Animated dialog cancellation restores interaction",
+    "Reduced motion disables dialog animation",
+    "Final mobile filters and add action reviewed"
+  ],
+  "browserErrors": [],
+  "limitations": [
+    "Service workers blocked; not an offline-installation test.",
+    "Frankfurter replies mocked in isolated context.",
+    "No physical device or live Supabase authentication/sync tested."
+  ]
+}

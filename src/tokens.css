@@ -69,3 +69,44 @@
   --category-other: #d7b0a1;
   --category-travel: #a0c9ef;
 }
+
+/* UI refinement: shared type, motion and layering. */
+:root {
+  --font-body: Inter, system-ui, sans-serif;
+  --font-heading: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-heading: 2rem;
+  --text-display: 3rem;
+  --leading-body: 1.5;
+  --leading-heading: 1.2;
+  --radius-lg: 16px;
+  --radius: 8px;
+  --radius-sm: 4px;
+  --duration: 180ms;
+  --ease: ease-out;
+  --layer-header: 10;
+  --layer-nav: 20;
+  --layer-toast: 40;
+  --layer-modal: 50;
+  --disabled: #52685b;
+  --category-groceries: #176c4b;
+  --category-snacks: #37765b;
+  --category-restaurants: #4c7b64;
+  --category-laundry: #805900;
+  --category-nightlife: #608372;
+  --category-other: #738b80;
+  --category-travel: #265d48;
+}
+:root[data-theme="dark"] {
+  --disabled: #afc5b6;
+  --category-groceries: #8ce3b6;
+  --category-snacks: #76cba2;
+  --category-restaurants: #a7d9bf;
+  --category-laundry: #f0cd79;
+  --category-nightlife: #64b98e;
+  --category-other: #b9d6c7;
+  --category-travel: #8dbca3;
+}

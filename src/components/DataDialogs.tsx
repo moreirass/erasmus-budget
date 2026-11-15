@@ -1,3 +1,4 @@
+import { BusyButton } from "./Feedback";
 import {
   AlertTriangle,
   Cloud,
@@ -36,7 +37,7 @@ export function DataDialogs({
           close={() => setPendingImport(null)}
         >
           <div className="record-summary import-summary">
-            <FileCheck2 size={28} aria-hidden="true" />
+            <FileCheck2 size={24} aria-hidden="true" />
             <p>
               {trCount("{0} transactions in the resulting workspace.", [
                 pendingImport.data.transactions.length,
@@ -49,9 +50,9 @@ export function DataDialogs({
             )}{" "}
           </p>
           <div className="button-pair dialog-actions">
-            <button onClick={exportJSON}>
+            <BusyButton onClick={exportJSON}>
               <Download size={16} /> {tr("Back up current")}{" "}
-            </button>
+            </BusyButton>
             <button className="primary" onClick={confirmImport}>
               {tr("Confirm import")}{" "}
             </button>
@@ -101,17 +102,19 @@ export function DataDialogs({
             )}
           </p>
           <div className="export-buttons conflict-exports">
-            <button onClick={exportBothVersions}>
+            <BusyButton onClick={exportBothVersions}>
               {tr("Export both versions")}
-            </button>
-            <button onClick={exportJSON}>{tr("Export local JSON")}</button>
-            <button onClick={exportCloudVersion}>
+            </BusyButton>
+            <BusyButton onClick={exportJSON}>
+              {tr("Export local JSON")}
+            </BusyButton>
+            <BusyButton onClick={exportCloudVersion}>
               {tr("Export cloud JSON")}{" "}
-            </button>
+            </BusyButton>
           </div>
           <div className="button-pair">
             <button onClick={() => store.resolveConflict("remote")}>
-              <Cloud size={18} /> {tr("Use cloud version")}{" "}
+              <Cloud size={20} /> {tr("Use cloud version")}{" "}
               <small>
                 {trCount("{0} transactions", [
                   store.conflict.data.transactions.length,
@@ -122,7 +125,7 @@ export function DataDialogs({
               className="primary"
               onClick={() => store.resolveConflict("local")}
             >
-              <Wallet size={18} /> {tr("Keep local version")}{" "}
+              <Wallet size={20} /> {tr("Keep local version")}{" "}
               <small>
                 {trCount("{0} transactions · sync later", [
                   data.transactions.length,

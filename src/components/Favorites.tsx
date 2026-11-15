@@ -1,3 +1,5 @@
+import { currentTime } from "../time";
+import { errorMessage } from "../i18n";
 import { AlertCircle, Repeat2, Star } from "lucide-react";
 import { useState } from "react";
 import {
@@ -184,6 +186,7 @@ export function FavoriteButtons({ data, fx, save }: Props) {
                   );
                   return;
                 }
+                t.time = currentTime();
                 if (
                   save(
                     { ...data, transactions: [...data.transactions, t] },
@@ -204,8 +207,8 @@ export function FavoriteButtons({ data, fx, save }: Props) {
       </div>
       {error && (
         <p className="form-error" role="alert">
-          <AlertCircle size={18} />
-          {tr(error)}
+          <AlertCircle size={20} />
+          {errorMessage(error)}
         </p>
       )}
       {added && (
