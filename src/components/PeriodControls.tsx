@@ -97,12 +97,14 @@ export function PeriodControls({
         )}
         <div className="segmented">
           <button
+            aria-pressed={view === "month"}
             className={view === "month" ? "selected" : ""}
             onClick={() => setView("month")}
           >
             {tr("Month")}{" "}
           </button>
           <button
+            aria-pressed={view === "week"}
             className={view === "week" ? "selected" : ""}
             onClick={() => {
               setView("week");

@@ -16,7 +16,7 @@ import {
   WashingMachine,
 } from "lucide-react";
 import { appLocale, displayDate, tr } from "../i18n";
-import { money } from "../model";
+import { money, monthLabel } from "../model";
 import type { BudgetStore } from "../hooks/types";
 import type { ViewProps } from "../views/types";
 type AppLayoutProps = Pick<
@@ -83,7 +83,7 @@ export function AppLayout({
             </strong>
           </div>
         </div>
-        <nav>
+        <nav aria-label={tr("Main navigation")}>
           {[
             { name: "Overview", icon: LayoutDashboard },
             { name: "Transactions", icon: ArrowLeftRight },
@@ -96,6 +96,11 @@ export function AppLayout({
                   ? "active"
                   : ""
               }
+              aria-current={
+                tab === name || (name === "Budget & settings" && isSettings)
+                  ? "page"
+                  : undefined
+              }
               onClick={() => setTab(name)}
             >
               <Icon size={20} />
@@ -106,8 +111,8 @@ export function AppLayout({
         <button
           className="sidebar-laundry"
           onClick={() => {
-            setTab("Overview");
-            setGroup("daily");
+            setTab("Budget & settings");
+            setSettingsSection("tracking");
           }}
         >
           <WashingMachine size={20} />
@@ -161,7 +166,7 @@ export function AppLayout({
           className={tab === "Budget & settings" ? "active" : ""}
           onClick={() => {
             setTab("Budget & settings");
-            setSettingsSection("rates");
+            setSettingsSection("sync");
           }}
         >
           <Settings size={21} />
@@ -279,13 +284,16 @@ export function AppLayout({
         >
           <div className="page-heading">
             <div>
-              <div className="eyebrow">ERASMUS · OSTRAVA 2026/27</div>
+              <div className="eyebrow">
+                OSTRAVA · {monthLabel(data.settings.start)} —{" "}
+                {monthLabel(data.settings.end)}
+              </div>
               <h1>
                 {tab === "Overview"
-                  ? tr("Your adventure, in balance.")
+                  ? tr("Overview")
                   : tab === "Transactions"
-                    ? tr("The little things add up.")
-                    : tr("A plan that fits your life.")}
+                    ? tr("Transactions")
+                    : tr("Budget & settings")}
               </h1>
               <p>
                 {tab === "Overview"
@@ -301,14 +309,14 @@ export function AppLayout({
                       )}
               </p>
             </div>
-            <button
-              className="primary"
-              onClick={() => openNew()}
-              disabled={!store.ready || store.corrupt}
-            >
-              <Plus size={18} /> {tr("Add transaction")}{" "}
-            </button>
           </div>
+          {!online && (
+            <p className="offline-banner" role="status">
+              {tr(
+                "Offline · changes are saved on this device. Sync when connected.",
+              )}
+            </p>
+          )}
           {children}
           <footer>
             <span>

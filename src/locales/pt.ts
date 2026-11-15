@@ -1,5 +1,8 @@
 // English source messages are the canonical keys. Keep placeholders unchanged.
 export const portuguese = {
+  "Main navigation": "Navegação principal",
+  "Offline · changes are saved on this device. Sync when connected.":
+    "Sem ligação · as alterações ficam guardadas neste dispositivo. Sincroniza quando tiveres ligação.",
   "{0} transaction": "{0} movimento",
   "{0} transaction this period · {1} money out":
     "{0} movimento neste período · {1} em saídas",
