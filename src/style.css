@@ -4942,3 +4942,24 @@ body:has(.screen-settings) .quick-add {
 .data-action > span {
   flex-wrap: wrap;
 }
+
+.sync-account-hero,
+.preference-row {
+  background: transparent;
+  border-radius: 0;
+}
+.preference-row {
+  padding-block: var(--space-4);
+}
+.auth-form button {
+  min-height: 56px;
+}
+.notice {
+  border-radius: var(--radius);
+}
+.preferences-panel {
+  border: 0;
+}
+.sync-status {
+  min-height: 44px;
+}

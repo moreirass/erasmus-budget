@@ -338,7 +338,7 @@ export function SettingsView({
               <h2>
                 <Cloud size={20} /> {tr("Account & sync")}
               </h2>
-              <p>{tr("Your devices, one budget")}</p>
+              <p>{tr("Account and manual sync")}</p>
             </div>
           </div>
           {!online && (

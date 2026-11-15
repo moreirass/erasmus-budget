@@ -117,7 +117,7 @@ export default function App() {
           {toast && (
             <div className="toast" role="status">
               <Info size={20} aria-hidden="true" />
-              {tr(toast)}
+              {errorMessage(toast)}
               <button
                 onClick={() => setToast("")}
                 aria-label={tr("Dismiss notification")}
