@@ -1,3 +1,4 @@
+import { AlertCircle, Repeat2, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   dueOccurrences,
@@ -25,15 +26,25 @@ type Props = {
 export function RecurringManager({ data, save, fx }: Props) {
   const [editing, setEditing] = useState<RecurringRule | "new" | null>(null);
   return (
-    <section className="panel">
-      <h2>{tr("Recurring transactions")}</h2>
+    <section className="panel recurring-panel">
+      <h2>
+        <Repeat2 size={20} aria-hidden="true" />
+        {tr("Recurring transactions")}
+      </h2>
       <p className="help">
         {tr(
           "Rules run when you open or resume the app. Missing exchange rates require confirmation.",
         )}
       </p>
+      {!data.recurring?.length && (
+        <p className="help">
+          {tr(
+            "No recurring rules yet. Create one for a regular expense or support.",
+          )}
+        </p>
+      )}
       {(data.recurring ?? []).map((r) => (
-        <div className="allocation-total" key={r.id}>
+        <div className="allocation-total template-row" key={r.id}>
           <span>
             {r.note || tr("Recurring transactions")} ·{" "}
             {money(r.amount, r.currency)} ·{" "}
@@ -283,10 +294,10 @@ export function RecurringOverview({ data, save, fx, enabled = true }: Props) {
         </div>
       )}
       {!!pending.length && (
-        <section className="panel">
+        <section className="panel recurring-panel">
           <h2>{tr("Pending recurring transactions")}</h2>
           {pending.map((o) => (
-            <div className="allocation-total" key={o.id}>
+            <div className="allocation-total template-row" key={o.id}>
               <span>
                 {o.date} · {o.rule.note} ·{" "}
                 {money(o.rule.amount, o.rule.currency)}

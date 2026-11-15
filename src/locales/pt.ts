@@ -1,5 +1,9 @@
 // English source messages are the canonical keys. Keep placeholders unchanged.
 export const portuguese = {
+  "No recurring rules yet. Create one for a regular expense or support.":
+    "Ainda não há regras recorrentes. Cria uma para uma despesa ou apoio regular.",
+  "Save frequent expenses here for quicker entry.":
+    "Guarda aqui as despesas frequentes para as registares mais depressa.",
   "Signing out…": "A terminar sessão…",
   "Your saved account data stays on this device after signing out.":
     "Os dados guardados da conta ficam neste dispositivo depois de terminares sessão.",

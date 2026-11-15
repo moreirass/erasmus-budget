@@ -1,3 +1,4 @@
+import { AlertCircle, Repeat2, Star } from "lucide-react";
 import { useState } from "react";
 import {
   periodStart,
@@ -22,10 +23,18 @@ type Props = {
 export function FavoriteManager({ data, fx, save }: Props) {
   const [editing, setEditing] = useState<Favorite | "new" | null>(null);
   return (
-    <section className="panel">
-      <h2>{tr("Favorites")}</h2>
+    <section className="panel favorites-panel">
+      <h2>
+        <Star size={20} aria-hidden="true" />
+        {tr("Favorites")}
+      </h2>
+      {!data.favorites?.length && (
+        <p className="help">
+          {tr("Save frequent expenses here for quicker entry.")}
+        </p>
+      )}
       {(data.favorites ?? []).map((f) => (
-        <div className="allocation-total" key={f.id}>
+        <div className="allocation-total template-row" key={f.id}>
           <span>
             {f.name} · {money(f.amount, f.currency)}
           </span>
@@ -156,7 +165,7 @@ export function FavoriteButtons({ data, fx, save }: Props) {
     [error, setError] = useState("");
   if (!data.favorites?.length && !added) return null;
   return (
-    <section className="panel">
+    <section className="panel favorites-panel">
       <h2>{tr("Favorites")}</h2>
       <div className="export-buttons">
         {data.favorites?.map((f) => (
@@ -189,7 +198,12 @@ export function FavoriteButtons({ data, fx, save }: Props) {
           </button>
         ))}
       </div>
-      {error && <p role="status">{tr(error)}</p>}
+      {error && (
+        <p className="form-error" role="alert">
+          <AlertCircle size={18} />
+          {tr(error)}
+        </p>
+      )}
       {added && (
         <div role="status">
           {tr("Favorite added")}{" "}

@@ -4034,3 +4034,55 @@ legend {
     flex-direction: row;
   }
 }
+
+/* Recurring and favourite lists share one compact row pattern. */
+.recurring-panel h2,
+.favorites-panel h2 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.recurring-panel h2 svg,
+.favorites-panel h2 svg {
+  color: var(--primary);
+}
+.template-row {
+  border-bottom: 1px solid var(--border);
+  padding: 16px 0;
+  gap: 12px;
+}
+.template-row > span {
+  flex: 1 1 180px;
+  overflow-wrap: anywhere;
+}
+.template-row .button-pair {
+  flex: 1 1 180px;
+}
+.recurring-panel > button,
+.favorites-panel > button {
+  margin-top: 16px;
+}
+.favorites-panel .export-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.favorites-panel .export-buttons button {
+  background: var(--low);
+  color: var(--text);
+  font-size: 0.875rem;
+  white-space: normal;
+  text-align: left;
+}
+.favorites-panel > [role="status"] {
+  padding-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.screen-overview > .favorites-panel {
+  margin-bottom: 24px;
+}
+.screen-overview .recurring-panel {
+  margin-bottom: 24px;
+}
