@@ -4731,3 +4731,32 @@ dialog[open],
     scroll-behavior: auto !important;
   }
 }
+.busy-button {
+  display: inline-grid;
+  align-items: center;
+  justify-items: center;
+}
+.busy-button > span {
+  grid-area: 1/1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.busy-label {
+  font-size: var(--text-sm);
+}
+.skeleton {
+  display: block;
+  min-height: var(--space-4);
+  width: 100%;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
