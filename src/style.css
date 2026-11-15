@@ -4903,3 +4903,25 @@ body:has(.screen-settings) .quick-add {
 .laundry-title {
   color: var(--gold);
 }
+
+.rate-hero {
+  background: var(--low);
+  border: 0;
+  border-radius: var(--radius-lg);
+}
+.rate-hero .skeleton {
+  display: inline-block;
+  width: 7ch;
+}
+.rate-list button {
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+}
+.rate-hero small {
+  min-height: 24px;
+  display: block;
+}
+.rate-hero .primary {
+  min-height: 56px;
+}

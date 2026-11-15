@@ -1,3 +1,4 @@
+import { Skeleton } from "./Feedback";
 import { formatNumber, formatPercent } from "../i18n";
 import { errorMessage } from "../i18n";
 import {
@@ -75,11 +76,15 @@ export function ExchangePanel({
           {money(100)}{" "}
           <span>
             ≈{" "}
-            {quote
-              ? quote.rate.toLocaleString(appLocale(), {
-                  maximumFractionDigits: 6,
-                })
-              : "—"}{" "}
+            {quote ? (
+              quote.rate.toLocaleString(appLocale(), {
+                maximumFractionDigits: 6,
+              })
+            ) : fx.busy ? (
+              <Skeleton label={tr("Loading reference rate…")} />
+            ) : (
+              "—"
+            )}{" "}
             {code}
           </span>
         </strong>
