@@ -138,11 +138,13 @@ export function AppLayout({
           <span>{tr("Overview")}</span>
         </button>
         <button
+          aria-label={tr("Transactions")}
           className={tab === "Transactions" ? "active" : ""}
           onClick={() => setTab("Transactions")}
         >
           <ArrowLeftRight size={21} />
-          <span>{tr("Transactions")}</span>
+          <span className="nav-full">{tr("Transactions")}</span>
+          <span className="nav-short">{tr("Ledger")}</span>
         </button>
         <button
           className="quick-add"

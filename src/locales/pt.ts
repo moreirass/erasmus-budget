@@ -1,5 +1,6 @@
 // English source messages are the canonical keys. Keep placeholders unchanged.
 export const portuguese = {
+  Ledger: "Registos",
   "No card credit. Add a top-up before recording a wash.":
     "Sem crédito no cartão. Adiciona um carregamento antes de registares uma lavagem.",
   "No recurring rules yet. Create one for a regular expense or support.":

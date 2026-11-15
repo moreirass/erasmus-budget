@@ -235,7 +235,8 @@ export function OverviewView({
                         <strong>
                           {tr(c.name)}
                           {alerts.some((a) => a.category === c.id) && (
-                            <small role="status">
+                            <small className="limit-alert" role="status">
+                              <AlertTriangle size={16} aria-hidden="true" />
                               {tr("Monthly limit: {0}% reached", [
                                 alerts.find((a) => a.category === c.id)!
                                   .threshold,
@@ -350,7 +351,7 @@ export function OverviewView({
                     <span>{money(groupCash(s))}</span>
                     <div className="bar-slot">
                       <div
-                        style={{ height: `${(groupCash(s) / max) * 100}%` }}
+                        style={{ width: `${(groupCash(s) / max) * 100}%` }}
                       />
                     </div>
                     <small>

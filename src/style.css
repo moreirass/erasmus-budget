@@ -107,7 +107,7 @@ p {
   color: var(--muted);
 }
 small {
-  font-size: 12px;
+  font-size: 14px;
 }
 b,
 strong {
@@ -120,7 +120,7 @@ strong {
 .tiny,
 .eyebrow,
 .field-label {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.065em;
   color: var(--muted);
@@ -163,7 +163,7 @@ strong {
   left: 24px;
   top: 75px;
   font-family: Inter, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--muted);
 }
@@ -179,12 +179,12 @@ strong {
 }
 .active-term span {
   display: block;
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.04em;
 }
 .active-term strong {
   display: block;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text);
 }
@@ -219,13 +219,13 @@ strong {
 .sidebar-laundry > span {
   flex: 1;
   text-align: left;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
 }
 .sidebar-laundry strong {
   display: block;
   color: var(--text);
-  font-size: 13px;
+  font-size: 14px;
 }
 .storage-badge {
   display: flex;
@@ -233,7 +233,7 @@ strong {
   gap: 6px;
   flex-wrap: wrap;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
   margin-top: 18px;
 }
 .storage-badge .status-dot {
@@ -241,7 +241,7 @@ strong {
 }
 .storage-badge small {
   flex-basis: 100%;
-  font-size: 10px;
+  font-size: 14px;
   overflow-wrap: anywhere;
 }
 .status-dot,
@@ -275,7 +275,7 @@ main {
 .breadcrumb {
   min-width: 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 .desktop-crumb {
   display: flex;
@@ -298,7 +298,7 @@ main {
   border-radius: 30px;
   background: var(--low);
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
   white-space: nowrap;
   padding: 4px 9px;
 }
@@ -307,7 +307,7 @@ main {
 }
 .fx-pill strong {
   color: var(--gold);
-  font-size: 13px;
+  font-size: 14px;
 }
 .sync-pill {
   min-height: 28px;
@@ -315,7 +315,7 @@ main {
   padding: 3px 10px;
   background: var(--surface);
   color: var(--primary);
-  font-size: 11px;
+  font-size: 14px;
   max-width: 160px;
   overflow: hidden;
   white-space: nowrap;
@@ -323,7 +323,7 @@ main {
 .primary {
   background: var(--cta);
   color: var(--on-cta);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 .primary:hover {
@@ -409,7 +409,7 @@ main {
 .period-right > select {
   width: auto;
   max-width: 190px;
-  font-size: 12px;
+  font-size: 14px;
   background: var(--surface);
 }
 .segmented {
@@ -426,7 +426,7 @@ main {
   padding: 5px 17px;
   background: none;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
   border-radius: 30px;
 }
 .segmented button.selected {
@@ -441,7 +441,7 @@ main {
   border-radius: 30px;
   background: var(--elevated);
   color: var(--primary);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -472,7 +472,7 @@ main {
   align-items: center;
   justify-content: space-between;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
   letter-spacing: 0.09em;
 }
 .balance-number {
@@ -483,7 +483,7 @@ main {
 }
 .balance-card p,
 .mini-card p {
-  font-size: 13px;
+  font-size: 14px;
 }
 .balance-footer {
   display: flex;
@@ -491,7 +491,7 @@ main {
   justify-content: space-between;
   margin-top: 28px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
 }
 .balance-footer strong {
   display: block;
@@ -520,14 +520,14 @@ main {
   margin: 20px 0 12px;
   border-top: 1px solid var(--border);
   padding-top: 15px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
 }
 .travel-totals {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
-  font-size: 12px;
+  font-size: 14px;
 }
 .budget-card-button {
   position: absolute;
@@ -541,7 +541,7 @@ main {
   border-radius: inherit;
 }
 .budget-card-button:hover {
-  background: var(--legacy-0) !important;
+  background: var(--low) !important;
 }
 .budget-card-button:focus-visible {
   outline-offset: -5px;
@@ -558,7 +558,7 @@ main {
   gap: 15px;
   margin: 17px 0 25px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
 }
 .under-hero > span:first-child {
   display: flex;
@@ -586,7 +586,7 @@ main {
   margin-bottom: 24px;
 }
 .section-heading p {
-  font-size: 12px;
+  font-size: 14px;
   margin-top: 5px;
 }
 .text-button {
@@ -595,7 +595,7 @@ main {
   color: var(--primary);
   background: none;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 14px;
 }
 .text-button:hover {
   background: none;
@@ -634,14 +634,14 @@ main {
   justify-content: space-between;
   gap: 10px;
   align-items: center;
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 9px;
 }
 .category-label strong {
   font-weight: 500;
 }
 .category-label > span {
-  font-size: 12px;
+  font-size: 14px;
   white-space: nowrap;
 }
 .track {
@@ -659,7 +659,7 @@ main {
 .category-main small {
   display: block;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
   margin-top: 6px;
 }
 .spending-chart {
@@ -697,7 +697,7 @@ main {
   color: var(--text);
 }
 .donut-label span {
-  font-size: 9px;
+  font-size: 14px;
   letter-spacing: 0.05em;
   color: var(--muted);
   margin-top: 6px;
@@ -713,7 +713,7 @@ main {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
 }
 .legend > div > span {
@@ -727,14 +727,14 @@ main {
   color: var(--text);
 }
 .empty-caption {
-  font-size: 12px;
+  font-size: 14px;
   max-width: 155px;
 }
 .laundry-title {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--gold);
 }
@@ -744,7 +744,7 @@ main {
 .laundry-card .pill {
   background: var(--gold-bg);
   color: var(--gold);
-  font-size: 10px;
+  font-size: 14px;
 }
 .laundry-value {
   font-size: 30px;
@@ -752,13 +752,13 @@ main {
   margin: 5px 0 8px;
 }
 .laundry-card p {
-  font-size: 12px;
+  font-size: 14px;
 }
 .laundry-meta {
   display: flex;
   gap: 30px;
   margin: 18px 0;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
 }
 .laundry-meta b {
@@ -774,13 +774,13 @@ main {
 }
 .button-pair > button {
   flex: 1;
-  font-size: 12px;
+  font-size: 14px;
 }
 .laundry-card button {
   background: var(--low);
 }
 .weekly-panel .muted {
-  font-size: 11px;
+  font-size: 14px;
 }
 .bar-chart {
   display: flex;
@@ -798,7 +798,7 @@ main {
 }
 .bar-column > span,
 .bar-column small {
-  font-size: 10px;
+  font-size: 14px;
   color: var(--muted);
 }
 .bar-slot {
@@ -834,7 +834,7 @@ main {
   font-size: 16px;
 }
 .empty-state p {
-  font-size: 13px;
+  font-size: 14px;
   margin: 10px 0;
 }
 .transactions-layout {
@@ -881,16 +881,16 @@ main {
 }
 .transaction-tools select {
   max-width: 170px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .export-csv {
-  font-size: 12px;
+  font-size: 14px;
   white-space: nowrap;
 }
 .ledger-heading {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.065em;
   font-weight: 600;
   color: var(--muted);
@@ -901,7 +901,7 @@ main {
   align-items: center;
   gap: 9px;
   font-family: Inter, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--muted);
@@ -913,7 +913,7 @@ main {
 }
 .day-total {
   margin-left: auto;
-  font-size: 12px;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
 }
 .transaction {
@@ -944,7 +944,7 @@ main {
 }
 .transaction-description small {
   display: block;
-  font-size: 11px;
+  font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -960,7 +960,7 @@ main {
 }
 .transaction-amount small {
   display: block;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--gold);
   margin-top: 5px;
 }
@@ -1000,7 +1000,7 @@ main {
   justify-content: space-between;
   gap: 12px;
   margin: 8px 0 16px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
 }
 .summary-values strong {
@@ -1008,13 +1008,13 @@ main {
   color: var(--text);
 }
 .summary-values > div > span {
-  font-size: 13px;
+  font-size: 14px;
 }
 .summary-foot {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
   margin: 10px 0 17px;
 }
@@ -1031,7 +1031,7 @@ main {
   border-radius: 25px;
   padding: 6px 14px;
   min-height: 32px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   white-space: nowrap;
 }
@@ -1040,7 +1040,7 @@ main {
   color: var(--on-cta);
 }
 .budget-pills small {
-  font-size: 10px;
+  font-size: 14px;
 }
 .fx-detail h2 {
   display: flex;
@@ -1057,7 +1057,7 @@ main {
   margin: 17px 0;
 }
 .fx-detail p {
-  font-size: 12px;
+  font-size: 14px;
 }
 .settings-grid {
   display: grid;
@@ -1092,13 +1092,13 @@ main {
   gap: 10px;
 }
 .settings-grid .panel > p {
-  font-size: 13px;
+  font-size: 14px;
 }
 .field {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
   margin: 18px 0;
   min-width: 0;
@@ -1115,7 +1115,7 @@ main {
   margin: 12px 0;
 }
 .help {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   margin: 13px 0;
   line-height: 1.65;
@@ -1125,7 +1125,7 @@ main {
   align-items: center;
   gap: 10px;
   color: var(--primary);
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.05em;
   background: var(--low);
   padding: 15px 17px;
@@ -1159,12 +1159,12 @@ main {
   min-width: 0;
 }
 .limit-description b {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 .limit-description small {
   display: block;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
   margin-top: 4px;
   line-height: 1.4;
@@ -1179,7 +1179,7 @@ main {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   flex-shrink: 0;
 }
@@ -1198,13 +1198,13 @@ main {
   gap: 10px;
   margin: 18px 0;
   color: var(--primary);
-  font-size: 12px;
+  font-size: 14px;
 }
 .budget-rule {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 12px;
+  font-size: 14px;
   padding: 17px;
   background: var(--low);
   border-radius: 10px;
@@ -1229,7 +1229,7 @@ main {
   margin: 18px 0;
 }
 .export-buttons button {
-  font-size: 12px;
+  font-size: 14px;
 }
 .data-panel .export-buttons > button:last-child {
   width: 100%;
@@ -1238,7 +1238,7 @@ main {
   flex-direction: column;
 }
 .sync-status {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--primary);
 }
 .rates-panel > button {
@@ -1253,11 +1253,11 @@ main {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 14px;
   margin-bottom: 20px;
 }
 .notice button {
-  font-size: 11px;
+  font-size: 14px;
 }
 .notice.error,
 .form-error {
@@ -1266,7 +1266,7 @@ main {
   border-color: color-mix(in srgb, var(--error) 30%, transparent);
 }
 .form-error {
-  font-size: 12px;
+  font-size: 14px;
   padding: 12px;
   border-radius: 8px;
   margin: 12px 0;
@@ -1276,7 +1276,7 @@ footer {
   justify-content: space-between;
   gap: 15px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 14px;
   padding: 25px 0 5px;
 }
 footer .muted {
@@ -1302,10 +1302,10 @@ dialog {
   padding: 26px;
   width: min(540px, calc(100vw - 32px));
   max-height: 92dvh;
-  box-shadow: 0 24px 80px var(--legacy-1);
+  box-shadow: 0 24px 80px var(--overlay);
 }
 dialog::backdrop {
-  background: var(--legacy-2);
+  background: var(--overlay);
   backdrop-filter: blur(8px);
 }
 .transaction-kinds {
@@ -1325,7 +1325,7 @@ dialog::backdrop {
   flex: 1;
   padding: 13px 4px;
   min-height: 75px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
 }
 .transaction-kinds > button.selected {
@@ -1341,7 +1341,7 @@ dialog::backdrop {
   justify-content: space-between;
   text-align: left;
   background: var(--low);
-  font-size: 13px;
+  font-size: 14px;
 }
 .field-label {
   display: block;
@@ -1369,7 +1369,7 @@ dialog::backdrop {
   border: 0;
   background: none;
   text-align: left;
-  font-size: 13px;
+  font-size: 14px;
 }
 .currency-results button[aria-selected="true"] {
   background: var(--active);
@@ -1433,11 +1433,11 @@ dialog::backdrop {
   color: var(--text);
 }
 .group-options b {
-  font-size: 13px;
+  font-size: 14px;
 }
 .group-options small {
   flex-basis: 100%;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
 }
 .category-picker {
@@ -1455,7 +1455,7 @@ dialog::backdrop {
   min-height: 82px;
   background: var(--lowest);
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
   gap: 9px;
 }
 .category-chips button.selected {
@@ -1479,8 +1479,8 @@ dialog::backdrop {
   max-width: calc(100vw - 32px);
   background: var(--primary);
   color: var(--on-cta);
-  box-shadow: 0 10px 35px var(--legacy-3);
-  font-size: 13px;
+  box-shadow: 0 10px 35px var(--overlay);
+  font-size: 14px;
   padding: 14px 18px;
   border-radius: 12px;
 }
@@ -1536,7 +1536,7 @@ dialog::backdrop {
     gap: 9px;
   }
   .limit-description small {
-    font-size: 10px;
+    font-size: 14px;
   }
   .transaction > .icon-button {
     padding: 2px;
@@ -1547,14 +1547,14 @@ dialog::backdrop {
     width: 205px;
   }
   .sidebar nav button {
-    font-size: 12px;
+    font-size: 14px;
     padding: 13px 10px;
   }
   main {
     margin-left: 205px;
   }
   .desktop-crumb {
-    font-size: 10px;
+    font-size: 14px;
     gap: 7px;
   }
   .top-add {
@@ -1623,9 +1623,6 @@ dialog::backdrop {
 }
 @media (max-width: 767px) {
   :root[data-theme="dark"] {
-    --canvas: var(--legacy-4);
-    --low: var(--legacy-5);
-    --lowest: var(--legacy-4);
   }
   .sidebar {
     display: none;
@@ -1656,7 +1653,7 @@ dialog::backdrop {
     color: var(--muted);
     border-radius: 0;
     min-height: 54px;
-    font-size: 10px;
+    font-size: 14px;
   }
   .mobile-nav > button.active {
     color: var(--primary);
@@ -1670,7 +1667,7 @@ dialog::backdrop {
     border-radius: 50%;
     background: var(--primary);
     color: var(--on-cta);
-    box-shadow: 0 0 24px var(--legacy-6);
+    box-shadow: 0 0 24px var(--border);
   }
   .topbar {
     height: 80px;
@@ -1698,7 +1695,7 @@ dialog::backdrop {
   .mobile-brand em {
     display: inline-block;
     font-family: Inter, sans-serif;
-    font-size: 9px;
+    font-size: 14px;
     font-style: normal;
     padding: 2px 5px;
     border-radius: 20px;
@@ -1708,7 +1705,7 @@ dialog::backdrop {
   .mobile-brand small {
     display: block;
     font-family: Inter, sans-serif;
-    font-size: 9px;
+    font-size: 14px;
     letter-spacing: 0.05em;
     color: var(--muted);
     margin-top: 3px;
@@ -1718,7 +1715,7 @@ dialog::backdrop {
   }
   .fx-pill {
     padding: 6px 8px;
-    font-size: 10px;
+    font-size: 14px;
     background: var(--gold-bg);
     color: var(--gold);
   }
@@ -1726,7 +1723,7 @@ dialog::backdrop {
     display: none;
   }
   .fx-pill strong {
-    font-size: 11px;
+    font-size: 14px;
   }
   .fx-pill svg {
     color: var(--gold);
@@ -1756,7 +1753,7 @@ dialog::backdrop {
     background: none;
     padding: 0;
     letter-spacing: 0.07em;
-    font-size: 10px;
+    font-size: 14px;
     margin-bottom: 6px;
   }
   .page-heading h1 {
@@ -1764,7 +1761,7 @@ dialog::backdrop {
     line-height: 1.25;
   }
   .page-heading p {
-    font-size: 12px;
+    font-size: 14px;
     margin-top: 8px;
   }
   .page-heading > .primary {
@@ -1796,7 +1793,7 @@ dialog::backdrop {
     flex-wrap: wrap;
   }
   .period-right > select {
-    font-size: 12px;
+    font-size: 14px;
     max-width: 160px;
     padding: 9px 10px;
   }
@@ -1804,7 +1801,7 @@ dialog::backdrop {
     margin-left: auto;
   }
   .segmented button {
-    font-size: 13px;
+    font-size: 14px;
     min-height: 34px;
     padding: 6px 17px;
   }
@@ -1839,28 +1836,28 @@ dialog::backdrop {
     font-size: 16px;
   }
   .balance-footer span {
-    font-size: 11px;
+    font-size: 14px;
   }
   .mini-card h2 {
     font-size: 35px;
   }
   .mini-card .tiny {
-    font-size: 10px;
+    font-size: 14px;
     letter-spacing: 0.06em;
   }
   .card-kicker {
-    font-size: 10px;
+    font-size: 14px;
     letter-spacing: 0.065em;
   }
   .mini-card p,
   .balance-card p {
-    font-size: 12px;
+    font-size: 14px;
   }
   .under-hero {
     flex-direction: column;
     align-items: flex-start;
     gap: 7px;
-    font-size: 10px;
+    font-size: 14px;
     margin: 15px 0 23px;
   }
   .dashboard-grid {
@@ -1882,23 +1879,23 @@ dialog::backdrop {
   .category-label {
     flex-wrap: nowrap;
     align-items: center;
-    font-size: 12px;
+    font-size: 14px;
     gap: 6px;
   }
   .category-label > span {
-    font-size: 11px;
+    font-size: 14px;
   }
   .category-main small {
-    font-size: 10px;
+    font-size: 14px;
   }
   .section-heading h2 {
     font-size: 17px;
   }
   .section-heading p {
-    font-size: 11px;
+    font-size: 14px;
   }
   .text-button {
-    font-size: 11px;
+    font-size: 14px;
   }
   .category-emoji {
     width: 39px;
@@ -1916,10 +1913,10 @@ dialog::backdrop {
     min-width: 100px;
   }
   .legend > div {
-    font-size: 10px;
+    font-size: 14px;
   }
   .empty-caption {
-    font-size: 11px;
+    font-size: 14px;
   }
   .bar-chart {
     height: 130px;
@@ -1927,7 +1924,7 @@ dialog::backdrop {
   }
   .bar-column > span,
   .bar-column small {
-    font-size: 9px;
+    font-size: 14px;
   }
   .transactions-layout {
     display: block;
@@ -1952,11 +1949,11 @@ dialog::backdrop {
   }
   .transaction-tools select {
     max-width: 190px;
-    font-size: 12px;
+    font-size: 14px;
   }
   .export-csv {
     margin-left: auto;
-    font-size: 11px;
+    font-size: 14px;
     min-height: 36px;
     padding: 7px 10px;
   }
@@ -1972,17 +1969,17 @@ dialog::backdrop {
     font-size: 29px;
   }
   .summary-values > div > span {
-    font-size: 11px;
+    font-size: 14px;
   }
   .summary-values > span {
-    font-size: 10px;
+    font-size: 14px;
     text-align: right;
   }
   .summary-top .pill {
-    font-size: 10px;
+    font-size: 14px;
   }
   .summary-foot {
-    font-size: 10px;
+    font-size: 14px;
     gap: 10px;
   }
   .budget-pills {
@@ -1990,22 +1987,22 @@ dialog::backdrop {
     margin-top: 18px;
   }
   .budget-pills button {
-    font-size: 12px;
+    font-size: 14px;
     padding: 6px 12px;
   }
   .budget-pills small {
-    font-size: 10px;
+    font-size: 14px;
   }
   .ledger-heading {
-    font-size: 10px;
+    font-size: 14px;
     margin: 22px 4px 7px;
   }
   .transaction-day h3 {
-    font-size: 12px;
+    font-size: 14px;
     margin: 23px 4px 13px;
   }
   .day-total {
-    font-size: 11px;
+    font-size: 14px;
   }
   .transaction {
     padding: 16px 13px;
@@ -2023,7 +2020,7 @@ dialog::backdrop {
     font-size: 14px;
   }
   .transaction-description small {
-    font-size: 10px;
+    font-size: 14px;
   }
   .transaction-amount {
     margin-left: auto;
@@ -2032,7 +2029,7 @@ dialog::backdrop {
     font-size: 14px;
   }
   .transaction-amount small {
-    font-size: 10px;
+    font-size: 14px;
   }
   .transaction .category-emoji {
     width: 38px;
@@ -2063,7 +2060,7 @@ dialog::backdrop {
     flex-direction: column;
     background: none;
     color: var(--muted);
-    font-size: 10px;
+    font-size: 14px;
     padding: 10px 5px;
     min-width: 55px;
     gap: 6px;
@@ -2099,7 +2096,7 @@ dialog::backdrop {
     margin-bottom: 10px;
   }
   .settings-grid .plan-panel > .section-heading p {
-    font-size: 11px;
+    font-size: 14px;
   }
   .plan-total-label {
     padding: 13px;
@@ -2122,10 +2119,10 @@ dialog::backdrop {
     width: 19px;
   }
   .limit-description b {
-    font-size: 13px;
+    font-size: 14px;
   }
   .limit-description small {
-    font-size: 10px;
+    font-size: 14px;
     line-height: 1.4;
   }
   .limit-input input {
@@ -2134,11 +2131,11 @@ dialog::backdrop {
     padding: 8px 6px;
   }
   .allocation-total {
-    font-size: 12px;
+    font-size: 14px;
     flex-wrap: wrap;
   }
   .budget-rule {
-    font-size: 11px;
+    font-size: 14px;
     padding: 15px;
   }
   .field input,
@@ -2149,7 +2146,7 @@ dialog::backdrop {
     grid-template-columns: 1fr;
   }
   .help {
-    font-size: 12px;
+    font-size: 14px;
   }
   .button-pair {
     flex-wrap: wrap;
@@ -2159,25 +2156,25 @@ dialog::backdrop {
   }
   .notice {
     align-items: flex-start;
-    font-size: 11px;
+    font-size: 14px;
     padding: 13px;
   }
   .notice button {
-    font-size: 10px;
+    font-size: 14px;
     padding: 7px;
   }
   .export-buttons button {
-    font-size: 12px;
+    font-size: 14px;
   }
   .toast {
     bottom: 100px;
-    font-size: 12px;
+    font-size: 14px;
   }
   footer {
     flex-direction: column;
     text-align: center;
     align-items: center;
-    font-size: 10px;
+    font-size: 14px;
     padding-top: 27px;
     gap: 7px;
   }
@@ -2189,7 +2186,7 @@ dialog::backdrop {
     max-height: 96dvh;
     border-radius: 24px 24px 0 0;
     border-bottom: 0;
-    box-shadow: 0 -20px 80px var(--legacy-7);
+    box-shadow: 0 -20px 80px var(--overlay);
   }
   dialog .modal-head {
     position: sticky;
@@ -2207,7 +2204,7 @@ dialog::backdrop {
     gap: 2px;
   }
   .transaction-kinds > button {
-    font-size: 11px;
+    font-size: 14px;
     padding: 12px 3px;
     min-height: 75px;
   }
@@ -2234,16 +2231,16 @@ dialog::backdrop {
     padding: 17px 12px;
   }
   .group-options b {
-    font-size: 12px;
+    font-size: 14px;
   }
   .category-chips {
     gap: 8px;
   }
   .category-chips button {
-    font-size: 11px;
+    font-size: 14px;
   }
   .conversion {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.5;
   }
   .full.primary {
@@ -2270,7 +2267,7 @@ dialog::backdrop {
     display: none;
   }
   .fx-pill strong {
-    font-size: 10px;
+    font-size: 14px;
   }
   .header-actions {
     gap: 2px;
@@ -2290,7 +2287,7 @@ dialog::backdrop {
   }
   .transaction-description strong,
   .transaction-amount strong {
-    font-size: 13px;
+    font-size: 14px;
   }
   .balance-footer strong {
     font-size: 14px;
@@ -2319,7 +2316,7 @@ dialog::backdrop {
   margin: 6px 0;
 }
 .welcome-card p {
-  font-size: 12px;
+  font-size: 14px;
 }
 .welcome-card > svg {
   color: var(--primary);
@@ -2347,7 +2344,7 @@ dialog::backdrop {
   color: var(--gold);
 }
 .rate-hero p {
-  font-size: 12px;
+  font-size: 14px;
 }
 .rate-hero button {
   margin: 20px 0 12px;
@@ -2355,7 +2352,7 @@ dialog::backdrop {
 .rate-hero > small {
   display: block;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
   text-align: center;
 }
 .rate-calculator {
@@ -2400,13 +2397,13 @@ dialog::backdrop {
 }
 .exchange-list small {
   display: block;
-  font-size: 10px;
+  font-size: 14px;
   color: var(--muted);
   margin-top: 3px;
   overflow-wrap: anywhere;
 }
 .exchange-list > button > strong {
-  font-size: 12px;
+  font-size: 14px;
 }
 .currency-symbol {
   width: 35px;
@@ -2446,10 +2443,10 @@ dialog::backdrop {
   min-width: 100px;
 }
 .laundry-history .transaction-amount strong {
-  font-size: 12px;
+  font-size: 14px;
 }
 .laundry-history .transaction-description strong {
-  font-size: 12px;
+  font-size: 14px;
 }
 .laundry-history .category-emoji {
   width: 30px;
@@ -2475,7 +2472,7 @@ dialog::backdrop {
   color: var(--gold);
 }
 .conflict-banner p {
-  font-size: 12px;
+  font-size: 14px;
   margin-top: 8px;
 }
 .conflict-banner ~ .button-pair {
@@ -2487,7 +2484,7 @@ dialog::backdrop {
 }
 .conflict-banner ~ .button-pair small {
   flex-basis: 100%;
-  font-size: 11px;
+  font-size: 14px;
 }
 .rate-hero .tiny {
   color: var(--muted);
@@ -2506,7 +2503,7 @@ dialog::backdrop {
     font-size: 19px;
   }
   .welcome-card p {
-    font-size: 11px;
+    font-size: 14px;
   }
   .rate-hero {
     padding: 20px;
@@ -2556,11 +2553,11 @@ dialog::backdrop {
 .semester-plan small {
   display: block;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 14px;
   margin-bottom: 5px;
 }
 .semester-plan b {
-  font-size: 13px;
+  font-size: 14px;
 }
 .semester-plan .current {
   background: var(--active);
@@ -2570,7 +2567,7 @@ dialog::backdrop {
   padding: 20px 8px;
 }
 .rates-panel > .help {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   background: none;
   padding: 0;
@@ -2615,7 +2612,7 @@ dialog::backdrop {
 }
 @media (max-width: 380px) {
   .mobile-brand small {
-    font-size: 8px;
+    font-size: 14px;
     max-width: 70px;
     overflow: hidden;
     white-space: nowrap;
@@ -2685,7 +2682,7 @@ dialog::backdrop {
   min-width: 0;
   margin: 0 0 24px;
   padding: 16px;
-  border: 1px solid var(--border, var(--legacy-8));
+  border: 1px solid var(--border, var(--border));
   border-radius: 16px;
 }
 .plan-budget-group legend {
@@ -4383,4 +4380,145 @@ legend {
 }
 .conflict-banner p {
   color: var(--text);
+}
+
+/* Final accessibility and density pass across inherited responsive selectors. */
+button,
+.icon-button,
+select {
+  min-width: 44px;
+  min-height: 44px !important;
+}
+.icon-button {
+  width: 44px;
+  height: 44px;
+}
+button {
+  line-height: 1.4;
+}
+.button-pair button {
+  font-size: 1rem;
+}
+.category-list {
+  gap: 0;
+}
+.category-row {
+  padding: 16px 0;
+}
+.category-label {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.category-label > span {
+  white-space: normal;
+}
+.category-label strong {
+  font-size: 1rem;
+}
+.category-label small.limit-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--gold);
+  font-size: 0.875rem;
+}
+.category-label small.limit-alert svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.category-main small {
+  font-size: 0.875rem;
+}
+.period-right {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+.period-right > select {
+  flex: 0 1 190px;
+}
+.period-right .segmented {
+  flex-shrink: 0;
+}
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: auto;
+  padding-top: 16px;
+}
+.bar-column {
+  display: grid;
+  grid-template-columns: 72px minmax(20px, 1fr) 95px;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+.bar-column > span {
+  grid-column: 3;
+  grid-row: 1;
+  text-align: right;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.bar-column .bar-slot {
+  grid-column: 2;
+  grid-row: 1;
+  height: 8px;
+  width: 100%;
+  border-radius: 8px;
+}
+.bar-column .bar-slot > div {
+  height: 8px;
+  border-radius: 8px;
+  min-height: 0;
+}
+.bar-column small {
+  grid-column: 1;
+  grid-row: 1;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.bar-column {
+  min-width: 0;
+}
+.legend {
+  width: 100%;
+  gap: 0;
+}
+.allocation-total {
+  margin: 0;
+  min-height: 0;
+  padding: 12px 0;
+}
+.mobile-nav .nav-short {
+  display: none;
+}
+@media (max-width: 767px) {
+  .mobile-nav {
+    grid-template-columns: 1.05fr 1.35fr 50px 1fr 1fr;
+  }
+  .mobile-nav button span {
+    overflow-wrap: normal;
+    word-break: normal;
+    letter-spacing: -0.035em;
+  }
+  .period-right > select {
+    flex: 1 1 120px;
+  }
+  .bar-column {
+    grid-template-columns: 60px minmax(20px, 1fr) 86px;
+    gap: 8px;
+  }
+  .transaction .icon-button {
+    min-height: 44px;
+  }
+}
+@media (max-width: 360px) {
+  .mobile-nav .nav-full {
+    display: none;
+  }
+  .mobile-nav .nav-short {
+    display: block;
+  }
 }
