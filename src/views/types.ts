@@ -16,9 +16,6 @@ export type ViewProps = {
   search: string;
   filter: string;
   setTab: (s: string) => void;
-  setSettingsSection: (s: string) => void;
-  selectBudget: (s: string) => void;
-  groupCash: (s: ReturnType<typeof summary>) => number;
   openNew: (kind?: Transaction["kind"]) => void;
   setEditor: (t: Transaction | "new" | null) => void;
   setPendingDelete: (t: Transaction | null) => void;

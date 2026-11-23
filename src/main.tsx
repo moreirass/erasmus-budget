@@ -1,8 +1,11 @@
-import { appLocale, tr } from "./i18n";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./style.css";
+import "./pocket.css";
+import { appLocale, readLanguage, setLanguage, tr } from "./i18n";
+
+setLanguage(readLanguage("pt"));
 document.documentElement.lang = appLocale();
 document.title = tr("Ostrava Pocket · Erasmus budget");
 try {

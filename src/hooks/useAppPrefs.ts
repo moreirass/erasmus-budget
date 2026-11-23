@@ -68,7 +68,7 @@ export function useAppPrefs() {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", dark ? "#00170f" : "#eaf5ee");
+      ?.setAttribute("content", dark ? "#101319" : "#f7f8fa");
     try {
       localStorage.setItem("pocket-theme", dark ? "dark" : "light");
     } catch {}

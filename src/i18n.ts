@@ -1,14 +1,16 @@
 import { useSyncExternalStore } from "react";
 import { portuguese } from "./locales/pt.ts";
 import { english } from "./locales/en.ts";
+import type { LaundryService, Transaction } from "./model.ts";
 
 export type Language = "en" | "pt";
 const storageKey = "pocket-language";
-export function readLanguage(): Language {
+export function readLanguage(fallback?: Language): Language {
   try {
     const saved = localStorage.getItem(storageKey);
     if (saved === "pt" || saved === "en") return saved;
   } catch {}
+  if (fallback) return fallback;
   return typeof navigator !== "undefined" &&
     navigator.language?.toLowerCase().startsWith("pt")
     ? "pt"
@@ -108,6 +110,16 @@ export function kindLabel(kind: string) {
       } as Record<string, string>
     )[kind] ?? kind,
   );
+}
+export function laundryServiceLabel(service: LaundryService = "wash") {
+  return service === "dry" ? tr("Drying") : tr("Wash");
+}
+export function transactionKindLabel(
+  row: Pick<Transaction, "kind" | "service">,
+) {
+  return row.kind === "wash"
+    ? laundryServiceLabel(row.service)
+    : kindLabel(row.kind);
 }
 const singularMessages: Readonly<Record<string, string>> = {
   "{0} transactions": "{0} transaction",

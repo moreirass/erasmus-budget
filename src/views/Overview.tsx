@@ -1,418 +1,120 @@
-import { formatPercent } from "../i18n";
-import { Metric } from "../components/Primitives";
-import { limitLevels } from "../model";
-import {
-  AlertTriangle,
-  ArrowUpRight,
-  Check,
-  Plane,
-  Plus,
-  Wallet,
-  WashingMachine,
-} from "lucide-react";
-import {
-  SpendingChart,
-  TransactionList,
-  TravelBreakdown,
-} from "../components/Panels";
-import { displayDate, tr, trCount } from "../i18n";
-import {
-  categories,
-  money,
-  monthEnd,
-  monthLabel,
-  periodDays,
-  summary,
-  type Category,
-} from "../model";
-import { CategoryIcon } from "../ui";
+import type { ReactNode } from "react";
+import { Bell, Wallet, Plane } from "lucide-react";
+import { categories, limitLevels, money, type Category } from "../model";
+import { tr } from "../i18n";
+import { PocketHistory, StatusBar } from "./PocketDetails";
 import type { ViewProps } from "./types";
+
 export function OverviewView({
   data,
   month,
-  view,
-  range,
-  group,
   stats,
-  plan,
-  weekList,
-  rows,
-  isFuture,
-  fx,
-  search,
-  filter,
   setTab,
-  setSettingsSection,
-  selectBudget,
-  groupCash,
-  openNew,
   setEditor,
   setPendingDelete,
-  setSearch,
-  setFilter,
-  setGroup,
-}: ViewProps) {
-  const selectedCash = groupCash(stats);
-  const selectedIncome =
-    group === "travel"
-      ? stats.received.travel
-      : group === "daily"
-        ? stats.income - stats.received.travel
-        : stats.income;
-  const fraction = range ? range.days / periodDays(data, month) : 1;
-  const selectedBudget =
-    group === "all"
-      ? stats.budget
-      : Math.round(
-          (group === "travel"
-            ? plan.limits.travel
-            : plan.budget - plan.limits.travel) * fraction,
-        );
+  favorites,
+  laundryCard,
+}: ViewProps & { favorites: ReactNode; laundryCard: ReactNode }) {
+  const daily = categories.filter((c) => c.id !== "travel").map((c) => c.id);
+  const budgetCards = [
+    {
+      label: tr("Day to day"),
+      icon: Wallet,
+      remaining: stats.everydayRemaining,
+      keys: daily,
+    },
+    {
+      label: tr("Travel"),
+      icon: Plane,
+      remaining: stats.travel,
+      keys: ["travel"] as Category[],
+    },
+  ];
+  return (
+    <div className="pocket-stack">
+      <div className="pocket-budgets">
+        {budgetCards.map(({ label, icon: Icon, remaining, keys }) => {
+          const spent = keys.reduce(
+            (total, key) => total + stats.spent[key],
+            0,
+          );
+          const support = keys.reduce(
+            (total, key) => total + stats.received[key],
+            0,
+          );
+          return (
+            <section className="pocket-panel budget-tile" key={label}>
+              <div className="budget-label">
+                <span className="pocket-symbol">
+                  <Icon size={18} />
+                </span>
+                <h2>{label}</h2>
+              </div>
+              <div className="pocket-number">{money(remaining)}</div>
+              <span className="muted">{tr("Remaining this month")}</span>
+              <StatusBar spent={spent} cap={spent + remaining} />
+              <dl className="budget-meta">
+                <div>
+                  <dt>{tr("Spent")}</dt>
+                  <dd>{money(spent)}</dd>
+                </div>
+                {support !== 0 && (
+                  <div>
+                    <dt>{tr("Support")}</dt>
+                    <dd>{money(support)}</dd>
+                  </div>
+                )}
+              </dl>
+            </section>
+          );
+        })}
+      </div>
+      <section className="pocket-panel">
+        <div className="pocket-section-head">
+          <h2>{tr("Recent activity")}</h2>
+          <button onClick={() => setTab("Transactions")}>
+            {tr("View all")}
+          </button>
+        </div>
+        <PocketHistory
+          rows={stats.rows}
+          limit={3}
+          setEditor={setEditor}
+          setPendingDelete={setPendingDelete}
+        />
+      </section>
+      {favorites}
+      <OverviewAlert data={data} month={month} setTab={setTab} />
+      {laundryCard}
+    </div>
+  );
+}
+
+export function OverviewAlert({
+  data,
+  month,
+  setTab,
+}: Pick<ViewProps, "data" | "month" | "setTab">) {
   const alerts =
     data.settings.limitAlerts === false ? [] : limitLevels(data, month);
+  if (!alerts.length) return null;
   return (
-    <>
-      <dl className="metrics" aria-label={tr("Period summary")}>
-        <Metric label={tr("Money out")} value={money(selectedCash)} />
-        <Metric label={tr("Money received")} value={money(selectedIncome)} />
-        <Metric
-          label={tr("Planned remainder")}
-          value={money(selectedBudget + selectedIncome - selectedCash)}
-        />
-      </dl>
-      {!stats.rows.length && (
-        <p className="first-use-note">
-          {tr(
-            "Your plan is ready. Add a transaction when you have one to record.",
-          )}
-        </p>
-      )}
-      <section className="hero-grid two-budgets">
-        <div
-          className={`balance-card budget-card ${group === "daily" ? "budget-selected" : ""}`}
-        >
-          <button
-            type="button"
-            className="budget-card-button"
-            aria-label={tr("View Day to day budget")}
-            aria-pressed={group === "daily"}
-            onClick={() => selectBudget("daily")}
-          />
-          <div className="card-kicker">
-            <span>
-              {tr(
-                view === "week"
-                  ? "DAY TO DAY · LEFT THIS WEEK"
-                  : "DAY TO DAY · LEFT THIS MONTH",
-              )}
-            </span>
-            <Wallet size={20} />
-          </div>
-          <div className="balance-number">{money(stats.everydayRemaining)}</div>
-          <div className="track">
-            <span
-              style={{
-                width: "100%",
-                transform: `scaleX(${Math.max(0, Math.min(100, ((stats.cash - stats.spent.travel) / Math.max(1, Math.round((plan.budget - plan.limits.travel) * (range ? range.days / periodDays(data, month) : 1)))) * 100)) / 100})`,
-              }}
-            />
-          </div>
-          <p>
-            {tr(
-              "Groceries, snacks, meals, laundry, nightlife and other spending",
-            )}
-          </p>
-          <div className="balance-footer">
-            <span>
-              {tr("Period budget")}{" "}
-              <strong>
-                {money(
-                  Math.round(
-                    (plan.budget - plan.limits.travel) *
-                      (range ? range.days / periodDays(data, month) : 1),
-                  ),
-                )}
-              </strong>
-            </span>
-            <span>
-              {tr("Money out")}
-              <strong>{money(stats.cash - stats.spent.travel)}</strong>
-            </span>
-            <span>
-              {tr("Support received")}{" "}
-              <strong>{money(stats.income - stats.received.travel)}</strong>
-            </span>
-          </div>
-        </div>
-        <div
-          className={`mini-card budget-card ${group === "travel" ? "budget-selected" : ""}`}
-        >
-          <button
-            type="button"
-            className="budget-card-button"
-            aria-label={tr("View Travel and tourism budget")}
-            aria-pressed={group === "travel"}
-            onClick={() => selectBudget("travel")}
-          />
-          <div className="mini-icon blue">
-            <Plane size={20} />
-          </div>
-          <span className="tiny">
-            {tr(
-              view === "week"
-                ? "TRAVEL & TOURISM · LEFT THIS WEEK"
-                : "TRAVEL & TOURISM · LEFT THIS MONTH",
-            )}
-          </span>
-          <h2>{money(stats.travel)}</h2>
-          <div className="track">
-            <span
-              style={{
-                width: "100%",
-                transform: `scaleX(${Math.max(0, Math.min(100, (stats.spent.travel / Math.max(1, Math.round(plan.limits.travel * (range ? range.days / periodDays(data, month) : 1)))) * 100)) / 100})`,
-              }}
-            />
-          </div>
-          <p>
-            {tr(
-              "One shared limit for transport, accommodation, food and activities.",
-            )}{" "}
-          </p>
-          <div className="mini-footer">
-            <span>
-              {tr("{0} for this month · no rollover", [
-                money(plan.limits.travel),
-              ])}
-            </span>
-          </div>
-          <div className="travel-totals">
-            <span>{tr("Out: {0}", [money(stats.spent.travel)])}</span>
-            <span>{tr("Support: {0}", [money(stats.received.travel)])}</span>
-          </div>
-        </div>
-      </section>
-      <div className="under-hero">
-        <span>
-          <Check size={16} />{" "}
-          {group === "all"
-            ? tr("Tap a budget card to filter · tap again for both")
-            : group === "daily"
-              ? tr("Viewing Day to day · tap its card again for both")
-              : tr("Viewing Travel & tourism · tap its card again for both")}
-        </span>
-        <span>
-          {tr("Laundry credit through {0}", [
-            displayDate(range?.end ?? monthEnd(month)),
-          ])}
-          {isFuture ? tr(" · plan preview") : ""}
-        </span>
-      </div>
-      <section className="dashboard-grid">
-        <div className="overview-primary">
-          <div className="panel category-panel">
-            <div className="section-heading">
-              <div>
-                <h2>{tr("Category spending")}</h2>
-                <p>
-                  {tr(
-                    view === "week"
-                      ? "Your prorated weekly category guide"
-                      : "Your monthly category guide",
-                  )}
-                </p>
-              </div>
-              <button
-                className="text-button"
-                onClick={() => {
-                  setTab("Budget & settings");
-                  setSettingsSection("plan");
-                }}
-              >
-                {tr("Edit limits")} <ArrowUpRight size={16} />
-              </button>
-            </div>
-            <div className="category-list">
-              {categories
-                .filter(
-                  (c) =>
-                    group === "all" ||
-                    (group === "travel"
-                      ? c.id === "travel"
-                      : c.id !== "travel"),
-                )
-                .map((c) => {
-                  const cap =
-                      Math.round(
-                        plan.limits[c.id] *
-                          (range ? range.days / periodDays(data, month) : 1),
-                      ) + stats.received[c.id],
-                    spent = stats.spent[c.id];
-                  return (
-                    <div className="category-row" key={c.id}>
-                      <div className={`category-emoji cat-${c.id}`}>
-                        <CategoryIcon category={c.id} />
-                      </div>
-                      <div className="category-main">
-                        <div className="category-label">
-                          <strong>
-                            {tr(c.name)}
-                            {alerts.some((a) => a.category === c.id) && (
-                              <small className="limit-alert" role="status">
-                                <AlertTriangle size={16} aria-hidden="true" />
-                                {tr("{0} of the monthly limit reached", [
-                                  formatPercent(
-                                    alerts.find((a) => a.category === c.id)!
-                                      .threshold / 100,
-                                  ),
-                                ])}
-                              </small>
-                            )}
-                          </strong>
-                          <span>
-                            <b>{money(spent)}</b>{" "}
-                            <span className="muted">/ {money(cap)}</span>
-                          </span>
-                        </div>
-                        <div className="track">
-                          <span
-                            style={{
-                              width: "100%",
-                              transform: `scaleX(${Math.min(100, (spent / Math.max(1, cap)) * 100) / 100})`,
-                              background:
-                                spent > cap
-                                  ? "var(--error)"
-                                  : `var(--category-${c.id})`,
-                            }}
-                          />
-                        </div>
-                        <small>
-                          {c.id === "laundry"
-                            ? tr("Top-ups only · washes use card credit")
-                            : spent > cap
-                              ? tr("{0} above this period’s guide", [
-                                  money(spent - cap),
-                                ])
-                              : tr("{0} left in this period · no rollover", [
-                                  money(cap - spent),
-                                ])}
-                        </small>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-          <section className="panel">
-            <div className="section-heading">
-              <div>
-                <h2>{tr("Recent activity")}</h2>
-                <p>{tr("Small moments, clearly recorded.")}</p>
-              </div>
-              <button
-                className="text-button"
-                onClick={() => setTab("Transactions")}
-              >
-                {tr("View all")} <ArrowUpRight size={16} />
-              </button>
-            </div>
-            <TransactionList
-              rows={rows.slice(0, 5)}
-              edit={setEditor}
-              remove={setPendingDelete}
-              add={() => openNew()}
-            />
-          </section>
-        </div>
-        <div className="right-stack">
-          {group !== "daily" && <TravelBreakdown rows={stats.rows} />}
-          <div className="panel">
-            <div className="section-heading">
-              <div>
-                <h2>{tr("Spending mix")}</h2>
-                <p>{tr("Money leaving your bank")}</p>
-              </div>
-              <span className="pill">
-                {view === "week" ? tr("This week") : tr("This month")}
-              </span>
-            </div>
-            <SpendingChart
-              spent={
-                Object.fromEntries(
-                  categories.map((c) => [
-                    c.id,
-                    group === "all" ||
-                    (group === "travel" ? c.id === "travel" : c.id !== "travel")
-                      ? stats.spent[c.id]
-                      : 0,
-                  ]),
-                ) as Record<Category, number>
-              }
-            />
-          </div>
-          {group !== "travel" && (
-            <div className="laundry-card">
-              <div className="section-heading">
-                <span className="laundry-title">
-                  <WashingMachine size={20} /> {tr("Laundry card")}{" "}
-                </span>
-                <span className="pill">{tr("CZK CREDIT")}</span>
-              </div>
-              <div className="laundry-value">{money(stats.card, "CZK")}</div>
-              <p>{tr("Credit carries over. Washes aren’t counted twice.")}</p>
-              <div className="laundry-meta">
-                <span>
-                  {tr("Top-ups this period")}{" "}
-                  <b>{money(stats.spent.laundry)}</b>
-                </span>
-                <span>
-                  {tr("Credit used")} <b>{money(stats.wash, "CZK")}</b>
-                </span>
-              </div>
-              <div className="button-pair">
-                <button onClick={() => openNew("topup")}>
-                  <Plus size={16} /> {tr("Top up")}{" "}
-                </button>
-                <button onClick={() => openNew("wash")}>
-                  <WashingMachine size={16} /> {tr("Log wash")}{" "}
-                </button>
-              </div>
-            </div>
-          )}
-          <div className="panel weekly-panel">
-            <div className="section-heading">
-              <h2>{tr("Weekly rhythm")}</h2>
-              <span className="muted">
-                {tr("{0} total", [money(groupCash(summary(data, month)))])}
-              </span>
-            </div>
-            <div className="bar-chart">
-              {weekList.map((w) => {
-                const s = summary(data, month, w);
-                const max = Math.max(
-                  1,
-                  ...weekList.map((x) => groupCash(summary(data, month, x))),
-                );
-                return (
-                  <div className="bar-column" key={w.start}>
-                    <span>{money(groupCash(s))}</span>
-                    <div className="bar-slot">
-                      <div
-                        style={{
-                          width: "100%",
-                          transform: `scaleX(${((groupCash(s) / max) * 100) / 100})`,
-                        }}
-                      />
-                    </div>
-                    <small>
-                      {w.start.slice(8)}–{w.end.slice(8)}
-                    </small>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
+    <button
+      className="pocket-alert"
+      onClick={() => setTab("Analysis")}
+      data-status={
+        alerts.some((alert) => alert.threshold === 100) ? "limit" : "near"
+      }
+    >
+      <Bell size={18} />
+      <span>
+        {alerts
+          .map(
+            (alert) =>
+              `${tr(categories.find((c) => c.id === alert.category)!.name)} · ${Math.floor(alert.percent)}%`,
+          )
+          .join("  /  ")}
+      </span>
+    </button>
   );
 }

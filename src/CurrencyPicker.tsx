@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { currencyName, searchCurrencies, type CurrencyInfo } from "./fx";
 import { tr } from "./i18n";
 export function CurrencyPicker({
@@ -6,11 +7,13 @@ export function CurrencyPicker({
   onChange,
   currencies,
   disabled = false,
+  compact = false,
 }: {
   value: string;
   onChange: (code: string) => void;
   currencies: CurrencyInfo[];
   disabled?: boolean;
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false),
     [query, setQuery] = useState(""),
@@ -59,7 +62,14 @@ export function CurrencyPicker({
           setActive(0);
         }}
       >
-        {value} · {currencyName(value)} ▾
+        {compact ? (
+          <>
+            {value}
+            <ChevronDown size={15} aria-hidden="true" />
+          </>
+        ) : (
+          `${value} · ${currencyName(value)} ▾`
+        )}
       </button>
       {open && (
         <div className="currency-options">

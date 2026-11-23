@@ -23,7 +23,7 @@ import {
   weeks,
   type Transaction,
 } from "./model.ts";
-import { importCSV, toCSV } from "./transfer.ts";
+import { importCSV, parseCSV, toCSV } from "./transfer.ts";
 const actualFreshData = () => {
   const d = dynamicFreshData();
   d.settings = {
@@ -512,9 +512,14 @@ it("preserves optional time metadata and reads older CSV headers without inventi
     validateData(JSON.parse(JSON.stringify(d))).transactions[0].time,
     "17:42",
   );
-  const previous = toCSV(d)
-    .split("\r\n")
-    .map((line) => line.slice(0, line.lastIndexOf(",")))
+  const previous = parseCSV(toCSV(d))
+    .slice(0, 2)
+    .map((row) =>
+      row
+        .slice(0, 15)
+        .map((value) => '"' + value.replaceAll('"', '""') + '"')
+        .join(","),
+    )
     .join("\r\n");
   assert.equal(
     importCSV(previous, freshData()).transactions[0].time,

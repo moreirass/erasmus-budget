@@ -42,6 +42,17 @@ it("remembers currency only for successful new manual expenses/support, retainin
   assert.equal(lastEntry().group, "travel");
   assert.equal(lastEntry(["CZK", "EUR"]).currency, "CZK");
 });
+it("keeps the last travel subcategory and support category independently", () => {
+  rememberEntry({ ...tx(), travelType: "transport" }, "new");
+  rememberEntry({ ...tx(), kind: "income", category: "laundry" }, "new");
+  assert.equal(lastEntry().group, "travel");
+  assert.equal(lastEntry().travelType, "transport");
+  assert.equal(lastEntry().incomeCategory, "laundry");
+  rememberEntry({ ...tx(), category: "snacks" }, "new");
+  assert.equal(lastEntry().category, "snacks");
+  assert.equal(lastEntry().travelType, undefined);
+  assert.equal(lastEntry().incomeCategory, "laundry");
+});
 it("consumes the PWA shortcut while retaining unrelated URL state", () => {
   assert.deepEqual(consumeAddShortcut("https://example.test/?add=1&x=2#hi"), {
     open: true,

@@ -10,13 +10,10 @@ export function useSettings(data: Data) {
       : planMonth > data.settings.end
         ? data.settings.end
         : planMonth;
-  const [settingsSection, setSettingsSection] = useState("plan");
   return {
     selectedPlanMonth,
     setPlanMonth,
     planScope,
     setPlanScope,
-    settingsSection,
-    setSettingsSection,
   };
 }

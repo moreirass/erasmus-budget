@@ -26,7 +26,7 @@ type Props = {
 export function FavoriteManager({ data, fx, save }: Props) {
   const [editing, setEditing] = useState<Favorite | "new" | null>(null);
   return (
-    <section className="panel favorites-panel">
+    <section className="pocket-panel favorites-panel">
       <h2>
         <Star size={20} aria-hidden="true" />
         {tr("Favorites")}
@@ -173,7 +173,7 @@ export function FavoriteButtons({ data, fx, save }: Props) {
   return (
     <section className="panel favorites-panel">
       <h2>{tr("Favorites")}</h2>
-      <div className="export-buttons">
+      <div className="pocket-favorite-row">
         {data.favorites?.map((f) => (
           <button
             key={f.id}

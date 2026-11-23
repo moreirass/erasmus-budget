@@ -1,320 +1,115 @@
+import { tr } from "../i18n";
 import type { ReactNode } from "react";
 import {
   ArrowLeftRight,
   ChartPie,
-  ChevronRight,
-  LayoutDashboard,
-  MapPin,
+  House,
   Moon,
   Plus,
-  RefreshCw,
   Settings,
-  SlidersHorizontal,
   Sun,
-  UserRound,
   Wallet,
   WashingMachine,
 } from "lucide-react";
-import { appLocale, displayDate, tr } from "../i18n";
-import { money, monthLabel } from "../model";
-import type { BudgetStore } from "../hooks/types";
-import type { ViewProps } from "../views/types";
-type AppLayoutProps = Pick<
-  ViewProps,
-  | "data"
-  | "stats"
-  | "fx"
-  | "setTab"
-  | "setGroup"
-  | "setSettingsSection"
-  | "openNew"
-> & {
-  store: BudgetStore;
-  tab: string;
-  isSettings: boolean;
-  online: boolean;
-  dark: boolean;
-  setDark: (dark: boolean) => void;
-  children: ReactNode;
-  overlays: ReactNode;
-};
+
+const navigation = [
+  { id: "Overview", label: "Home", icon: House },
+  { id: "Analysis", label: "Analysis", icon: ChartPie },
+  { id: "Transactions", label: "Transactions", icon: ArrowLeftRight },
+  { id: "Budget & settings", label: "Settings", icon: Settings },
+];
+const card = { id: "Card", label: "Card", icon: WashingMachine };
+
 export function AppLayout({
-  data,
-  stats,
-  fx,
-  setTab,
-  setGroup,
-  setSettingsSection,
-  openNew,
-  store,
   tab,
-  isSettings,
-  online,
+  setTab,
+  openNew,
+  canAdd,
   dark,
   setDark,
+  online,
   children,
   overlays,
-}: AppLayoutProps) {
+}: {
+  tab: string;
+  setTab: (tab: string) => void;
+  openNew: () => void;
+  canAdd: boolean;
+  dark: boolean;
+  setDark: (dark: boolean) => void;
+  online: boolean;
+  children: ReactNode;
+  overlays: ReactNode;
+}) {
+  const current = [...navigation, card].find((page) => page.id === tab);
+  const navItem = ({ id, label, icon: Icon }: typeof card) => (
+    <button
+      key={id}
+      aria-current={tab === id ? "page" : undefined}
+      className={tab === id ? "active" : ""}
+      onClick={() => setTab(id)}
+    >
+      <Icon size={19} />
+      <span>{tr(label)}</span>
+    </button>
+  );
+  const add = (
+    <button
+      className="pocket-add"
+      aria-label={tr("Add transaction")}
+      onClick={openNew}
+      disabled={!canAdd}
+    >
+      <Plus size={24} />
+    </button>
+  );
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <a
-          className="brand"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            setTab("Overview");
-          }}
-        >
-          <span className="brand-icon">
-            <Wallet size={24} />
+    <div className="pocket-shell">
+      <aside className="pocket-sidebar">
+        <button className="pocket-brand" onClick={() => setTab("Overview")}>
+          <span className="pocket-logo">
+            <Wallet size={19} />
           </span>
           <span>
-            Pocket<small>{tr("Your Erasmus Companion")}</small>
+            Ostrava Pocket<small>{tr("Ostrava, Czechia")}</small>
           </span>
-        </a>
-
+        </button>
         <nav aria-label={tr("Main navigation")}>
-          {[
-            { name: "Overview", icon: LayoutDashboard },
-            { name: "Transactions", icon: ArrowLeftRight },
-            { name: "Budget & settings", icon: SlidersHorizontal },
-          ].map(({ name, icon: Icon }) => (
-            <button
-              key={name}
-              className={
-                tab === name || (name === "Budget & settings" && isSettings)
-                  ? "active"
-                  : ""
-              }
-              aria-current={
-                tab === name || (name === "Budget & settings" && isSettings)
-                  ? "page"
-                  : undefined
-              }
-              onClick={() => setTab(name)}
-            >
-              <Icon size={20} />
-              <span>{tr(name)}</span>
-            </button>
-          ))}
+          {[...navigation.slice(0, 3), card, navigation[3]].map(navItem)}
         </nav>
         <button
-          className="sidebar-laundry"
-          onClick={() => {
-            setTab("Budget & settings");
-            setSettingsSection("tracking");
-          }}
+          className="pocket-side-add"
+          onClick={openNew}
+          disabled={!canAdd}
         >
-          <WashingMachine size={20} />
-          <span>
-            {tr("Laundry")}
-            <strong>{money(stats.card, "CZK")}</strong>
-          </span>
-          <ChevronRight size={16} />
+          <Plus size={19} /> {tr("Add transaction")}
         </button>
-        <div className="storage-badge">
-          <MapPin size={16} />
-          <span>{tr("Ostrava, Czechia")}</span>
-          <span className={online ? "status-dot" : "status-dot offline"} />
-          <small>{store.user?.email ?? tr("Saved on this device")}</small>
-        </div>
       </aside>
-      <nav className="mobile-nav" aria-label={tr("Mobile navigation")}>
-        <button
-          className={tab === "Overview" ? "active" : ""}
-          onClick={() => setTab("Overview")}
-        >
-          <LayoutDashboard size={20} />
-          <span>{tr("Overview")}</span>
-        </button>
-        <button
-          aria-label={tr("Transactions")}
-          className={tab === "Transactions" ? "active" : ""}
-          onClick={() => setTab("Transactions")}
-        >
-          <ArrowLeftRight size={20} />
-          <span className="nav-full">{tr("Transactions")}</span>
-          <span className="nav-short">{tr("Ledger")}</span>
-        </button>
-        <button
-          className="quick-add"
-          aria-label={tr("Add transaction")}
-          onClick={() => openNew()}
-          disabled={!store.ready || store.corrupt}
-        >
-          <Plus size={24} />
-        </button>
-        <button
-          className={tab === "Budget" ? "active" : ""}
-          onClick={() => {
-            setTab("Budget");
-            setSettingsSection("plan");
-          }}
-        >
-          <ChartPie size={20} />
-          <span>{tr("Budget")}</span>
-        </button>
-        <button
-          className={tab === "Budget & settings" ? "active" : ""}
-          onClick={() => {
-            setTab("Budget & settings");
-            setSettingsSection("sync");
-          }}
-        >
-          <Settings size={20} />
-          <span>{tr("Settings")}</span>
-        </button>
-      </nav>
-      <main>
-        <header className="topbar">
-          <div className="breadcrumb">
-            <span className="desktop-crumb">
-              <LayoutDashboard size={16} /> {tr("/ Erasmus Hub /")}{" "}
-              <b>{tr(tab)}</b>
-            </span>
-            <span className="mobile-brand">
-              <span className="brand-icon">
-                <Wallet size={24} />
-              </span>
-              <span>Pocket</span>
-            </span>
+      <main className="pocket-main">
+        <header className="pocket-header">
+          <div className="pocket-heading">
+            <h1>{current && tr(current.label)}</h1>
           </div>
-          <div className="header-actions">
-            <span
-              className="fx-pill"
-              title={
-                fx.cache?.rates.CZK
-                  ? tr("Published on {0}", [
-                      displayDate(fx.cache.rates.CZK.date),
-                    ])
-                  : tr("No cached rate")
-              }
-            >
-              <RefreshCw size={16} />{" "}
-              {fx.cache?.rates.CZK ? (
-                <>
-                  <span>1 EUR ≈ </span>
-                  <strong>
-                    {fx.cache.rates.CZK.rate.toLocaleString(appLocale(), {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    CZK
-                  </strong>
-                </>
-              ) : (
-                <strong>EUR / CZK</strong>
-              )}
-            </span>
+          <div className="pocket-header-actions">
+            {!online && <span className="muted">{tr("Offline")}</span>}
             <button
-              className="sync-pill"
-              onClick={() => {
-                setTab("Budget & settings");
-                setSettingsSection("sync");
-              }}
-            >
-              <span
-                className={
-                  store.user &&
-                  !store.dirty &&
-                  store.status === "Synced just now"
-                    ? "status-dot"
-                    : "status-dot offline"
-                }
-              />
-              {!online
-                ? tr("Offline")
-                : !store.user
-                  ? tr("Local workspace")
-                  : store.dirty
-                    ? tr("Sync pending")
-                    : tr(store.status)}
-              {store.user && store.lastSyncedAt && (
-                <small>
-                  {tr("Last sync: {0}", [
-                    new Date(store.lastSyncedAt).toLocaleTimeString(
-                      appLocale(),
-                      { hour: "2-digit", minute: "2-digit" },
-                    ),
-                  ])}
-                </small>
-              )}
-            </button>
-            <button
-              className="icon-button theme-toggle"
+              className="pocket-theme"
+              onClick={() => setDark(!dark)}
               aria-label={
                 dark ? tr("Switch to light theme") : tr("Switch to dark theme")
               }
-              onClick={() => setDark(!dark)}
             >
-              {dark ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-            <button
-              className="primary top-add"
-              onClick={() => openNew()}
-              disabled={!store.ready || store.corrupt}
-            >
-              <Plus size={20} /> {tr("Add transaction")}{" "}
-            </button>
-            <button
-              className="avatar"
-              aria-label={tr("Account settings")}
-              onClick={() => {
-                setTab("Budget & settings");
-                setSettingsSection("sync");
-              }}
-            >
-              <UserRound size={20} />
+              {dark ? <Sun size={19} /> : <Moon size={19} />}
             </button>
           </div>
         </header>
-        <div
-          className={`content screen-${tab === "Transactions" ? "transactions" : isSettings ? "settings" : "overview"}`}
-        >
-          <div className="page-heading">
-            <div>
-              <div className="eyebrow">
-                OSTRAVA · {monthLabel(data.settings.start)} —{" "}
-                {monthLabel(data.settings.end)}
-              </div>
-              <h1>
-                {tab === "Overview"
-                  ? tr("Overview")
-                  : tab === "Transactions"
-                    ? tr("Transactions")
-                    : tr("Budget & settings")}
-              </h1>
-              <p>
-                {tab === "Overview"
-                  ? tr("Budget remaining")
-                  : tab === "Transactions"
-                    ? tr("Search and manage your recorded movements.")
-                    : tr("Review your limits, card and saved data.")}
-              </p>
-            </div>
-          </div>
-          {!online && (
-            <p className="offline-banner" role="status">
-              {tr(
-                "Offline · changes are saved on this device. Sync when connected.",
-              )}
-            </p>
-          )}
-          {children}
-          <footer>
-            <span>
-              pocket.{" "}
-              <span className="muted">
-                {tr("Made for your Ostrava chapter.")}
-              </span>
-            </span>
-            <span className="muted">
-              {tr("EUR budget · multiple currencies · CZK laundry card")}{" "}
-            </span>
-          </footer>
-        </div>
+        {children}
       </main>
+      <nav className="pocket-bottom" aria-label={tr("Main navigation")}>
+        {navigation.slice(0, 2).map(navItem)}
+        {add}
+        {navigation.slice(2).map(navItem)}
+      </nav>
       {overlays}
     </div>
   );

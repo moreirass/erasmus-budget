@@ -1,14 +1,17 @@
 import { visualFeedback } from "../visualFeedback";
 import { useEffect, useState } from "react";
 import { rememberEntry, consumeAddShortcut } from "../quickEntry";
-import { tr, kindLabel } from "../i18n";
+import { tr, transactionKindLabel } from "../i18n";
 import {
   categories,
+  addLaundryUse,
+  InsufficientLaundryCredit,
   crossedLimits,
   transactionOrder,
   travelTypes,
   type Data,
   type Transaction,
+  type LaundryService,
   type summary,
 } from "../model";
 import type { BudgetStore } from "./types";
@@ -23,10 +26,12 @@ export function useLedger(
   const [editorKind, setEditorKind] = useState<Transaction["kind"]>("expense");
   const [pendingDelete, setPendingDelete] = useState<Transaction | null>(null);
   const [removed, setRemoved] = useState<Transaction | null>(null);
+  const [laundryUndo, setLaundryUndo] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   useEffect(() => {
     setRemoved(null);
+    setLaundryUndo(null);
     setPendingDelete(null);
     setEditor(null);
   }, [store.user?.id]);
@@ -98,6 +103,35 @@ export function useLedger(
     setEditorKind(kind);
     setEditor("new");
   }
+  function quickLaundry(service: LaundryService) {
+    try {
+      const next = addLaundryUse(data, service);
+      if (commit(next.data, "Laundry use saved"))
+        setLaundryUndo(next.transaction.id);
+    } catch (error) {
+      setToast(
+        error instanceof InsufficientLaundryCredit
+          ? "Insufficient credit"
+          : (error as Error).message,
+      );
+    }
+  }
+  function undoLaundry() {
+    if (!data.transactions.some((t) => t.id === laundryUndo)) {
+      setToast("This laundry entry is no longer available.");
+      return;
+    }
+    if (
+      commit(
+        {
+          ...data,
+          transactions: data.transactions.filter((t) => t.id !== laundryUndo),
+        },
+        "Laundry use undone",
+      )
+    )
+      setLaundryUndo(null);
+  }
   const rows = stats.rows
     .filter(
       (t) =>
@@ -106,7 +140,7 @@ export function useLedger(
             ? t.category === "travel"
             : t.category !== "travel")) &&
         (filter === "all" || t.category === filter) &&
-        `${t.note} ${t.category} ${t.kind} ${tr(categories.find((c) => c.id === t.category)!.name)} ${kindLabel(t.kind)} ${tr(travelTypes.find((c) => c.id === t.travelType)?.name ?? "")}`
+        `${t.note} ${t.category} ${t.kind} ${tr(categories.find((c) => c.id === t.category)!.name)} ${transactionKindLabel(t)} ${tr(travelTypes.find((c) => c.id === t.travelType)?.name ?? "")}`
           .toLowerCase()
           .includes(search.toLowerCase()),
     )
@@ -170,6 +204,9 @@ export function useLedger(
     rows,
     commit,
     openNew,
+    quickLaundry,
+    laundryUndo,
+    undoLaundry,
     saveTransaction,
     deleteTransaction,
     undoDelete,

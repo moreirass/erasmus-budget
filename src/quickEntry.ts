@@ -1,10 +1,26 @@
 import { fallbackCurrencies } from "./fx.ts";
-import { categories, type Category, type Transaction } from "./model.ts";
+import {
+  categories,
+  travelTypes,
+  type Category,
+  type Transaction,
+  type TravelType,
+} from "./model.ts";
 const key = "pocket-last-entry-v1";
+function knownTravelType(value?: TravelType) {
+  return travelTypes.find((type) => type.id === value)?.id;
+}
 export function lastEntry(
   currencies = fallbackCurrencies().map((c) => c.code),
 ) {
-  let value: { currency?: string; category?: Category; group?: string } = {};
+  let value: {
+    currency?: string;
+    category?: Category;
+    group?: string;
+    travelType?: TravelType;
+    incomeCategory?: Category;
+    incomeTravelType?: TravelType;
+  } = {};
   try {
     value = JSON.parse(localStorage.getItem(key) ?? "{}") ?? {};
   } catch {
@@ -20,6 +36,9 @@ export function lastEntry(
       ? value.category!
       : ("groceries" as Category),
     group: value.group === "travel" ? "travel" : "daily",
+    travelType: knownTravelType(value.travelType),
+    incomeCategory: categories.find((c) => c.id === value.incomeCategory)?.id,
+    incomeTravelType: knownTravelType(value.incomeTravelType),
   };
 }
 export function rememberEntry(
@@ -43,6 +62,11 @@ export function rememberEntry(
               ? "travel"
               : "daily"
             : previous.group,
+        travelType: t.kind === "expense" ? t.travelType : previous.travelType,
+        incomeCategory:
+          t.kind === "income" ? t.category : previous.incomeCategory,
+        incomeTravelType:
+          t.kind === "income" ? t.travelType : previous.incomeTravelType,
       }),
     );
   } catch {

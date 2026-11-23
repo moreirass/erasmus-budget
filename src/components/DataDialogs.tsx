@@ -46,7 +46,7 @@ export function DataDialogs({
           </div>
           <p className="help">
             {tr(
-              "JSON replaces the full workspace, including plans and balances. CSV keeps current settings and merges transactions. Download a backup first if you want to preserve the current version.",
+              "JSON replaces the full workspace, including plans and balances. CSV merges transactions and updates laundry prices when included. Download a backup first if you want to preserve the current version.",
             )}{" "}
           </p>
           <div className="button-pair dialog-actions">

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "./Primitives";
 import { UnsavedDialog } from "./UnsavedDialog";
 import { TransactionForm } from "./TransactionEditor";
-import { displayDate, kindLabel, tr } from "../i18n";
+import { displayDate, transactionKindLabel, tr } from "../i18n";
 import { validateData, type Data, type Transaction } from "../model";
 import { formatAmount } from "../formatAmount";
 import type { useExchangeRates } from "../useExchangeRates";
@@ -117,11 +117,11 @@ export function LedgerDialogs({
             </span>
             <div>
               <strong>
-                {pendingDelete.note || kindLabel(pendingDelete.kind)}
+                {pendingDelete.note || transactionKindLabel(pendingDelete)}
               </strong>
               <p>
                 {displayDate(pendingDelete.date)} ·{" "}
-                {kindLabel(pendingDelete.kind)}
+                {transactionKindLabel(pendingDelete)}
               </p>
             </div>
             <strong>

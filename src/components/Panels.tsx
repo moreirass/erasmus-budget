@@ -18,9 +18,16 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { currencyDigits, currencyName, searchCurrencies } from "../fx";
 import { formatAmount } from "../formatAmount";
-import { appLocale, displayDate, kindLabel, tr, trCount } from "../i18n";
+import {
+  appLocale,
+  displayDate,
+  transactionKindLabel,
+  tr,
+  trCount,
+} from "../i18n";
 import {
   applyGlobalPlan,
+  firstTrackedDay,
   applyMonthlyPlan,
   resizePlan,
   currentPeriod,
@@ -507,7 +514,7 @@ export function TransactionList({
                           : t.kind === "topup"
                             ? tr("Laundry top-up")
                             : t.kind === "wash"
-                              ? tr("Laundry wash")
+                              ? transactionKindLabel(t)
                               : tr(c.name))}
                     </button>
                     <small>
@@ -545,14 +552,18 @@ export function TransactionList({
                   <button
                     className="icon-button"
                     onClick={() => edit(t)}
-                    aria-label={tr("Edit {0}", [t.note || kindLabel(t.kind)])}
+                    aria-label={tr("Edit {0}", [
+                      t.note || transactionKindLabel(t),
+                    ])}
                   >
                     <Pencil size={16} />
                   </button>
                   <button
                     className="icon-button"
                     onClick={() => remove(t)}
-                    aria-label={tr("Delete {0}", [t.note || kindLabel(t.kind)])}
+                    aria-label={tr("Delete {0}", [
+                      t.note || transactionKindLabel(t),
+                    ])}
                   >
                     <Trash2 size={16} />
                   </button>
@@ -833,25 +844,22 @@ export function SettingsForm({
         e.preventDefault();
         const f = new FormData(e.currentTarget);
         try {
-          save(
-            applyGlobalPlan(
-              {
-                ...data,
-                settings: {
-                  ...s,
-                  firstDay: Number(f.get("firstDay")),
-                  start: String(f.get("start")),
-                  end: String(f.get("end")),
-                  rate: f.get("rate") ? Number(f.get("rate")) : null,
-                  openingCard: toCents(f.get("card")),
-                  openingTravel: s.openingTravel,
-                  openingEmergency: s.openingEmergency,
-                },
-              },
-              globalPlan(data),
-            ),
-          );
-          setError("");
+          const settings = {
+            ...s,
+            firstDay: Number(f.get("firstDay")),
+            start: String(f.get("start")),
+            end: String(f.get("end")),
+            rate: f.get("rate") ? Number(f.get("rate")) : null,
+            openingCard: toCents(f.get("card")),
+          };
+          const next = { ...data, settings };
+          const startChanged =
+            settings.start !== s.start ||
+            settings.firstDay !== firstTrackedDay(data);
+          if (
+            save(startChanged ? applyGlobalPlan(next, globalPlan(data)) : next)
+          )
+            setError("");
         } catch (e) {
           setError((e as Error).message);
         }

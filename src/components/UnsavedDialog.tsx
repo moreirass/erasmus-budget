@@ -29,8 +29,13 @@ export function UnsavedDialog({
   }, [dirty]);
   return (
     <>
-      <Modal title={title} close={() => (dirty ? setDiscard(true) : close())}>
+      <Modal
+        transactionSheet
+        title={title}
+        close={() => (dirty ? setDiscard(true) : close())}
+      >
         <div
+          className="unsaved-content"
           onChangeCapture={(event) => {
             if (
               (event.target as HTMLElement).getAttribute("role") !== "combobox"

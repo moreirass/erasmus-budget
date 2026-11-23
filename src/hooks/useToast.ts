@@ -1,11 +1,14 @@
 import { visualFeedback } from "../visualFeedback";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 export function useToast() {
-  const [toast, setToast] = useState("");
+  const [notice, setNotice] = useState<{ message: string } | null>(null);
+  const setToast = useCallback((message: string) => {
+    setNotice(message ? { message } : null);
+  }, []);
   useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => visualFeedback(() => setToast("")), 5000);
+    if (!notice) return;
+    const timer = setTimeout(() => visualFeedback(() => setNotice(null)), 5000);
     return () => clearTimeout(timer);
-  }, [toast]);
-  return { toast, setToast };
+  }, [notice]);
+  return { toast: notice?.message ?? "", setToast };
 }

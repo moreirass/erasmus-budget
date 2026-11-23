@@ -1,157 +1,115 @@
-import { EmptyState } from "../components/Primitives";
-import { Download, RefreshCw, Search } from "lucide-react";
-import {
-  LaundryPanel,
-  PeriodSummary,
-  SpendingChart,
-  TransactionList,
-} from "../components/Panels";
-import { appLocale, displayDate, tr, trCount } from "../i18n";
-import { categories, today, type Category } from "../model";
-import { download, toCSV } from "../transfer";
+import { Search, SlidersHorizontal } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { Modal } from "../components/Primitives";
+import { tr, trCount } from "../i18n";
+import { categories } from "../model";
+import { PocketHistory } from "./PocketDetails";
 import type { ViewProps } from "./types";
+
 export function TransactionsView({
-  data,
-  month,
-  view,
-  range,
-  group,
-  stats,
-  plan,
-  weekList,
   rows,
-  isFuture,
-  fx,
-  search,
+  group,
   filter,
-  setTab,
-  setSettingsSection,
-  selectBudget,
-  groupCash,
-  openNew,
+  search,
+  view,
+  setGroup,
+  setFilter,
+  setSearch,
   setEditor,
   setPendingDelete,
-  setSearch,
-  setFilter,
-  setGroup,
-}: ViewProps) {
+  monthControl,
+  periodFilter,
+}: ViewProps & { monthControl: ReactNode; periodFilter: ReactNode }) {
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const activeFilters =
+    Number(group !== "all") +
+    Number(filter !== "all") +
+    Number(view === "week");
   return (
-    <>
-      <PeriodSummary
-        stats={stats}
-        plan={plan}
-        month={month}
-        range={range}
-        group={group}
-        selectGroup={(value) => {
-          setGroup(value);
-          setFilter("all");
-        }}
-      />
-      <section className="transactions-layout">
-        <div className="transaction-stream">
-          <div className="transaction-tools">
-            <label className="search">
-              <Search size={20} />
-              <input
-                aria-label={tr("Search transactions")}
-                placeholder={tr("Search notes, coffees, trains…")}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+    <div className="pocket-stack">
+      <section
+        className="pocket-panel pocket-filters"
+        aria-label={tr("Search and filters")}
+      >
+        {monthControl}
+        <label className="pocket-search">
+          <Search size={17} aria-hidden="true" />
+          <input
+            aria-label={tr("Search transactions")}
+            placeholder={tr("Search transactions")}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
+        <button
+          className="pocket-filter-trigger"
+          aria-haspopup="dialog"
+          onClick={() => setFiltersOpen(true)}
+        >
+          <SlidersHorizontal size={17} /> {tr("Filters")}
+          {activeFilters > 0 && (
+            <span className="pocket-filter-count">{activeFilters}</span>
+          )}
+        </button>
+      </section>
+      <section className="pocket-panel" aria-label={tr("History")}>
+        <div className="pocket-section-head">
+          <span className="muted">
+            {trCount("{0} transactions", [rows.length])}
+          </span>
+        </div>
+        <PocketHistory
+          rows={rows}
+          setEditor={setEditor}
+          setPendingDelete={setPendingDelete}
+        />
+      </section>
+      {filtersOpen && (
+        <Modal title={tr("Filters")} close={() => setFiltersOpen(false)}>
+          <div className="pocket-filter-fields">
+            {periodFilter}
+            <label className="field">
+              <span>{tr("Group")}</span>
+              <select
+                value={group}
+                onChange={(event) => {
+                  setGroup(event.target.value);
+                  setFilter("all");
+                }}
+              >
+                <option value="all">{tr("All groups")}</option>
+                <option value="daily">{tr("Day to day")}</option>
+                <option value="travel">{tr("Travel")}</option>
+              </select>
             </label>
-            <select
-              aria-label={tr("Filter category")}
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            >
-              <option value="all">{tr("All categories")}</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {tr(c.name)}
-                </option>
-              ))}
-            </select>
-            <button
-              className="secondary export-csv"
-              onClick={() =>
-                download(
-                  `pocket-transactions-${today()}.csv`,
-                  toCSV(data),
-                  "text/csv;charset=utf-8",
-                )
-              }
-            >
-              <Download size={16} /> {tr("Export CSV")}{" "}
+            <label className="field">
+              <span>{tr("Category")}</span>
+              <select
+                value={filter}
+                onChange={(event) => setFilter(event.target.value)}
+              >
+                <option value="all">{tr("All categories")}</option>
+                {categories
+                  .filter(
+                    (category) =>
+                      group === "all" ||
+                      (group === "travel"
+                        ? category.id === "travel"
+                        : category.id !== "travel"),
+                  )
+                  .map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {tr(category.name)}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <button className="primary" onClick={() => setFiltersOpen(false)}>
+              {tr("Done")}
             </button>
           </div>
-          <div className="ledger-heading">
-            <span>{tr("TRANSACTION HISTORY")}</span>
-            <span>{trCount("{0} transactions", [rows.length])}</span>
-          </div>
-          {!rows.length && (search || filter !== "all") ? (
-            <EmptyState
-              title={tr("No matching transactions")}
-              action={
-                <button
-                  onClick={() => {
-                    setSearch("");
-                    setFilter("all");
-                  }}
-                >
-                  {tr("Clear filters")}
-                </button>
-              }
-            >
-              {tr("Try another search or clear your filters.")}
-            </EmptyState>
-          ) : (
-            <TransactionList
-              rows={rows}
-              edit={setEditor}
-              remove={setPendingDelete}
-              add={() => openNew()}
-            />
-          )}
-        </div>
-        <aside className="ledger-aside">
-          <LaundryPanel stats={stats} openNew={openNew} />
-          <div className="panel">
-            <h2>{tr("Spending mix")}</h2>
-            <SpendingChart
-              spent={
-                Object.fromEntries(
-                  categories.map((c) => [
-                    c.id,
-                    group === "all" ||
-                    (group === "travel" ? c.id === "travel" : c.id !== "travel")
-                      ? stats.spent[c.id]
-                      : 0,
-                  ]),
-                ) as Record<Category, number>
-              }
-            />
-          </div>
-          <div className="panel fx-detail">
-            <h2>
-              <RefreshCw size={20} /> EUR / CZK
-            </h2>
-            <strong>
-              {fx.cache?.rates.CZK
-                ? `1 EUR ≈ ${fx.cache.rates.CZK.rate.toLocaleString(appLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} CZK`
-                : tr("No rate available")}
-            </strong>
-            <p>
-              {fx.cache?.rates.CZK
-                ? tr(
-                    "Reference published on {0}. Each transaction keeps its rate.",
-                    [displayDate(fx.cache.rates.CZK.date)],
-                  )
-                : tr("Refresh rates in settings or enter your bank rate.")}
-            </p>
-          </div>
-        </aside>
-      </section>
-    </>
+        </Modal>
+      )}
+    </div>
   );
 }

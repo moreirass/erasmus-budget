@@ -49,6 +49,9 @@ export const travelTypes = [
 export type TravelType = (typeof travelTypes)[number]["id"];
 export type Category = (typeof categories)[number]["id"];
 export type Plan = { budget: number; limits: Record<Category, number> };
+export type LaundryService = "wash" | "dry";
+export const laundryServices = ["wash", "dry"] as const;
+const defaultLaundryPrices = { wash: 110, dry: 60 } as const;
 export type Transaction = {
   id: string;
   date: string;
@@ -67,6 +70,7 @@ export type Transaction = {
   addedOrder?: number;
   rateDate?: string;
   rateSource?: "Frankfurter" | "manual";
+  service?: LaundryService;
 };
 export type Data = {
   favorites?: Favorite[];
@@ -84,6 +88,8 @@ export type Data = {
     openingCard: number;
     openingTravel: number;
     openingEmergency: number;
+    washPriceCzk?: number;
+    dryPriceCzk?: number;
   };
   plans: Record<string, Plan>;
   transactions: Transaction[];
@@ -126,6 +132,8 @@ export const freshData = (): Data => {
       openingCard: 0,
       openingTravel: 0,
       openingEmergency: 0,
+      washPriceCzk: defaultLaundryPrices.wash,
+      dryPriceCzk: defaultLaundryPrices.dry,
     },
     plans: { "2000-01": defaultPlan() },
     transactions: [],
@@ -219,16 +227,7 @@ export function summary(
     ]),
   ) as Record<Category, number>;
   const income = Object.values(received).reduce((a, b) => a + b, 0);
-  const card =
-    d.settings.openingCard +
-    d.transactions
-      .filter((t) => t.date <= end)
-      .reduce(
-        (s, t) =>
-          s +
-          (t.kind === "topup" ? t.credit : t.kind === "wash" ? -t.credit : 0),
-        0,
-      );
+  const card = laundryBalance(d, end);
   const cash = Object.values(spent).reduce((a, b) => a + b, 0);
   const fraction = range ? range.days / periodDays(d, m) : 1;
   const everyday = categories
@@ -258,11 +257,14 @@ export function makeTransaction(
   input: Omit<Transaction, "eur" | "credit">,
 ): Transaction {
   const eur =
-    input.currency === "EUR"
-      ? input.amount
-      : Math.round(
-          ((input.amount / currencyFactor(input.currency)) * 100) / input.rate,
-        );
+    input.kind === "wash" && input.service !== undefined
+      ? 0
+      : input.currency === "EUR"
+        ? input.amount
+        : Math.round(
+            ((input.amount / currencyFactor(input.currency)) * 100) /
+              input.rate,
+          );
   const credit =
     input.kind === "expense" || input.kind === "income"
       ? 0
@@ -275,6 +277,66 @@ const monthValid = (s: unknown): s is string =>
   typeof s === "string" && /^20\d{2}-(0[1-9]|1[0-2])$/.test(s);
 const nonnegative = (n: unknown): n is number =>
   Number.isSafeInteger(n) && Number(n) >= 0 && Number(n) <= 100000000;
+export function validLaundryPrice(price: unknown): price is number {
+  if (typeof price !== "number") return false;
+  const cents = Math.round(price * 100);
+  return (
+    nonnegative(cents) && cents > 0 && Math.abs(cents - price * 100) < 0.000001
+  );
+}
+
+export function laundryPrice(
+  settings: Data["settings"],
+  service: LaundryService,
+) {
+  return (
+    (service === "wash" ? settings.washPriceCzk : settings.dryPriceCzk) ??
+    defaultLaundryPrices[service]
+  );
+}
+
+export function laundryBalance(data: Data, through = today()) {
+  return data.transactions.reduce((balance, row) => {
+    if (row.date > through) return balance;
+    return (
+      balance +
+      (row.kind === "topup"
+        ? row.credit
+        : row.kind === "wash"
+          ? -row.credit
+          : 0)
+    );
+  }, data.settings.openingCard);
+}
+
+export class InsufficientLaundryCredit extends Error {}
+
+export function addLaundryUse(
+  data: Data,
+  service: LaundryService,
+  date = today(),
+) {
+  const transaction = makeTransaction({
+    id: crypto.randomUUID(),
+    date,
+    kind: "wash",
+    category: "laundry",
+    service,
+    amount: Math.round(laundryPrice(data.settings, service) * 100),
+    currency: "CZK",
+    rate: 1,
+    note: "",
+    addedOrder:
+      Math.max(0, ...data.transactions.map((row) => row.addedOrder ?? 0)) + 1,
+  });
+  return {
+    data: validateData({
+      ...data,
+      transactions: [...data.transactions, transaction],
+    }),
+    transaction,
+  };
+}
 const fail = (message: string): never => {
   throw new Error(message);
 };
@@ -289,6 +351,16 @@ export function validateData(value: unknown): Data {
   )
     fail("This is not a Pocket v1 backup.");
   const s = d.settings;
+  if (
+    [s.washPriceCzk, s.dryPriceCzk].some(
+      (price) => price !== undefined && !validLaundryPrice(price),
+    )
+  )
+    fail(
+      "Enter laundry prices greater than zero with up to two decimal places.",
+    );
+  s.washPriceCzk ??= defaultLaundryPrices.wash;
+  s.dryPriceCzk ??= defaultLaundryPrices.dry;
   if (s.limitAlerts !== undefined && typeof s.limitAlerts !== "boolean")
     throw new Error("Invalid alert setting.");
   if (
@@ -392,6 +464,11 @@ export function validateData(value: unknown): Data {
       !["EUR", "CZK"].includes(t.currency)
     )
       fail("Laundry card entries use EUR or CZK.");
+    if (
+      t.service !== undefined &&
+      (t.kind !== "wash" || !laundryServices.includes(t.service))
+    )
+      fail("Invalid laundry service.");
     if (t.rateDate !== undefined && !/^20\d{2}-\d{2}-\d{2}$/.test(t.rateDate))
       fail("Invalid rate date.");
     if (
@@ -421,7 +498,7 @@ export function validateData(value: unknown): Data {
   )) {
     card += t.kind === "topup" ? t.credit : t.kind === "wash" ? -t.credit : 0;
     if (card < 0)
-      fail(
+      throw new InsufficientLaundryCredit(
         `Laundry credit would be negative on ${t.date}. Add the missing top-up or opening credit first.`,
       );
   }
