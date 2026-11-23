@@ -246,6 +246,8 @@ export const portuguese = {
     "A conversão do movimento não corresponde à taxa guardada.",
   "Laundry credit would be negative on {0}. Add the missing top-up or opening credit first.":
     "O crédito da lavandaria ficaria negativo em {0}. Adiciona primeiro o carregamento em falta ou o crédito inicial.",
+  "A later card entry on {0} would make the balance negative. Check the card history for that date.":
+    "Um movimento do cartão em {0}, posterior ao ajuste, deixaria o saldo negativo. Verifica essa data no histórico do cartão.",
   "This is not a Pocket backup.":
     "Este ficheiro não é uma cópia de segurança Pocket.",
   "Unsupported budget layout.": "Este formato de orçamento não é suportado.",

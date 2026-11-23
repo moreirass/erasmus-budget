@@ -238,6 +238,8 @@ export const english = {
     "Transaction conversion does not match its saved rate.",
   "Laundry credit would be negative on {0}. Add the missing top-up or opening credit first.":
     "Laundry credit would be negative on {0}. Add the missing top-up or opening credit first.",
+  "A later card entry on {0} would make the balance negative. Check the card history for that date.":
+    "A later card entry on {0} would make the balance negative. Check the card history for that date.",
   "This is not a Pocket backup.": "This is not a Pocket backup.",
   "Unsupported budget layout.": "Unsupported budget layout.",
   "Invalid legacy monthly limits.": "Invalid legacy monthly limits.",

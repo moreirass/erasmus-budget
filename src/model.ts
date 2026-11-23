@@ -146,13 +146,20 @@ export const money = (cents: number, currency = "EUR") =>
     currency,
     maximumFractionDigits: 2,
   }).format(cents / currencyFactor(currency));
-export const today = () =>
-  new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Prague",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+const pragueCalendar = new Intl.DateTimeFormat("en", {
+  timeZone: "Europe/Prague",
+  calendar: "gregory",
+  numberingSystem: "latn",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+export function today(at = new Date()) {
+  const parts = pragueCalendar.formatToParts(at);
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((entry) => entry.type === type)!.value;
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
 export function monthLabel(m: string) {
   return new Date(m + "-15T12:00:00").toLocaleDateString(appLocale(), {
     month: "long",
@@ -296,23 +303,26 @@ export function laundryPrice(
   );
 }
 
+function laundryDailyChanges(data: Data) {
+  const changes = new Map<string, number>();
+  const record = (date: string, delta: number) =>
+    changes.set(date, (changes.get(date) ?? 0) + delta);
+  for (const { date, delta } of data.settings.laundryAdjustments ?? [])
+    record(date, delta);
+  for (const row of data.transactions) {
+    if (row.kind === "topup") record(row.date, row.credit);
+    if (row.kind === "wash") record(row.date, -row.credit);
+  }
+  return [...changes].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+}
+
 export function laundryBalance(data: Data, through = today()) {
-  const opening = (data.settings.laundryAdjustments ?? []).reduce(
-    (balance, adjustment) =>
-      adjustment.date <= through ? balance + adjustment.delta : balance,
-    data.settings.openingCard,
-  );
-  return data.transactions.reduce((balance, row) => {
-    if (row.date > through) return balance;
-    return (
-      balance +
-      (row.kind === "topup"
-        ? row.credit
-        : row.kind === "wash"
-          ? -row.credit
-          : 0)
-    );
-  }, opening);
+  let balance = data.settings.openingCard;
+  for (const [date, delta] of laundryDailyChanges(data)) {
+    if (date > through) break;
+    balance += delta;
+  }
+  return balance;
 }
 
 export function adjustLaundryBalance(
@@ -323,7 +333,7 @@ export function adjustLaundryBalance(
   if (!nonnegative(balance)) fail("Enter a valid laundry card balance.");
   const delta = balance - laundryBalance(data, date);
   if (!delta) return data;
-  return validateData({
+  const adjusted = {
     ...data,
     settings: {
       ...data.settings,
@@ -332,10 +342,29 @@ export function adjustLaundryBalance(
         { date, delta },
       ],
     },
-  });
+  };
+  try {
+    return validateData(adjusted);
+  } catch (error) {
+    if (error instanceof InsufficientLaundryCredit && error.date > date)
+      throw new InsufficientLaundryCredit(
+        error.date,
+        `A later card entry on ${error.date} would make the balance negative. Check the card history for that date.`,
+      );
+    throw error;
+  }
 }
 
-export class InsufficientLaundryCredit extends Error {}
+export class InsufficientLaundryCredit extends Error {
+  readonly date: string;
+  constructor(
+    date: string,
+    message = `Laundry credit would be negative on ${date}. Add the missing top-up or opening credit first.`,
+  ) {
+    super(message);
+    this.date = date;
+  }
+}
 
 export function addLaundryUse(
   data: Data,
@@ -531,28 +560,11 @@ export function validateData(value: unknown): Data {
       ))
   )
     fail("Invalid laundry card adjustment.");
-  const dailyCardChanges = new Map<string, number>();
-  for (const { date, delta } of adjustments ?? [])
-    dailyCardChanges.set(date, (dailyCardChanges.get(date) ?? 0) + delta);
-  for (const t of d.transactions) {
-    if (t.kind === "topup" || t.kind === "wash")
-      dailyCardChanges.set(
-        t.date,
-        (dailyCardChanges.get(t.date) ?? 0) +
-          (t.kind === "topup" ? t.credit : -t.credit),
-      );
-  }
   let card = s.openingCard;
-  // Transactions are tracked by date, so net same-day changes before checking credit.
-  for (const [date, delta] of [...dailyCardChanges].sort(([a], [b]) =>
-    a.localeCompare(b),
-  )) {
+  for (const [date, delta] of laundryDailyChanges(d)) {
     card += delta;
     if (!Number.isSafeInteger(card)) fail("Invalid laundry card adjustment.");
-    if (card < 0)
-      throw new InsufficientLaundryCredit(
-        `Laundry credit would be negative on ${date}. Add the missing top-up or opening credit first.`,
-      );
+    if (card < 0) throw new InsufficientLaundryCredit(date);
   }
   return structuredClone(d);
 }

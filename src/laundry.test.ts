@@ -9,6 +9,7 @@ import {
   laundryPrice,
   makeTransaction,
   summary,
+  today,
   validateData,
 } from "./model.ts";
 import { monthSeries } from "./views/desktop/series.ts";
@@ -16,6 +17,35 @@ import { laundryServiceLabel } from "./i18n.ts";
 import { importCSV, parseCSV, toCSV } from "./transfer.ts";
 
 const date = "2026-11-23";
+
+test("reconciles 388.60 CZK to 48.60 CZK with Prague dates and existing laundry history", () => {
+  const data = workspace(8860);
+  const movements = [
+    { date: "2026-11-19", kind: "topup", amount: 28000 },
+    { date: "2026-11-15", kind: "wash", amount: 28000 },
+    { date: "2026-11-15", kind: "topup", amount: 30000 },
+  ] as const;
+  data.transactions = movements.map((row, index) =>
+    makeTransaction({
+      ...row,
+      id: String(index + 1),
+      addedOrder: index + 1,
+      category: "laundry",
+      currency: "CZK",
+      rate: 25,
+      note: "",
+    }),
+  );
+  const afternoon = today(new Date("2026-11-23T22:58:16Z"));
+  assert.equal(afternoon, date);
+  assert.equal(today(new Date("2026-11-23T23:00:00Z")), "2026-11-24");
+  assert.equal(laundryBalance(data, afternoon), 38860);
+  const next = adjustLaundryBalance(data, 4860, afternoon);
+  assert.equal(laundryBalance(next, afternoon), 4860);
+  assert.equal(laundryBalance(next, "2026-11-22"), 38860);
+  assert.deepEqual(next.transactions, data.transactions);
+  assert.equal(summary(next, "2026-11").cash, summary(data, "2026-11").cash);
+});
 
 test("reconciles card credit from the adjustment date without changing bank spending or past balances", () => {
   const original = addLaundryUse(workspace(), "wash", "2026-11-22").data;
@@ -41,7 +71,7 @@ test("reconciles card credit from the adjustment date without changing bank spen
   const scheduled = addLaundryUse(workspace(), "wash", "2026-11-24").data;
   assert.throws(
     () => adjustLaundryBalance(scheduled, 1000, date),
-    InsufficientLaundryCredit,
+    /later card entry on 2026-11-24/,
   );
 });
 function workspace(openingCard = 30000) {
