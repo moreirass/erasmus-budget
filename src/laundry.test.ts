@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   addLaundryUse,
+  adjustLaundryBalance,
   freshData,
   InsufficientLaundryCredit,
   laundryBalance,
@@ -10,10 +11,39 @@ import {
   summary,
   validateData,
 } from "./model.ts";
+import { monthSeries } from "./views/desktop/series.ts";
 import { laundryServiceLabel } from "./i18n.ts";
 import { importCSV, parseCSV, toCSV } from "./transfer.ts";
 
 const date = "2026-11-23";
+
+test("reconciles card credit from the adjustment date without changing bank spending or past balances", () => {
+  const original = addLaundryUse(workspace(), "wash", "2026-11-22").data;
+  const adjusted = adjustLaundryBalance(original, 8860, date);
+  assert.deepEqual(adjusted.transactions, original.transactions);
+  assert.equal(laundryBalance(adjusted, "2026-11-22"), 19000);
+  assert.equal(laundryBalance(adjusted, date), 8860);
+  assert.equal(summary(adjusted, "2026-11").cash, 0);
+  assert.equal(
+    monthSeries(adjusted, "2026-11", adjusted.transactions).days[22].card,
+    8860,
+  );
+  assert.equal(addLaundryUse(adjusted, "dry", date).transaction.credit, 6000);
+  assert.throws(
+    () => addLaundryUse(adjusted, "wash", date),
+    InsufficientLaundryCredit,
+  );
+  assert.deepEqual(
+    validateData(JSON.parse(JSON.stringify(adjusted))),
+    adjusted,
+  );
+
+  const scheduled = addLaundryUse(workspace(), "wash", "2026-11-24").data;
+  assert.throws(
+    () => adjustLaundryBalance(scheduled, 1000, date),
+    InsufficientLaundryCredit,
+  );
+});
 function workspace(openingCard = 30000) {
   const data = freshData();
   data.settings = {

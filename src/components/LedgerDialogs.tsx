@@ -5,7 +5,12 @@ import { Modal } from "./Primitives";
 import { UnsavedDialog } from "./UnsavedDialog";
 import { TransactionForm } from "./TransactionEditor";
 import { displayDate, transactionKindLabel, tr } from "../i18n";
-import { validateData, type Data, type Transaction } from "../model";
+import {
+  validateData,
+  type Data,
+  type LaundryService,
+  type Transaction,
+} from "../model";
 import { formatAmount } from "../formatAmount";
 import type { useExchangeRates } from "../useExchangeRates";
 import type { useLedger } from "../hooks/useLedger";
@@ -15,6 +20,7 @@ type LedgerDialogsProps = Pick<
   | "editor"
   | "setEditor"
   | "editorKind"
+  | "editorService"
   | "pendingDelete"
   | "setPendingDelete"
   | "removed"
@@ -30,6 +36,7 @@ function EditorDialog({
   fx,
   initial,
   initialKind,
+  initialService,
   close,
   save,
 }: {
@@ -38,6 +45,7 @@ function EditorDialog({
   fx: ReturnType<typeof useExchangeRates>;
   initial?: Transaction;
   initialKind: Transaction["kind"];
+  initialService: LaundryService;
   close: () => void;
   save: (transaction: Transaction) => void;
 }) {
@@ -52,6 +60,7 @@ function EditorDialog({
           month={month}
           initial={initial}
           initialKind={initialKind}
+          initialService={initialService}
           fx={fx}
           save={save}
           onDirtyChange={markDirty}
@@ -68,6 +77,7 @@ export function LedgerDialogs({
   editor,
   setEditor,
   editorKind,
+  editorService,
   pendingDelete,
   setPendingDelete,
   removed,
@@ -96,12 +106,15 @@ export function LedgerDialogs({
     <>
       {editor && (
         <EditorDialog
-          key={editor === "new" ? `new-${editorKind}` : editor.id}
+          key={
+            editor === "new" ? `new-${editorKind}-${editorService}` : editor.id
+          }
           data={data}
           month={month}
           fx={fx}
           initial={editor === "new" ? undefined : editor}
           initialKind={editorKind}
+          initialService={editorService}
           close={() => setEditor(null)}
           save={saveTransaction}
         />

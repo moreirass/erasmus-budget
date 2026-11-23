@@ -687,4 +687,13 @@ export const portuguese = {
   "Top-up": "Carregamento",
   "JSON replaces the full workspace, including plans and balances. CSV merges transactions and updates laundry prices when included. Download a backup first if you want to preserve the current version.":
     "O JSON substitui todo o espaço, incluindo planos e saldos. O CSV combina os movimentos e atualiza os preços da lavandaria quando constam do ficheiro. Descarrega primeiro uma cópia de segurança se quiseres preservar a versão atual.",
+  "Actual card balance (CZK)": "Saldo real do cartão (CZK)",
+  "Affects card credit from today without recording bank spending.":
+    "Corrige o crédito do cartão a partir de hoje, sem registar uma despesa bancária.",
+  "Adjust balance": "Ajustar saldo",
+  "Laundry card balance adjusted": "Saldo do cartão ajustado",
+  "Enter a valid laundry card balance.":
+    "Introduz um saldo válido para o cartão.",
+  "Invalid laundry card adjustment.": "Ajuste do saldo do cartão inválido.",
+  "Log a dry": "Secar",
 } as const;

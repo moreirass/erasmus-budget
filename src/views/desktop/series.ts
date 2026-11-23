@@ -30,6 +30,17 @@ export function monthSeries(data: Data, month: string, rows: Transaction[]) {
   let hasCard = openingCard > 0;
   const end = monthEnd(month);
 
+  for (const { date, delta } of data.settings.laundryAdjustments ?? []) {
+    if (date > end) continue;
+    hasCard = true;
+    if (date < start) openingCard += delta;
+    else {
+      const day = byDate.get(date) ?? { daily: 0, travel: 0, cardDelta: 0 };
+      day.cardDelta += delta;
+      byDate.set(date, day);
+    }
+  }
+
   for (const row of data.transactions) {
     if (row.date > end || (row.kind !== "wash" && row.kind !== "topup"))
       continue;

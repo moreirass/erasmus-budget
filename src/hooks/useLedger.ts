@@ -24,6 +24,7 @@ export function useLedger(
   const { data, update } = store;
   const [editor, setEditor] = useState<Transaction | "new" | null>(null);
   const [editorKind, setEditorKind] = useState<Transaction["kind"]>("expense");
+  const [editorService, setEditorService] = useState<LaundryService>("wash");
   const [pendingDelete, setPendingDelete] = useState<Transaction | null>(null);
   const [removed, setRemoved] = useState<Transaction | null>(null);
   const [laundryUndo, setLaundryUndo] = useState<string | null>(null);
@@ -99,8 +100,12 @@ export function useLedger(
       return false;
     }
   }
-  function openNew(kind: Transaction["kind"] = "expense") {
+  function openNew(
+    kind: Transaction["kind"] = "expense",
+    service: LaundryService = "wash",
+  ) {
     setEditorKind(kind);
+    setEditorService(service);
     setEditor("new");
   }
   function quickLaundry(service: LaundryService) {
@@ -193,6 +198,7 @@ export function useLedger(
     editor,
     setEditor,
     editorKind,
+    editorService,
     pendingDelete,
     setPendingDelete,
     removed,

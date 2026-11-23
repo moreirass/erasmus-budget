@@ -267,12 +267,18 @@ export function CardView({
       <section className="pocket-panel card-balance">
         <h2>{tr("Laundry credit")}</h2>
         <div className="pocket-number">{money(balance, "CZK")}</div>
-        <div className="button-pair">
+        <div className="button-pair laundry-card-actions">
           <button className="primary" onClick={() => openNew("topup")}>
             {tr("Top up")}
           </button>
           <button className="pocket-card-wash" onClick={() => openNew("wash")}>
             {tr("Log a wash")}
+          </button>
+          <button
+            className="pocket-card-wash"
+            onClick={() => openNew("wash", "dry")}
+          >
+            {tr("Log a dry")}
           </button>
         </div>
       </section>

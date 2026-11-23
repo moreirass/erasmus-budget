@@ -1,5 +1,12 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { Data, Plan, summary, Transaction, weeks } from "../model";
+import type {
+  Data,
+  LaundryService,
+  Plan,
+  summary,
+  Transaction,
+  weeks,
+} from "../model";
 import type { useExchangeRates } from "../useExchangeRates";
 export type ViewProps = {
   data: Data;
@@ -16,7 +23,7 @@ export type ViewProps = {
   search: string;
   filter: string;
   setTab: (s: string) => void;
-  openNew: (kind?: Transaction["kind"]) => void;
+  openNew: (kind?: Transaction["kind"], service?: LaundryService) => void;
   setEditor: (t: Transaction | "new" | null) => void;
   setPendingDelete: (t: Transaction | null) => void;
   setSearch: (s: string) => void;

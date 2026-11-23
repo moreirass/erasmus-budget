@@ -663,4 +663,12 @@ export const english = {
   "Top-up": "Top-up",
   "JSON replaces the full workspace, including plans and balances. CSV merges transactions and updates laundry prices when included. Download a backup first if you want to preserve the current version.":
     "JSON replaces the full workspace, including plans and balances. CSV merges transactions and updates laundry prices when included. Download a backup first if you want to preserve the current version.",
+  "Actual card balance (CZK)": "Actual card balance (CZK)",
+  "Affects card credit from today without recording bank spending.":
+    "Affects card credit from today without recording bank spending.",
+  "Adjust balance": "Adjust balance",
+  "Laundry card balance adjusted": "Laundry card balance adjusted",
+  "Enter a valid laundry card balance.": "Enter a valid laundry card balance.",
+  "Invalid laundry card adjustment.": "Invalid laundry card adjustment.",
+  "Log a dry": "Log a dry",
 } as const;

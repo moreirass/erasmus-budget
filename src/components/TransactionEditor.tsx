@@ -42,6 +42,7 @@ export function TransactionForm({
   month,
   initial,
   initialKind,
+  initialService = "wash",
   fx,
   save,
   extraFields,
@@ -53,6 +54,7 @@ export function TransactionForm({
   month: string;
   initial?: Transaction;
   initialKind: Transaction["kind"];
+  initialService?: LaundryService;
   fx: ReturnType<typeof useExchangeRates>;
   save: (t: Transaction) => void;
   extraFields?: ReactNode;
@@ -63,7 +65,7 @@ export function TransactionForm({
   const remembered = lastEntry(fx.currencies.map((c) => c.code));
   const [kind, setKind] = useState(initial?.kind ?? initialKind);
   const [service, setService] = useState<LaundryService>(
-    initial?.service ?? "wash",
+    initial ? (initial.service ?? "wash") : initialService,
   );
   const [categoryChoice, setCategoryChoice] = useState(
     initial ? categoryOption(initial.category, initial.travelType) : null,

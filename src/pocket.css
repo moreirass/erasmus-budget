@@ -424,6 +424,9 @@
   margin-top: 20px;
   max-width: 360px;
 }
+.card-balance .laundry-card-actions > button {
+  flex: 1 1 auto;
+}
 .pocket-settings {
   display: grid;
   gap: 9px;

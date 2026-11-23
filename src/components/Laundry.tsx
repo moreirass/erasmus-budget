@@ -1,8 +1,10 @@
 import { WashingMachine } from "lucide-react";
+import { useState } from "react";
 import { appLocale, laundryServiceLabel, tr } from "../i18n";
 import type { Commit } from "../hooks/types";
 import {
   laundryBalance,
+  adjustLaundryBalance,
   laundryPrice,
   laundryServices,
   money,
@@ -62,13 +64,64 @@ export function LaundryQuickCard({
   );
 }
 
-export function LaundryPriceSettings({
-  data,
-  save,
-}: {
-  data: Data;
-  save: Commit;
-}) {
+export function LaundryPriceSettings(props: { data: Data; save: Commit }) {
+  return (
+    <>
+      <LaundryBalanceSettings {...props} />
+      <LaundryPrices {...props} />
+    </>
+  );
+}
+
+function LaundryBalanceSettings({ data, save }: { data: Data; save: Commit }) {
+  const balance = laundryBalance(data);
+  const [error, setError] = useState("");
+  return (
+    <form
+      key={balance}
+      onSubmit={(event) => {
+        event.preventDefault();
+        setError("");
+        const amount = Number(
+          new FormData(event.currentTarget).get("cardBalance"),
+        );
+        try {
+          const next = adjustLaundryBalance(data, Math.round(amount * 100));
+          if (next !== data) save(next, "Laundry card balance adjusted");
+        } catch (error) {
+          setError((error as Error).message);
+        }
+      }}
+    >
+      <p className="muted">
+        {tr("Current card balance: {0}", [money(balance, "CZK")])}
+      </p>
+      <Field label={tr("Actual card balance (CZK)")}>
+        <input
+          type="number"
+          name="cardBalance"
+          inputMode="decimal"
+          min="0"
+          max="1000000"
+          step="0.01"
+          required
+          defaultValue={balance / 100}
+        />
+      </Field>
+      <p className="help">
+        {tr("Affects card credit from today without recording bank spending.")}
+      </p>
+      {error && (
+        <p className="form-error" role="alert">
+          {tr(error)}
+        </p>
+      )}
+      <button type="submit">{tr("Adjust balance")}</button>
+    </form>
+  );
+}
+
+function LaundryPrices({ data, save }: { data: Data; save: Commit }) {
   const wash = laundryPrice(data.settings, "wash");
   const dry = laundryPrice(data.settings, "dry");
   return (
@@ -90,9 +143,6 @@ export function LaundryPriceSettings({
         );
       }}
     >
-      <p className="muted">
-        {tr("Current card balance: {0}", [money(laundryBalance(data), "CZK")])}
-      </p>
       <div className="laundry-price-fields">
         <Field label={tr("Wash price (CZK)")}>
           <input
