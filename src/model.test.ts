@@ -20,6 +20,9 @@ import {
   currentPeriod,
   transactionOrder,
   planFor,
+  partialPlan,
+  removedTrackingPlanMonths,
+  retrackPlans,
   weeks,
   type Transaction,
 } from "./model.ts";
@@ -546,4 +549,114 @@ it("orders same-day entries by addition rather than recorded time or later edits
       .map((t) => t.id),
     ["later-add", "earlier-add"],
   );
+});
+
+describe("retracking monthly plans", () => {
+  it("prorates the new month's specific plan in leap February and preserves later overrides and movements", () => {
+    const prev = dynamicFreshData();
+    prev.settings = {
+      ...prev.settings,
+      start: "2028-01",
+      end: "2028-06",
+      firstDay: 1,
+    };
+    const base = prev.plans["2000-01"];
+    const january = resizePlan(base, 74000);
+    const february = resizePlan(base, 58000);
+    const march = resizePlan(base, 62000);
+    const may = resizePlan(base, 49000);
+    prev.plans = {
+      "2000-01": base,
+      "2028-01": january,
+      "2028-02": february,
+      "2028-03": march,
+      "2028-05": may,
+      "2028-06": january,
+    };
+    prev.transactions = [tx({ date: "2028-02-16", addedOrder: 1 })];
+    const next = {
+      ...prev,
+      settings: {
+        ...prev.settings,
+        start: "2028-02",
+        firstDay: 16,
+        end: "2028-05",
+      },
+    };
+    assert.deepEqual(removedTrackingPlanMonths(prev, next), [
+      "2028-01",
+      "2028-06",
+    ]);
+    const result = retrackPlans(prev, next);
+    assert.deepEqual(result.plans, {
+      "2000-01": base,
+      "2028-02": partialPlan(february, 14 / 29),
+      "2028-03": march,
+      "2028-05": may,
+    });
+    assert.deepEqual(result.transactions, prev.transactions);
+    assert.deepEqual(validateData(result), result);
+    assert.deepEqual(retrackPlans(result, result), result);
+    assert.deepEqual(retrackPlans(prev, result), result);
+    assert.deepEqual(prev.plans["2028-02"], february);
+  });
+
+  it("carries the last pre-start step forward and restores the full plan after a partial first month", () => {
+    const prev = freshData();
+    prev.settings = {
+      ...prev.settings,
+      start: "2026-11",
+      end: "2027-03",
+      firstDay: 1,
+    };
+    const inherited = resizePlan(prev.plans["2000-01"], 62000);
+    prev.plans["2026-11"] = inherited;
+    const next = {
+      ...prev,
+      settings: { ...prev.settings, start: "2026-12", firstDay: 17 },
+    };
+    const result = retrackPlans(prev, next);
+    assert.deepEqual(result.plans["2026-12"], partialPlan(inherited, 15 / 31));
+    assert.deepEqual(planFor(result, "2027-01"), inherited);
+    assert.deepEqual(removedTrackingPlanMonths(prev, next), ["2026-11"]);
+    assert.equal(result.plans["2026-11"], undefined);
+    const full = retrackPlans(result, {
+      ...result,
+      settings: { ...result.settings, firstDay: 1 },
+    });
+    assert.deepEqual(planFor(full, "2026-12"), inherited);
+    const laterFirstDay = retrackPlans(result, {
+      ...result,
+      settings: { ...result.settings, firstDay: 20 },
+    });
+    assert.deepEqual(
+      planFor(laterFirstDay, "2026-12"),
+      partialPlan(inherited, 12 / 31),
+    );
+  });
+
+  it("keeps the old partial's original source when the following month has a different specific plan", () => {
+    const prev = actualFreshData();
+    const base = prev.plans["2000-01"];
+    const following = resizePlan(base, 82000);
+    prev.plans["2026-11"] = following;
+    const next = { ...prev, settings: { ...prev.settings, firstDay: 16 } };
+    const result = retrackPlans(prev, next);
+    assert.deepEqual(planFor(result, "2026-10"), partialPlan(base, 16 / 31));
+    assert.deepEqual(result.plans["2026-11"], following);
+  });
+
+  it("leaves plans untouched when only the opening credit, rate or end month changes", () => {
+    const prev = actualFreshData();
+    prev.plans["2027-01"] = resizePlan(prev.plans["2000-01"], 61000);
+    for (const changes of [
+      { openingCard: 4000 },
+      { rate: 25 },
+      { end: "2026-12" },
+    ]) {
+      const next = { ...prev, settings: { ...prev.settings, ...changes } };
+      assert.deepEqual(removedTrackingPlanMonths(prev, next), []);
+      assert.deepEqual(retrackPlans(prev, next).plans, prev.plans);
+    }
+  });
 });

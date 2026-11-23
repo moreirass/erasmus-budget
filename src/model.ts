@@ -586,6 +586,67 @@ export function applyGlobalPlan(d: Data, p: Plan): Data {
   return validateData({ ...d, plans });
 }
 
+export function removedTrackingPlanMonths(prev: Data, next: Data): string[] {
+  if (
+    prev.settings.start === next.settings.start &&
+    firstTrackedDay(prev) === firstTrackedDay(next)
+  )
+    return [];
+  const { start, end } = next.settings;
+  return Object.keys(prev.plans)
+    .filter((month) => month !== "2000-01" && (month < start || month > end))
+    .sort();
+}
+
+function fullPlanAtTrackingStart(prev: Data, start: string): Plan {
+  const effective = planFor(prev, start);
+  const oldStart = prev.settings.start;
+  if (firstTrackedDay(prev) === 1 || effective !== prev.plans[oldStart])
+    return effective;
+
+  // The previous opening step is already partial. Prefer an exact source plan
+  // when it can be identified, otherwise reverse the proration per category.
+  const fraction = periodDays(prev, oldStart) / lastDay(oldStart);
+  const before = Object.keys(prev.plans)
+    .filter((month) => month < oldStart)
+    .sort()
+    .at(-1);
+  for (const candidate of [
+    prev.plans[nextMonth(oldStart)],
+    before ? prev.plans[before] : defaultPlan(),
+  ]) {
+    if (!candidate) continue;
+    const partial = partialPlan(candidate, fraction);
+    if (
+      categories.every(({ id }) => partial.limits[id] === effective.limits[id])
+    )
+      return candidate;
+  }
+  return partialPlan(effective, 1 / fraction);
+}
+
+export function retrackPlans(prev: Data, next: Data): Data {
+  const { start, end } = next.settings;
+  if (
+    prev.settings.start === start &&
+    firstTrackedDay(prev) === firstTrackedDay(next)
+  )
+    return validateData(next);
+
+  const plans = { ...prev.plans };
+  for (const month of removedTrackingPlanMonths(prev, next))
+    delete plans[month];
+  const full = fullPlanAtTrackingStart(prev, start);
+  if (firstTrackedDay(next) > 1) {
+    plans[start] = partialPlan(full, periodDays(next, start) / lastDay(start));
+    const following = nextMonth(start);
+    if (following <= end && !plans[following]) plans[following] = full;
+  } else if (plans[start] || planFor({ ...next, plans }, start) !== full) {
+    plans[start] = full;
+  }
+  return validateData({ ...next, plans });
+}
+
 // Legacy financial values and IDs are retained; only categories and budget configuration change.
 export function migrateTransaction(t: Transaction): Transaction {
   const category = String(t.category);

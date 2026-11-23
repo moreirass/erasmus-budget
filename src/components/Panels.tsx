@@ -26,14 +26,14 @@ import {
   trCount,
 } from "../i18n";
 import {
-  applyGlobalPlan,
   firstTrackedDay,
+  removedTrackingPlanMonths,
+  retrackPlans,
   applyMonthlyPlan,
   resizePlan,
   currentPeriod,
   months,
   categories,
-  globalPlan,
   money,
   monthLabel,
   periodStart,
@@ -856,10 +856,23 @@ export function SettingsForm({
           const startChanged =
             settings.start !== s.start ||
             settings.firstDay !== firstTrackedDay(data);
+          if (!startChanged) {
+            if (save(next)) setError("");
+            return;
+          }
+          const updated = retrackPlans(data, next);
+          const removed = removedTrackingPlanMonths(data, next);
           if (
-            save(startChanged ? applyGlobalPlan(next, globalPlan(data)) : next)
+            removed.length &&
+            !window.confirm(
+              tr(
+                "Changing tracking will remove saved plans for: {0}. Continue?",
+                [removed.map(monthLabel).join(", ")],
+              ),
+            )
           )
-            setError("");
+            return;
+          if (save(updated)) setError("");
         } catch (e) {
           setError((e as Error).message);
         }

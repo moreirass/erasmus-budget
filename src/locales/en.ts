@@ -1,4 +1,6 @@
 export const english = {
+  "Changing tracking will remove saved plans for: {0}. Continue?":
+    "Changing tracking will remove saved plans for: {0}. Continue?",
   Ledger: "Ledger",
   "No card credit. Add a top-up before recording a wash.":
     "No card credit. Add a top-up before recording a wash.",
