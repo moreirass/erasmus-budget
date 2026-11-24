@@ -68,7 +68,8 @@ export function PeriodFilter({
   weekList,
   view,
   setView,
-}: Pick<Period, "week" | "setWeek" | "weekList"> & {
+}: Pick<Period, "week" | "weekList"> & {
+  setWeek: (week: number) => void;
   view: string;
   setView: (view: string) => void;
 }) {

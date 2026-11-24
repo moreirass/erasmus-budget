@@ -1,6 +1,13 @@
-import type { ReactNode } from "react";
-import { Bell, Wallet, Plane } from "lucide-react";
-import { categories, limitLevels, money, type Category } from "../model";
+import { useState, type ReactNode } from "react";
+import { Wallet, Plane } from "lucide-react";
+import { PeriodFilter } from "../components/PeriodControls";
+import {
+  categories,
+  currentPeriod,
+  money,
+  summary,
+  type Category,
+} from "../model";
 import { tr } from "../i18n";
 import { PocketHistory, StatusBar } from "./PocketDetails";
 import type { ViewProps } from "./types";
@@ -9,6 +16,7 @@ export function OverviewView({
   data,
   month,
   stats,
+  weekList,
   setTab,
   setEditor,
   setPendingDelete,
@@ -84,37 +92,61 @@ export function OverviewView({
         />
       </section>
       {favorites}
-      <OverviewAlert data={data} month={month} setTab={setTab} />
+      <CategorySpendingCard
+        data={data}
+        month={month}
+        stats={stats}
+        weekList={weekList}
+      />
       {laundryCard}
     </div>
   );
 }
 
-export function OverviewAlert({
+export function CategorySpendingCard({
   data,
   month,
-  setTab,
-}: Pick<ViewProps, "data" | "month" | "setTab">) {
-  const alerts =
-    data.settings.limitAlerts === false ? [] : limitLevels(data, month);
-  if (!alerts.length) return null;
+  stats,
+  weekList,
+}: Pick<ViewProps, "data" | "month" | "stats" | "weekList">) {
+  const [view, setView] = useState("month");
+  const [selection, setSelection] = useState<{ month: string; week: number }>();
+  const current = currentPeriod(data);
+  const week = Math.min(
+    selection?.month === month
+      ? selection.week
+      : current.month === month
+        ? current.week
+        : 0,
+    weekList.length - 1,
+  );
+  const spending =
+    view === "week" ? summary(data, month, weekList[week]) : stats;
   return (
-    <button
-      className="pocket-alert"
-      onClick={() => setTab("Analysis")}
-      data-status={
-        alerts.some((alert) => alert.threshold === 100) ? "limit" : "near"
-      }
-    >
-      <Bell size={18} />
-      <span>
-        {alerts
-          .map(
-            (alert) =>
-              `${tr(categories.find((c) => c.id === alert.category)!.name)} · ${Math.floor(alert.percent)}%`,
-          )
-          .join("  /  ")}
-      </span>
-    </button>
+    <section className="pocket-panel category-spending">
+      <div className="pocket-section-head">
+        <h2>{tr("Spending by category")}</h2>
+        <span className="muted">
+          {tr("Total spent")} <strong>{money(spending.cash)}</strong>
+        </span>
+      </div>
+      <div className="category-spending-period">
+        <PeriodFilter
+          week={week}
+          weekList={weekList}
+          view={view}
+          setView={setView}
+          setWeek={(selected) => setSelection({ month, week: selected })}
+        />
+      </div>
+      <dl className="category-spending-list">
+        {categories.map((category) => (
+          <div key={category.id}>
+            <dt>{tr(category.name)}</dt>
+            <dd>{money(spending.spent[category.id])}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

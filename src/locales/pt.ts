@@ -1,5 +1,6 @@
 // English source messages are the canonical keys. Keep placeholders unchanged.
 export const portuguese = {
+  "Spending by category": "Despesas por categoria",
   "Changing tracking will remove saved plans for: {0}. Continue?":
     "Esta alteração ao acompanhamento vai remover os planos guardados para {0}. Queres continuar?",
   Ledger: "Registos",

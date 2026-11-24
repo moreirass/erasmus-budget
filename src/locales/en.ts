@@ -1,4 +1,5 @@
 export const english = {
+  "Spending by category": "Spending by category",
   "Changing tracking will remove saved plans for: {0}. Continue?":
     "Changing tracking will remove saved plans for: {0}. Continue?",
   Ledger: "Ledger",

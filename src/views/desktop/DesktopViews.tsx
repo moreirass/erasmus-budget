@@ -21,7 +21,7 @@ import {
 } from "../../model";
 import { StatusBar } from "../PocketDetails";
 import { displayTime } from "../../time";
-import { OverviewAlert } from "../Overview";
+import { CategorySpendingCard } from "../Overview";
 import type { ViewProps } from "../types";
 import { ChartPanel, colors, Donut, HorizontalBars, Plot } from "./Charts";
 import {
@@ -253,8 +253,13 @@ function DesktopHome({
       {data.favorites?.length ? (
         <div className="desktop-full">{favorites}</div>
       ) : null}
-      <div className="desktop-full desktop-extra">
-        <OverviewAlert data={data} month={month} setTab={setTab} />
+      <div className="desktop-full">
+        <CategorySpendingCard
+          data={data}
+          month={month}
+          stats={stats}
+          weekList={weekList}
+        />
       </div>
     </div>
   );
