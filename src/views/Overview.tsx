@@ -137,8 +137,8 @@ export function CategorySpendingCard({
           {money(budget)}
         </span>
       </div>
-      <StatusBar spent={spending.cash} cap={budget} />
       <div className="category-spending-period">
+        <StatusBar spent={spending.cash} cap={budget} />
         <PeriodFilter
           week={week}
           weekList={weekList}

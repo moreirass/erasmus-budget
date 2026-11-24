@@ -810,20 +810,24 @@
 .category-spending .pocket-section-head {
   flex-wrap: wrap;
 }
-.category-spending > .pocket-meter {
-  margin-top: 8px;
-}
 .category-spending-period {
-  display: flex;
-  align-items: end;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   gap: 8px 12px;
-  margin-top: 12px;
+  width: min(100%, 32rem);
+  margin-block-start: 8px;
+  margin-inline-start: auto;
+}
+.category-spending-period > .pocket-meter {
+  height: 4px;
 }
 .category-spending-period .period-toggle {
   width: auto;
 }
 .category-spending-period .field {
+  grid-column: 1 / -1;
+  justify-self: end;
   margin: 0;
 }
 .category-spending-list {
