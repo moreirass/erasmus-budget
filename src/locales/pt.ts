@@ -699,11 +699,4 @@ export const portuguese = {
     "Introduz um saldo válido para o cartão.",
   "Invalid laundry card adjustment.": "Ajuste do saldo do cartão inválido.",
   "Log a dry": "Secar",
-  "Pending sync": "Por sincronizar",
-  "Over budget by {0}": "Excedido em {0}",
-  "Balance adjustment": "Ajuste de saldo",
-  "Laundry credit at tracking start (CZK)":
-    "Crédito da lavandaria no início do acompanhamento (CZK)",
-  "Enter the credit you had when tracking began. To correct today's balance, use Laundry card settings.":
-    "Indica o crédito que tinhas quando começaste a acompanhar as despesas. Para corrigir o saldo atual, usa as definições do cartão da lavandaria.",
 } as const;

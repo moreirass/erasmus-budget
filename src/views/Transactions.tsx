@@ -4,17 +4,14 @@ import { Modal } from "../components/Primitives";
 import { tr, trCount } from "../i18n";
 import { categories } from "../model";
 import { PocketHistory } from "./PocketDetails";
-import { movementAdjustments } from "./historyEntries";
 import type { ViewProps } from "./types";
 
 export function TransactionsView({
   rows,
-  data,
-  month,
-  range,
   group,
   filter,
   search,
+  view,
   setGroup,
   setFilter,
   setSearch,
@@ -24,11 +21,10 @@ export function TransactionsView({
   periodFilter,
 }: ViewProps & { monthControl: ReactNode; periodFilter: ReactNode }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const entries = [
-    ...rows,
-    ...movementAdjustments({ data, month, range, group, filter, search }),
-  ];
-  const activeFilters = Number(group !== "all") + Number(filter !== "all");
+  const activeFilters =
+    Number(group !== "all") +
+    Number(filter !== "all") +
+    Number(view === "week");
   return (
     <div className="pocket-stack">
       <section
@@ -59,11 +55,11 @@ export function TransactionsView({
       <section className="pocket-panel" aria-label={tr("History")}>
         <div className="pocket-section-head">
           <span className="muted">
-            {trCount("{0} transactions", [entries.length])}
+            {trCount("{0} transactions", [rows.length])}
           </span>
         </div>
         <PocketHistory
-          rows={entries}
+          rows={rows}
           setEditor={setEditor}
           setPendingDelete={setPendingDelete}
         />

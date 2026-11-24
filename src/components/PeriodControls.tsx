@@ -19,10 +19,8 @@ export function PeriodControls({
   monthList,
   changeMonth,
   compact = false,
-  shortLabel = false,
 }: Pick<Period, "month" | "monthList" | "changeMonth"> & {
   compact?: boolean;
-  shortLabel?: boolean;
 }) {
   const index = monthList.indexOf(month);
   return (
@@ -47,12 +45,7 @@ export function PeriodControls({
       >
         {monthList.map((item) => (
           <option value={item} key={item}>
-            {shortLabel
-              ? new Intl.DateTimeFormat(appLocale(), {
-                  month: "short",
-                  year: "numeric",
-                }).format(new Date(item + "-15T12:00:00"))
-              : monthLabel(item)}
+            {monthLabel(item)}
           </option>
         ))}
       </select>

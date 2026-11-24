@@ -904,7 +904,7 @@ export function SettingsForm({
           placeholder={tr("Optional · entered manually")}
         />
       </Field>
-      <Field label={tr("Laundry credit at tracking start (CZK)")}>
+      <Field label={tr("Opening laundry credit (CZK)")}>
         <input
           type="number"
           name="card"
@@ -915,18 +915,13 @@ export function SettingsForm({
           defaultValue={s.openingCard / 100}
         />
       </Field>
-      <p className="help">
-        {tr(
-          "Enter the credit you had when tracking began. To correct today's balance, use Laundry card settings.",
-        )}
-      </p>
       {error && (
         <p role="alert" className="form-error">
           <AlertTriangle size={20} aria-hidden="true" />
           {errorMessage(error)}
         </p>
       )}
-      <button className="primary full">{tr("Save settings")}</button>
+      <button className="secondary full">{tr("Save settings")}</button>
     </form>
   );
 }

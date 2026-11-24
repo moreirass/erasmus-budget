@@ -12,7 +12,7 @@ import { RecurringManager } from "../components/Recurring";
 import { BudgetForm, ExchangePanel, SettingsForm } from "../components/Panels";
 import { Field } from "../components/Primitives";
 import { money, monthLabel, planFor, today } from "../model";
-import { appLocale, tr, type Language } from "../i18n";
+import { tr, type Language } from "../i18n";
 import { cloud } from "../store";
 import type { ViewProps } from "./types";
 import type { BudgetStore, Commit } from "../hooks/types";
@@ -215,15 +215,6 @@ export function SettingsView({
                   )}
                 </p>
                 <p className="sync-status">{tr(store.status)}</p>
-                <p className="help">
-                  {store.lastSyncedAt
-                    ? tr("Last sync: {0}", [
-                        new Date(store.lastSyncedAt).toLocaleString(
-                          appLocale(),
-                        ),
-                      ])
-                    : tr("Not synced yet")}
-                </p>
                 <div className="button-pair">
                   <button
                     onClick={() => store.sync()}

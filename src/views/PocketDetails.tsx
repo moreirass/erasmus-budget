@@ -1,4 +1,4 @@
-import { Pencil, Scale, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { weekLabel } from "../components/PeriodControls";
 import { displayDate, transactionKindLabel, tr } from "../i18n";
@@ -7,37 +7,13 @@ import {
   laundryBalance,
   money,
   summary,
+  transactionOrder,
   travelTypes,
+  type Transaction,
 } from "../model";
 import { CategoryIcon } from "../ui";
 import { displayTime } from "../time";
-import {
-  cardAdjustments,
-  historyOrder,
-  type HistoryEntry,
-} from "./historyEntries";
 import type { ViewProps } from "./types";
-
-export function BudgetBalance({
-  available,
-  className,
-}: {
-  available: number;
-  className: string;
-}) {
-  if (available < 0)
-    return (
-      <strong className={`${className} budget-exceeded`}>
-        {tr("Over budget by {0}", [money(-available)])}
-      </strong>
-    );
-  return (
-    <>
-      <strong className={className}>{money(available)}</strong>
-      <span className="muted">{tr("Remaining this month")}</span>
-    </>
-  );
-}
 
 export function StatusBar({ spent, cap }: { spent: number; cap: number }) {
   const percent = cap > 0 ? (spent / cap) * 100 : spent > 0 ? 100 : 0;
@@ -61,13 +37,12 @@ export function PocketHistory({
   setEditor,
   setPendingDelete,
   empty = tr("No transactions in this period."),
-}: Pick<ViewProps, "setEditor" | "setPendingDelete"> & {
-  rows: HistoryEntry[];
+}: Pick<ViewProps, "rows" | "setEditor" | "setPendingDelete"> & {
   limit?: number;
   empty?: string;
 }) {
-  const days = new Map<string, HistoryEntry[]>();
-  for (const row of [...rows].sort(historyOrder).slice(0, limit)) {
+  const days = new Map<string, Transaction[]>();
+  for (const row of [...rows].sort(transactionOrder).slice(0, limit)) {
     const entries = days.get(row.date) ?? [];
     entries.push(row);
     days.set(row.date, entries);
@@ -79,26 +54,7 @@ export function PocketHistory({
         <section key={day}>
           {!limit && <h3>{displayDate(day)}</h3>}
           <ul>
-            {entries.map((row) => {
-              if ("delta" in row)
-                return (
-                  <li key={row.id}>
-                    <span className="pocket-symbol">
-                      <Scale size={18} aria-hidden="true" />
-                    </span>
-                    <div className="pocket-item-label">
-                      <strong>{tr("Balance adjustment")}</strong>
-                      {limit && <small>{displayDate(row.date)}</small>}
-                    </div>
-                    <div className="pocket-item-value">
-                      <strong>
-                        {row.delta > 0 ? "+" : "−"}
-                        {money(Math.abs(row.delta), "CZK")}
-                      </strong>
-                    </div>
-                  </li>
-                );
-
+            {entries?.map((row: Transaction) => {
               const category = categories.find(
                 (item) => item.id === row.category,
               )!;
@@ -108,7 +64,7 @@ export function PocketHistory({
                   ? tr(category.name)
                   : `${transactionKindLabel(row)} · ${tr(category.name)}`;
               return (
-                <li key={`transaction:${row.id}`}>
+                <li key={row.id}>
                   <span className="pocket-symbol">
                     <CategoryIcon category={row.category} />
                   </span>
@@ -329,7 +285,7 @@ export function CardView({
       <section className="pocket-panel">
         <h2>{tr("Card history")}</h2>
         <PocketHistory
-          rows={[...rows, ...cardAdjustments(data)]}
+          rows={rows}
           setEditor={setEditor}
           setPendingDelete={setPendingDelete}
           empty={tr("No top-ups or washes yet.")}

@@ -378,9 +378,3 @@
     justify-content: end;
   }
 }
-
-.desktop-adjustment-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}

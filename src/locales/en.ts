@@ -674,11 +674,4 @@ export const english = {
   "Enter a valid laundry card balance.": "Enter a valid laundry card balance.",
   "Invalid laundry card adjustment.": "Invalid laundry card adjustment.",
   "Log a dry": "Log a dry",
-  "Pending sync": "Pending sync",
-  "Over budget by {0}": "Over budget by {0}",
-  "Balance adjustment": "Balance adjustment",
-  "Laundry credit at tracking start (CZK)":
-    "Laundry credit at tracking start (CZK)",
-  "Enter the credit you had when tracking began. To correct today's balance, use Laundry card settings.":
-    "Enter the credit you had when tracking began. To correct today's balance, use Laundry card settings.",
 } as const;

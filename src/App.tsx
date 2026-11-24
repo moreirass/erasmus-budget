@@ -5,14 +5,14 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Cloud, CloudUpload, X } from "lucide-react";
+import { X } from "lucide-react";
 import { FavoriteButtons } from "./components/Favorites";
 import { RecurringOverview } from "./components/Recurring";
 import { AppLayout } from "./components/AppLayout";
 import { LedgerDialogs } from "./components/LedgerDialogs";
 import { LaundryQuickCard } from "./components/Laundry";
 import { DataDialogs } from "./components/DataDialogs";
-import { tr } from "./i18n";
+import { appLocale, tr } from "./i18n";
 import { useBudget } from "./store";
 import { download } from "./transfer";
 import { useExchangeRates } from "./useExchangeRates";
@@ -159,12 +159,12 @@ export default function App() {
     >
       {store.user && (
         <p className="help sync-summary" role="status">
-          {store.dirty ? (
-            <CloudUpload size={15} aria-hidden="true" />
-          ) : (
-            <Cloud size={15} aria-hidden="true" />
-          )}
-          {store.dirty ? tr("Pending sync") : tr("No pending changes")}
+          {store.dirty ? tr("Unsynced changes") : tr("No pending changes")} ·{" "}
+          {store.lastSyncedAt
+            ? tr("Last sync: {0}", [
+                new Date(store.lastSyncedAt).toLocaleString(appLocale()),
+              ])
+            : tr("Not synced yet")}
         </p>
       )}
       {store.corrupt && (
@@ -258,7 +258,7 @@ export default function App() {
           {tab === "Transactions" && (
             <TransactionsView
               {...viewProps}
-              monthControl={<PeriodControls {...period} shortLabel />}
+              monthControl={<PeriodControls {...period} />}
               periodFilter={
                 <PeriodFilter {...period} view={view} setView={setView} />
               }

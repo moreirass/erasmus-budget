@@ -5,16 +5,13 @@ import {
   categories,
   currentPeriod,
   money,
-  monthEnd,
-  periodStart,
   periodDays,
   planFor,
   summary,
   type Category,
 } from "../model";
 import { tr } from "../i18n";
-import { BudgetBalance, PocketHistory, StatusBar } from "./PocketDetails";
-import { cardAdjustments } from "./historyEntries";
+import { PocketHistory, StatusBar } from "./PocketDetails";
 import type { ViewProps } from "./types";
 
 export function OverviewView({
@@ -63,7 +60,8 @@ export function OverviewView({
                 </span>
                 <h2>{label}</h2>
               </div>
-              <BudgetBalance available={remaining} className="pocket-number" />
+              <div className="pocket-number">{money(remaining)}</div>
+              <span className="muted">{tr("Remaining this month")}</span>
               <StatusBar spent={spent} cap={spent + remaining} />
               <dl className="budget-meta">
                 <div>
@@ -89,10 +87,7 @@ export function OverviewView({
           </button>
         </div>
         <PocketHistory
-          rows={[
-            ...stats.rows,
-            ...cardAdjustments(data, periodStart(data, month), monthEnd(month)),
-          ]}
+          rows={stats.rows}
           limit={3}
           setEditor={setEditor}
           setPendingDelete={setPendingDelete}

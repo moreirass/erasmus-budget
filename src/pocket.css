@@ -849,22 +849,3 @@
 .category-spending-meter {
   grid-column: 1 / -1;
 }
-
-.pocket-main .sync-summary {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-block: 0 10px;
-  font-size: 0.8125rem;
-  white-space: nowrap;
-}
-.pocket-number,
-.desktop-budget-value {
-  display: block;
-}
-.pocket-number.budget-exceeded,
-.desktop-budget-value.budget-exceeded {
-  color: var(--status-limit);
-  font-size: clamp(1.1rem, 2.4vw, 1.75rem);
-  letter-spacing: -0.02em;
-}

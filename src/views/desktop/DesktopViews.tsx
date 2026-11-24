@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ArrowDownUp, Pencil, Scale, Search, Trash2 } from "lucide-react";
+import { ArrowDownUp, Pencil, Search, Trash2 } from "lucide-react";
 import { weekLabel } from "../../components/PeriodControls";
 import { currencyDigits, currencyFactor } from "../../fx";
 import {
@@ -12,23 +12,16 @@ import {
 import {
   categories,
   money,
-  monthEnd,
   monthLabel,
   periodDays,
-  periodStart,
   summary,
+  transactionOrder,
   travelTypes,
   type Transaction,
 } from "../../model";
-import { BudgetBalance, StatusBar } from "../PocketDetails";
+import { StatusBar } from "../PocketDetails";
 import { displayTime } from "../../time";
 import { CategorySpendingCard } from "../Overview";
-import {
-  cardAdjustments,
-  historyOrder,
-  movementAdjustments,
-  type HistoryEntry,
-} from "../historyEntries";
 import type { ViewProps } from "../types";
 import { ChartPanel, colors, Donut, HorizontalBars, Plot } from "./Charts";
 import {
@@ -78,7 +71,8 @@ function BudgetCard({
       style={{ borderTopColor: colors[group] }}
     >
       <h2>{label}</h2>
-      <BudgetBalance available={available} className="desktop-budget-value" />
+      <strong className="desktop-budget-value">{money(available)}</strong>
+      <span className="muted">{tr("Remaining this month")}</span>
       <StatusBar spent={spent} cap={budget + support} />
       <dl>
         <div>
@@ -253,12 +247,7 @@ function DesktopHome({
           </button>
         </div>
         <MovementTable
-          rows={[
-            ...stats.rows,
-            ...cardAdjustments(data, periodStart(data, month), monthEnd(month)),
-          ]
-            .sort(historyOrder)
-            .slice(0, 8)}
+          rows={[...stats.rows].sort(transactionOrder).slice(0, 8)}
         />
       </section>
       {data.favorites?.length ? (
@@ -470,10 +459,6 @@ function DesktopMovements({
   periodFilter,
 }: Props) {
   const totals = movementSummary(rows, range?.days ?? periodDays(data, month));
-  const entries = [
-    ...rows,
-    ...movementAdjustments({ data, month, range, group, filter, search }),
-  ];
   return (
     <div className="desktop-grid">
       <section
@@ -552,10 +537,10 @@ function DesktopMovements({
         aria-label={tr("Transactions")}
       >
         <p className="desktop-empty">
-          {trCount("{0} transactions", [entries.length])}
+          {trCount("{0} transactions", [rows.length])}
         </p>
         <MovementTable
-          rows={entries}
+          rows={rows}
           setEditor={setEditor}
           setPendingDelete={setPendingDelete}
         />
@@ -565,27 +550,20 @@ function DesktopMovements({
 }
 
 type SortKey = "date" | "category" | "amount" | "eur";
-function rowCategory(row: HistoryEntry) {
-  if ("delta" in row) return tr("Balance adjustment");
+function rowCategory(row: Transaction) {
   const category = categories.find((item) => item.id === row.category)!;
   const subcategory = travelTypes.find((item) => item.id === row.travelType);
   return tr(subcategory?.name ?? category.name);
 }
 const signed = (row: Transaction, cents: number) =>
   row.kind === "income" ? cents : -cents;
-const entryCurrency = (row: HistoryEntry) =>
-  "delta" in row ? "CZK" : row.currency;
-const entryAmount = (row: HistoryEntry) =>
-  "delta" in row ? row.delta : signed(row, row.amount);
-const entryEur = (row: HistoryEntry) =>
-  "delta" in row || row.kind === "wash" ? 0 : signed(row, row.eur);
 
 function MovementTable({
   rows,
   setEditor,
   setPendingDelete,
 }: {
-  rows: HistoryEntry[];
+  rows: Transaction[];
   setEditor?: (row: Transaction) => void;
   setPendingDelete?: (row: Transaction) => void;
 }) {
@@ -613,14 +591,16 @@ function MovementTable({
             break;
           case "amount":
             order =
-              entryCurrency(a).localeCompare(entryCurrency(b)) ||
-              entryAmount(a) - entryAmount(b);
+              a.currency.localeCompare(b.currency) ||
+              signed(a, a.amount) - signed(b, b.amount);
             break;
           case "eur":
-            order = entryEur(a) - entryEur(b);
+            order =
+              signed(a, a.kind === "wash" ? 0 : a.eur) -
+              signed(b, b.kind === "wash" ? 0 : b.eur);
             break;
         }
-        return order * sort.direction || historyOrder(a, b);
+        return order * sort.direction || transactionOrder(a, b);
       })
     : rows;
   if (!rows.length)
@@ -667,27 +647,9 @@ function MovementTable({
       <tbody>
         {sorted.map((row) => {
           const category = rowCategory(row);
-          if ("delta" in row)
-            return (
-              <tr key={row.id}>
-                <td>{displayDate(row.date)}</td>
-                <td>
-                  <strong className="desktop-adjustment-label">
-                    <Scale size={16} aria-hidden="true" />
-                    {category}
-                  </strong>
-                </td>
-                <td>
-                  {row.delta > 0 ? "+" : "−"}
-                  {money(Math.abs(row.delta), "CZK")}
-                </td>
-                <td>{money(0)}</td>
-                {sortable && <td />}
-              </tr>
-            );
           const sign = row.kind === "income" ? "+" : "−";
           return (
-            <tr key={`transaction:${row.id}`}>
+            <tr key={row.id}>
               <td>
                 {displayDate(row.date)}
                 {row.time && <small>{displayTime(row.time)}</small>}
