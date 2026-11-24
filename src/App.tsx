@@ -6,7 +6,6 @@ import {
   useSyncExternalStore,
 } from "react";
 import { X } from "lucide-react";
-import { BackupReminder } from "./components/BackupReminder";
 import { FavoriteButtons } from "./components/Favorites";
 import { RecurringOverview } from "./components/Recurring";
 import { AppLayout } from "./components/AppLayout";
@@ -81,7 +80,6 @@ export default function App() {
   const transfer = useDataTransfer(store, setToast, () =>
     ledger.setRemoved(null),
   );
-  const { exportJSON } = transfer;
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [tab]);
@@ -213,15 +211,6 @@ export default function App() {
           fx={fx}
         />
       </div>
-      {tab === "Overview" && (
-        <BackupReminder
-          key={store.user?.id ?? "guest"}
-          data={data}
-          scope={store.user?.id ?? "guest"}
-          save={commit}
-          exportJSON={exportJSON}
-        />
-      )}
       {isDesktop &&
       (tab === "Overview" || tab === "Analysis" || tab === "Transactions") ? (
         <Suspense fallback={null}>

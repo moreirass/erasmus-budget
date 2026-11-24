@@ -5,6 +5,8 @@ import {
   categories,
   currentPeriod,
   money,
+  periodDays,
+  planFor,
   summary,
   type Category,
 } from "../model";
@@ -120,16 +122,22 @@ export function CategorySpendingCard({
         : 0,
     weekList.length - 1,
   );
-  const spending =
-    view === "week" ? summary(data, month, weekList[week]) : stats;
+  const range = view === "week" ? weekList[week] : undefined;
+  const spending = range ? summary(data, month, range) : stats;
+  const fraction = range ? range.days / periodDays(data, month) : 1;
+  const { limits } = planFor(data, month);
+  const budget = spending.budget + spending.income;
   return (
     <section className="pocket-panel category-spending">
       <div className="pocket-section-head">
         <h2>{tr("Spending by category")}</h2>
         <span className="muted">
           {tr("Total spent")} <strong>{money(spending.cash)}</strong>
+          {" / "}
+          {money(budget)}
         </span>
       </div>
+      <StatusBar spent={spending.cash} cap={budget} />
       <div className="category-spending-period">
         <PeriodFilter
           week={week}
@@ -140,12 +148,21 @@ export function CategorySpendingCard({
         />
       </div>
       <dl className="category-spending-list">
-        {categories.map((category) => (
-          <div key={category.id}>
-            <dt>{tr(category.name)}</dt>
-            <dd>{money(spending.spent[category.id])}</dd>
-          </div>
-        ))}
+        {categories.map(({ id, name }) => {
+          const spent = spending.spent[id];
+          const cap = Math.round(limits[id] * fraction) + spending.received[id];
+          return (
+            <div key={id}>
+              <dt>{tr(name)}</dt>
+              <dd>
+                <strong>{money(spent)}</strong> / {money(cap)}
+              </dd>
+              <dd className="category-spending-meter">
+                <StatusBar spent={spent} cap={cap} />
+              </dd>
+            </div>
+          );
+        })}
       </dl>
     </section>
   );

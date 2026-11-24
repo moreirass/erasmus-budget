@@ -6,7 +6,6 @@ import {
   RefreshCw,
   Upload,
 } from "lucide-react";
-import { BackupReminder } from "../components/BackupReminder";
 import { FavoriteManager } from "../components/Favorites";
 import { LaundryPriceSettings } from "../components/Laundry";
 import { RecurringManager } from "../components/Recurring";
@@ -162,14 +161,6 @@ export function SettingsView({
               key={JSON.stringify(data.settings)}
               data={data}
               save={(d) => commit(d, "Settings saved")}
-            />
-            <BackupReminder
-              key={store.user?.id ?? "guest"}
-              data={data}
-              scope={store.user?.id ?? "guest"}
-              save={commit}
-              exportJSON={exportJSON}
-              settings
             />
             <p className="help">
               {tr(

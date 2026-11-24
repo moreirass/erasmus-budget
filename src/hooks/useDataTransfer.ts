@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { recordExport } from "../components/BackupReminder";
 import { tr } from "../i18n";
 import { today, validateData, type Data } from "../model";
 import { download, importCSV, toCSV } from "../transfer";
@@ -37,7 +36,6 @@ export function useDataTransfer(
   }
   const exportJSON = () => {
     download(`pocket-${today()}.json`, JSON.stringify(data, null, 2));
-    recordExport(store.user?.id ?? "guest");
   };
   function exportCSV() {
     download(
@@ -45,7 +43,6 @@ export function useDataTransfer(
       toCSV(data),
       "text/csv;charset=utf-8",
     );
-    recordExport(store.user?.id ?? "guest");
   }
   function confirmImport() {
     if (!pendingImport) return;

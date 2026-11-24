@@ -128,9 +128,9 @@ New manual expenses and support remember the last successfully saved currency on
 
 Manage favorite expense templates in Settings. Each keeps its own name, amount, currency and category, plus an optional fixed manual rate. Overview buttons create an expense dated today and offer Undo. With no cached/manual rate, the favorite reports the missing rate; edit its fixed rate in Settings or refresh rates before retrying. Favorites cannot launch outside the tracking period. Installed PWAs expose an Add expense shortcut at `/?add=1`; the app consumes the parameter and opens the editor. Shortcut availability depends on the browser/OS.
 
-## Backup reminders and sync status
+## Backups and sync status
 
-The default backup reminder is seven days; change it to 1–365 days in the Data panel. Tracking starts when this version first opens in a workspace. Overview and Data show overdue reminders with a full JSON export button. The last export date is recorded per browser and workspace when a JSON/CSV download is requested; the browser cannot verify that you retained the file. CSV only includes transactions: use JSON to retain rules, favorites and settings. JSON and CSV are plain text, without encryption. Reminder/export timestamps and last-entry preferences remain on the device.
+Settings → Data includes a full JSON export for backing up transactions, plans, rules, favorites and settings. JSON and CSV exports are plain text, without encryption. Last-entry preferences remain on the device.
 
 Signed-in workspaces show pending changes and the time of the last successful sync. Sync remains manual and transfers the complete document. The existing Supabase schema and `save_budget` RPC are unchanged: a local envelope stores the last cloud revision, fetch compares it with the current cloud revision, and the RPC atomically checks `expected_revision` before writing. If phone and PC both edit revision N, the first upload becomes N+1 and the second detects a conflict. A race between fetch and upload is rejected by the RPC; press Sync again to display the conflicting versions. Changes made locally during upload remain dirty for another sync.
 
