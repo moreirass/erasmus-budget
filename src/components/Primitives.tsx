@@ -1,7 +1,46 @@
 import { visualFeedback } from "../visualFeedback";
 import { AlertCircle, X } from "lucide-react";
-import { useLayoutEffect, useId, useRef, type ReactNode } from "react";
+import {
+  useLayoutEffect,
+  useId,
+  useRef,
+  useState,
+  type InputHTMLAttributes,
+  type ReactNode,
+} from "react";
 import { tr } from "../i18n";
+
+export function NumberInput({
+  value,
+  onValue,
+  onBlur,
+  ...props
+}: Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "value" | "onChange" | "type"
+> & {
+  value: number;
+  onValue: (n: number) => void;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  return (
+    <input
+      {...props}
+      type="number"
+      value={draft ?? String(value)}
+      onChange={(event) => {
+        const text = event.target.value;
+        setDraft(text);
+        const number = Number(text);
+        if (text !== "" && Number.isFinite(number)) onValue(number);
+      }}
+      onBlur={(event) => {
+        setDraft(null);
+        onBlur?.(event);
+      }}
+    />
+  );
+}
 
 export function Modal({
   title,

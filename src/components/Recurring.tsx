@@ -18,7 +18,7 @@ import { formatAmount } from "../formatAmount";
 import { UnsavedDialog } from "./UnsavedDialog";
 import type { useExchangeRates } from "../useExchangeRates";
 import { TransactionForm } from "./TransactionEditor";
-import { Field } from "./Primitives";
+import { Field, NumberInput } from "./Primitives";
 type Props = {
   enabled?: boolean;
   data: Data;
@@ -143,13 +143,12 @@ function RuleEditor({
                     : "Day of week (0 Sunday, 6 Saturday)",
                 )}
               >
-                <input
-                  type="number"
+                <NumberInput
                   required
                   min={frequency === "monthly" ? 1 : 0}
                   max={frequency === "monthly" ? 31 : 6}
                   value={day}
-                  onChange={(e) => setDay(Number(e.target.value))}
+                  onValue={setDay}
                 />
               </Field>
               <p className="help">

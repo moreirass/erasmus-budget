@@ -24,7 +24,6 @@ export const english = {
   "Offline changes stay on this device until you sync online.":
     "Offline changes stay on this device until you sync online.",
   "Your devices, one budget": "Your devices, one budget",
-  "Backup reminders": "Backup reminders",
   "Review the file before making changes":
     "Review the file before making changes",
   "Transaction history for a spreadsheet":
@@ -547,7 +546,6 @@ export const english = {
   "Time to export a backup.": "Time to export a backup.",
   "Last export: {0}": "Last export: {0}",
   "No export recorded on this device.": "No export recorded on this device.",
-  "Backup reminder interval (days)": "Backup reminder interval (days)",
   "Export both versions": "Export both versions",
   "Unsynced changes": "Unsynced changes",
   "No pending changes": "No pending changes",
@@ -676,4 +674,11 @@ export const english = {
   "Enter a valid laundry card balance.": "Enter a valid laundry card balance.",
   "Invalid laundry card adjustment.": "Invalid laundry card adjustment.",
   "Log a dry": "Log a dry",
+  "Pending sync": "Pending sync",
+  "Over budget by {0}": "Over budget by {0}",
+  "Balance adjustment": "Balance adjustment",
+  "Laundry credit at tracking start (CZK)":
+    "Laundry credit at tracking start (CZK)",
+  "Enter the credit you had when tracking began. To correct today's balance, use Laundry card settings.":
+    "Enter the credit you had when tracking began. To correct today's balance, use Laundry card settings.",
 } as const;

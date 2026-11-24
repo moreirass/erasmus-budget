@@ -48,7 +48,7 @@ import {
 } from "../model";
 import { CategoryIcon, categoryInfo } from "../ui";
 import { useExchangeRates } from "../useExchangeRates";
-import { Field, Modal } from "./Primitives";
+import { Field, Modal, NumberInput } from "./Primitives";
 const toCents = (s: FormDataEntryValue | null) => Math.round(Number(s) * 100);
 export function ExchangePanel({
   fx,
@@ -706,14 +706,13 @@ export function BudgetForm({
           )}
         </p>
         <Field label={tr("Day-to-day monthly budget (€)")}>
-          <input
-            type="number"
+          <NumberInput
             min="0"
             max="1000000"
             step="0.01"
             required
             value={budget}
-            onChange={(e) => setBudget(Number(e.target.value))}
+            onValue={setBudget}
           />
         </Field>
         {categories
@@ -731,18 +730,17 @@ export function BudgetForm({
               </span>
               <span>
                 €{" "}
-                <input
+                <NumberInput
                   aria-label={tr("{0} monthly limit", [tr(c.name)])}
-                  type="number"
                   min="0"
                   max="1000000"
                   step="0.01"
                   required
                   value={limits[c.id] / 100}
-                  onChange={(e) =>
+                  onValue={(n) =>
                     setLimits({
                       ...limits,
-                      [c.id]: Math.round(Number(e.target.value) * 100),
+                      [c.id]: Math.round(n * 100),
                     })
                   }
                 />
@@ -775,17 +773,16 @@ export function BudgetForm({
           )}
         </p>
         <Field label={tr("Travel monthly budget (€)")}>
-          <input
-            type="number"
+          <NumberInput
             min="0"
             max="1000000"
             step="0.01"
             required
             value={limits.travel / 100}
-            onChange={(e) =>
+            onValue={(n) =>
               setLimits({
                 ...limits,
-                travel: Math.round(Number(e.target.value) * 100),
+                travel: Math.round(n * 100),
               })
             }
           />
@@ -907,7 +904,7 @@ export function SettingsForm({
           placeholder={tr("Optional · entered manually")}
         />
       </Field>
-      <Field label={tr("Opening laundry credit (CZK)")}>
+      <Field label={tr("Laundry credit at tracking start (CZK)")}>
         <input
           type="number"
           name="card"
@@ -918,13 +915,18 @@ export function SettingsForm({
           defaultValue={s.openingCard / 100}
         />
       </Field>
+      <p className="help">
+        {tr(
+          "Enter the credit you had when tracking began. To correct today's balance, use Laundry card settings.",
+        )}
+      </p>
       {error && (
         <p role="alert" className="form-error">
           <AlertTriangle size={20} aria-hidden="true" />
           {errorMessage(error)}
         </p>
       )}
-      <button className="secondary full">{tr("Save settings")}</button>
+      <button className="primary full">{tr("Save settings")}</button>
     </form>
   );
 }

@@ -25,7 +25,6 @@ export const portuguese = {
   "Offline changes stay on this device until you sync online.":
     "As alterações sem ligação ficam neste dispositivo até sincronizares com ligação à internet.",
   "Your devices, one budget": "Os teus dispositivos, um orçamento",
-  "Backup reminders": "Lembretes de cópia de segurança",
   "Review the file before making changes":
     "Revê o ficheiro antes de aplicar alterações",
   "Transaction history for a spreadsheet":
@@ -571,7 +570,6 @@ export const portuguese = {
   "Last export: {0}": "Última exportação: {0}",
   "No export recorded on this device.":
     "Ainda não há exportações registadas neste dispositivo.",
-  "Backup reminder interval (days)": "Intervalo do lembrete de backup (dias)",
   "Export both versions": "Exportar ambas as versões",
   "Unsynced changes": "Alterações por sincronizar",
   "No pending changes": "Sem alterações pendentes",
@@ -701,4 +699,11 @@ export const portuguese = {
     "Introduz um saldo válido para o cartão.",
   "Invalid laundry card adjustment.": "Ajuste do saldo do cartão inválido.",
   "Log a dry": "Secar",
+  "Pending sync": "Por sincronizar",
+  "Over budget by {0}": "Excedido em {0}",
+  "Balance adjustment": "Ajuste de saldo",
+  "Laundry credit at tracking start (CZK)":
+    "Crédito da lavandaria no início do acompanhamento (CZK)",
+  "Enter the credit you had when tracking began. To correct today's balance, use Laundry card settings.":
+    "Indica o crédito que tinhas quando começaste a acompanhar as despesas. Para corrigir o saldo atual, usa as definições do cartão da lavandaria.",
 } as const;
